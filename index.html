@@ -226,32 +226,44 @@
 
     async function loadMessages() {
 
-        const { data, error } =
-            await supabaseClient
-                .from("messages")
-                .select("*")
-                .order("created_at", {
-                    ascending: true
-                });
+    const { data, error } =
+        await supabaseClient
+            .from("messages")
+            .select("id, nickname, message, created_at")
+            .order("created_at", {
+                ascending: true
+            });
 
-        if (error) {
+    if (error) {
+        console.error("CHYBA DATABÁZE:", error);
 
-            console.error(error);
+        document.getElementById("messages").innerText =
+            "Chyba při načítání zpráv.";
 
-            document.getElementById("messages").innerText =
-                "Chyba při načítání zpráv.";
-
-            return;
-        }
-
-        const messages =
-            document.getElementById("messages");
-
-        messages.innerHTML = "";
-
-        data.forEach(addMessage);
+        return;
     }
 
+    const messages =
+        document.getElementById("messages");
+
+    messages.innerHTML = "";
+
+    data.forEach(message => {
+
+        addMessage(message);
+
+    });
+}
+
+    setInterval(() => {
+
+    if (document.getElementById("chat").style.display !== "none") {
+
+        loadMessages();
+
+    }
+
+}, 2000);
 
     // ==========================================
     // PŘIDÁNÍ ZPRÁVY NA OBRAZOVKU
