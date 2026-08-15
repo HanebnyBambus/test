@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Můj chat</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+        }
+
+        .box {
+            width: 90%;
+            max-width: 500px;
+            margin: 80px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        input, button {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #222;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #444;
+        }
+
+        #chat {
+            display: none;
+        }
+
+        #messages {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .message {
+            padding: 8px;
+            margin-bottom: 6px;
+            background: #e6e6e6;
+            border-radius: 8px;
+        }
+
+        .nickname {
+            font-weight: bold;
+        }
+
+        .logout {
+            background: #b00020;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- PŘIHLÁŠENÍ -->
+    <div class="box" id="login">
+        <h1>🔐 Přihlášení</h1>
+
+        <input
+            type="password"
+            id="password"
+            placeholder="Heslo"
+        >
+
+        <button onclick="login()">
+            Přihlásit
+        </button>
+
+        <p id="loginError"></p>
+    </div>
+
+
+    <!-- VÝBĚR PŘEZDÍVKY -->
+    <div class="box" id="nicknameBox" style="display:none;">
+        <h1>👤 Tvoje přezdívka</h1>
+
+        <input
+            type="text"
+            id="nickname"
+            placeholder="Zadej přezdívku"
+        >
+
+        <button onclick="enterChat()">
+            Vstoupit do chatu
+        </button>
+    </div>
+
+
+    <!-- CHAT -->
+    <div class="box" id="chat">
+
+        <h1>💬 Chat</h1>
+
+        <p>
+            Přihlášen jako:
+            <strong id="currentNickname"></strong>
+        </p>
+
+        <div id="messages"></div>
+
+        <input
+            type="text"
+            id="messageInput"
+            placeholder="Napiš zprávu..."
+            onkeydown="if(event.key === 'Enter') sendMessage()"
+        >
+
+        <button onclick="sendMessage()">
+            Odeslat
+        </button>
+
+        <button class="logout" onclick="logout()">
+            Odhlásit
+        </button>
+
+    </div>
+
+
+    <script>
+
+        // ==================================
+        // ZDE JE ZKUŠEBNÍ HESLO
+        // ==================================
+
+        const SPRAVNE_HESLO = "1234";
+
+
+        // Přihlášení
+        function login() {
+
+            const password =
+                document.getElementById("password").value;
+
+            if (password === SPRAVNE_HESLO) {
+
+                document.getElementById("login").style.display = "none";
+
+                document.getElementById("nicknameBox").style.display = "block";
+
+            } else {
+
+                document.getElementById("loginError").innerText =
+                    "❌ Špatné heslo!";
+            }
+        }
+
+
+        // Vstup do chatu
+        function enterChat() {
+
+            const nickname =
+                document.getElementById("nickname").value.trim();
+
+            if (nickname === "") {
+
+                alert("Nejdříve zadej přezdívku.");
+
+                return;
+            }
+
+            document.getElementById("nicknameBox").style.display = "none";
+
+            document.getElementById("chat").style.display = "block";
+
+            document.getElementById("currentNickname").innerText =
+                nickname;
+        }
+
+
+        // Odeslání zprávy
+        function sendMessage() {
+
+            const input =
+                document.getElementById("messageInput");
+
+            const message =
+                input.value.trim();
+
+            if (message === "") {
+                return;
+            }
+
+            const nickname =
+                document.getElementById("currentNickname").innerText;
+
+            const messages =
+                document.getElementById("messages");
+
+            const newMessage =
+                document.createElement("div");
+
+            newMessage.className = "message";
+
+            newMessage.innerHTML =
+                "<span class='nickname'>" +
+                nickname +
+                ":</span> " +
+                message;
+
+            messages.appendChild(newMessage);
+
+            input.value = "";
+
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+
+        // Odhlášení
+        function logout() {
+
+            document.getElementById("chat").style.display = "none";
+
+            document.getElementById("login").style.display = "block";
+
+            document.getElementById("password").value = "";
+        }
+
+    </script>
+
+</body>
+</html>
