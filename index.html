@@ -29,6 +29,7 @@
             --msg-mine-text: #ffffff;
             --time-color: #777777;
             --mine-time-color: #ccc;
+            --icon-color: #64748b;
         }
 
         body.dark-mode {
@@ -44,6 +45,7 @@
             --msg-mine-text: #ffffff;
             --time-color: #aaaaaa;
             --mine-time-color: #dddddd;
+            --icon-color: #94a3b8;
         }
 
         * {
@@ -106,6 +108,51 @@
             color: var(--text-color);
         }
 
+        /* Obal pro pole s heslem a ikonu očka */
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .password-wrapper input {
+            margin-top: 0;
+            padding-right: 45px;
+        }
+
+        .toggle-password-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin-top: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--icon-color);
+        }
+
+        .toggle-password-btn:hover {
+            background: transparent;
+            opacity: 0.8;
+        }
+
+        .toggle-password-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
         button {
             background: #222;
             color: white;
@@ -123,23 +170,6 @@
 
         .logout {
             background: #b00020;
-        }
-
-        .show-password-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 8px;
-            font-size: 14px;
-            color: var(--text-color);
-            cursor: pointer;
-        }
-
-        .show-password-label input[type="checkbox"] {
-            width: auto;
-            margin: 0;
-            padding: 0;
-            cursor: pointer;
         }
 
         #registerBox,
@@ -356,16 +386,17 @@
         placeholder="E-mail"
     >
 
-    <input
-        id="loginPassword"
-        type="password"
-        placeholder="Heslo"
-    >
-    
-    <label class="show-password-label">
-        <input type="checkbox" onchange="document.getElementById('loginPassword').type = this.checked ? 'text' : 'password'">
-        Zobrazit heslo
-    </label>
+    <div class="password-wrapper">
+        <input
+            id="loginPassword"
+            type="password"
+            placeholder="Heslo"
+        >
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('loginPassword', this)">
+            <svg class="eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        </button>
+    </div>
 
     <button onclick="login()">
         Přihlásit
@@ -398,26 +429,29 @@
         placeholder="E-mail"
     >
 
-    <input
-        id="registerPassword"
-        type="password"
-        placeholder="Heslo (min. 6 znaků)"
-    >
+    <div class="password-wrapper">
+        <input
+            id="registerPassword"
+            type="password"
+            placeholder="Heslo (min. 6 znaků)"
+        >
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('registerPassword', this)">
+            <svg class="eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        </button>
+    </div>
     
-    <input
-        id="registerPasswordConfirm"
-        type="password"
-        placeholder="Potvrď heslo znovu"
-    >
-    
-    <label class="show-password-label">
-        <input type="checkbox" onchange="
-            const isChecked = this.checked;
-            document.getElementById('registerPassword').type = isChecked ? 'text' : 'password';
-            document.getElementById('registerPasswordConfirm').type = isChecked ? 'text' : 'password';
-        ">
-        Zobrazit hesla
-    </label>
+    <div class="password-wrapper">
+        <input
+            id="registerPasswordConfirm"
+            type="password"
+            placeholder="Potvrď heslo znovu"
+        >
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('registerPasswordConfirm', this)">
+            <svg class="eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        </button>
+    </div>
 
     <input
         id="registerNickname"
@@ -484,17 +518,18 @@
         Pro vstup do chatu musíš zadat přístupové heslo.
     </p>
 
-    <input
-        id="roomPasswordInput"
-        type="password"
-        placeholder="Heslo místnosti"
-        onkeydown="if(event.key === 'Enter') verifyRoomPassword()"
-    >
-    
-    <label class="show-password-label">
-        <input type="checkbox" onchange="document.getElementById('roomPasswordInput').type = this.checked ? 'text' : 'password'">
-        Zobrazit heslo
-    </label>
+    <div class="password-wrapper">
+        <input
+            id="roomPasswordInput"
+            type="password"
+            placeholder="Heslo místnosti"
+            onkeydown="if(event.key === 'Enter') verifyRoomPassword()"
+        >
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('roomPasswordInput', this)">
+            <svg class="eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        </button>
+    </div>
 
     <button onclick="verifyRoomPassword()">
         Vstoupit do chatu
@@ -606,6 +641,27 @@ function toggleDarkMode() {
 // Načtení uloženého režimu při otevření stránky
 if (localStorage.getItem("chatDarkMode") === "true") {
     document.body.classList.add("dark-mode");
+}
+
+
+// ==========================================
+// PREPÍNÁNÍ ZOBRAZENÍ HESLA (SVG IONY)
+// ==========================================
+
+function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const eyeOpen = btn.querySelector('.eye-open');
+    const eyeClosed = btn.querySelector('.eye-closed');
+
+    if (input.type === "password") {
+        input.type = "text";
+        eyeOpen.style.display = "none";
+        eyeClosed.style.display = "block";
+    } else {
+        input.type = "password";
+        eyeOpen.style.display = "block";
+        eyeClosed.style.display = "none";
+    }
 }
 
 
