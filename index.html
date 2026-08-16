@@ -12,6 +12,40 @@
 
     <style>
 
+        /* ================================= */
+        /* CSS PROMĚNNÉ PRO TMAVÝ REŽIM */
+        /* ================================= */
+
+        :root {
+            --bg-color: #f2f2f2;
+            --box-bg: #ffffff;
+            --text-color: #222222;
+            --border-color: #cccccc;
+            --box-border: #ddd;
+            --sub-bg: #fafafa;
+            --msg-other-bg: #e8e8e8;
+            --msg-other-text: #222222;
+            --msg-mine-bg: #222222;
+            --msg-mine-text: #ffffff;
+            --time-color: #777777;
+            --mine-time-color: #ccc;
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --box-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --border-color: #444444;
+            --box-border: #333333;
+            --sub-bg: #262626;
+            --msg-other-bg: #333333;
+            --msg-other-text: #ffffff;
+            --msg-mine-bg: #0066cc;
+            --msg-mine-text: #ffffff;
+            --time-color: #aaaaaa;
+            --mine-time-color: #dddddd;
+        }
+
         * {
             box-sizing: border-box;
         }
@@ -19,17 +53,41 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: #f2f2f2;
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: background 0.3s, color 0.3s;
         }
 
         .box {
+            position: relative;
             width: 90%;
             max-width: 1100px;
             margin: 40px auto;
-            background: white;
+            background: var(--box-bg);
             padding: 25px;
             border-radius: 15px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        /* Tlačítko pro tmavý režim */
+        .theme-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: auto;
+            padding: 6px 12px;
+            margin-top: 0;
+            font-size: 14px;
+            background: #444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        body.dark-mode .theme-btn {
+            background: #e0e0e0;
+            color: #121212;
         }
 
         h1 {
@@ -43,13 +101,16 @@
             margin-top: 10px;
             font-size: 16px;
             border-radius: 8px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--border-color);
+            background: var(--box-bg);
+            color: var(--text-color);
         }
 
         button {
             background: #222;
             color: white;
             cursor: pointer;
+            border: none;
         }
 
         button:hover {
@@ -70,7 +131,7 @@
             gap: 8px;
             margin-top: 8px;
             font-size: 14px;
-            color: #555;
+            color: var(--text-color);
             cursor: pointer;
         }
 
@@ -107,9 +168,9 @@
 
         #usersBox {
             padding: 15px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--box-border);
             border-radius: 10px;
-            background: #fafafa;
+            background: var(--sub-bg);
 
             height: 455px;
             overflow-y: auto;
@@ -131,9 +192,9 @@
             display: flex;
             align-items: center;
             padding: 9px 10px;
-            background: white;
+            background: var(--box-bg);
             border-radius: 8px;
-            border: 1px solid #eee;
+            border: 1px solid var(--box-border);
         }
 
         .userStatus {
@@ -164,11 +225,11 @@
         #messages {
             height: 400px;
             overflow-y: auto;
-            border: 1px solid #ddd;
+            border: 1px solid var(--box-border);
             padding: 12px;
             margin-top: 15px;
             border-radius: 10px;
-            background: #fafafa;
+            background: var(--sub-bg);
         }
 
 
@@ -188,15 +249,15 @@
 
         .message.other {
             margin-right: auto;
-            background: #e8e8e8;
-            color: #222;
+            background: var(--msg-other-bg);
+            color: var(--msg-other-text);
             border-bottom-left-radius: 4px;
         }
 
         .message.mine {
             margin-left: auto;
-            background: #222;
-            color: white;
+            background: var(--msg-mine-bg);
+            color: var(--msg-mine-text);
             border-bottom-right-radius: 4px;
         }
 
@@ -211,18 +272,18 @@
         }
 
         .message.other .nickname {
-            color: #333;
+            color: var(--msg-other-text);
         }
 
         .time {
             display: block;
             font-size: 11px;
             margin-top: 6px;
-            color: #777;
+            color: var(--time-color);
         }
 
         .message.mine .time {
-            color: #ccc;
+            color: var(--mine-time-color);
         }
 
 
@@ -285,6 +346,7 @@
 <!-- ================================= -->
 
 <div class="box" id="loginBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
 
     <h1>🔐 Přihlášení</h1>
 
@@ -326,6 +388,7 @@
 <!-- ================================= -->
 
 <div class="box" id="registerBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
 
     <h1>👤 Registrace</h1>
 
@@ -384,6 +447,7 @@
 <!-- ================================= -->
 
 <div class="box" id="nicknameBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
 
     <h1>👤 Přezdívka</h1>
 
@@ -412,6 +476,7 @@
 <!-- ================================= -->
 
 <div class="box" id="chatPasswordBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
 
     <h1>🔒 Tajná místnost</h1>
 
@@ -452,6 +517,7 @@
 <!-- ================================= -->
 
 <div class="box" id="chat">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
 
     <h1>💬 Můj chat</h1>
 
@@ -525,6 +591,22 @@
 
 
 <script>
+
+
+// ==========================================
+// PŘEPÍNÁNÍ TMAVÉHO REŽIMU
+// ==========================================
+
+function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+    const isDark = document.body.classList.contains("dark-mode");
+    localStorage.setItem("chatDarkMode", isDark);
+}
+
+// Načtení uloženého režimu při otevření stránky
+if (localStorage.getItem("chatDarkMode") === "true") {
+    document.body.classList.add("dark-mode");
+}
 
 
 // ==========================================
