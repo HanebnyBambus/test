@@ -1200,34 +1200,37 @@ async function checkProfile() {
 /* ================================= */
 
 async function saveNickname() {
-
-    const nickname =
-        document.getElementById("nickname").value.trim();
-
-    if (!nickname) return;
-
-    const {
-        data: { user }
-    } = await supabaseClient.auth.getUser();
-
-    if (!user) return;
-
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
-            .from("profiles")
-            .insert({
-                id: user.id,
-                nickname
-            })
-            .select("nickname")
-            .single();
-
-    if (!error) {
-        openChat(data.nickname);
+    const nickname = document.getElementById("nickname").value.trim();
+    if (!nickname) {
+        alert("Přezdívka nesmí být prázdná!");
+        return;
     }
+
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) {
+        alert("Nejsi přihlášen!");
+        return;
+    }
+
+    console.log("Zkouším uložit ID:", user.id, "Přezdívka:", nickname);
+
+    const { data, error } = await supabaseClient
+        .from("profiles")
+        .insert({
+            id: user.id,
+            nickname: nickname
+        })
+        .select("nickname")
+        .single();
+
+    if (error) {
+        console.error("Chyba Supabase:", error);
+        alert("Chyba při ukládání: " + error.message);
+        return;
+    }
+
+    console.log("Úspěch:", data);
+    openChat(data.nickname);
 }
 
 
