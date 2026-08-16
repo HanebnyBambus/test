@@ -219,6 +219,7 @@
         /* Výchozí stav: Všechno kromě hesla je skryté */
         #dashboardBox,
         #pollsBox,
+        #profileBox,
         #loginBox,
         #registerBox,
         #nicknameBox,
@@ -662,6 +663,7 @@
     <div class="dashboard-buttons">
         <button onclick="enterChatFlow()">💬 Vstoupit do chatu</button>
         <button class="poll-btn" onclick="openPolls()">📊 Ankety (Připravuje se)</button>
+        <button class="secondary" onclick="showProfileSettings()">⚙️ Nastavení profilu</button>
         <button class="secondary" onclick="backToRoomPassword()">🚪 Zamknout a odejít</button>
     </div>
 </div>
@@ -672,6 +674,22 @@
     <h1>📊 Ankety</h1>
     <p style="text-align: center; padding: 40px 0;">Modul pro hlasování a ankety se momentálně vyvíjí...</p>
     <button class="secondary" onclick="showDashboard()">⬅️ Zpět do menu</button>
+</div>
+
+<!-- NASTAVENÍ PROFILU -->
+<div class="box" id="profileBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
+    <h1>⚙️ Nastavení profilu</h1>
+    
+    <div style="margin: 20px 0; text-align: center;">
+        <label for="favColor" style="display: block; margin-bottom: 10px; font-weight: bold;">Barva přezdívky:</label>
+        <input type="color" id="favColor" value="#3b82f6" style="width: 100px; height: 50px; padding: 0; cursor: pointer; border-radius: 8px; border: 1px solid var(--border-color); background: var(--box-bg);">
+    </div>
+
+    <button onclick="saveProfileSettings()">Uložit nastavení</button>
+    <button class="secondary" onclick="showDashboard()" style="margin-top: 10px;">⬅️ Zpět do menu</button>
+    
+    <p id="profileMessage"></p>
 </div>
 
 
@@ -724,7 +742,6 @@
 </div>
 
 <!-- NOVÉ HESLO (KROK B: Nastavení nového hesla po kliknutí z e-mailu) -->
-<!-- NOVÉ HESLO (KROK B: Nastavení nového hesla po kliknutí z e-mailu) -->
 <div class="box" id="updatePasswordBox">
     <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
     <h1>🔑 Nové heslo</h1>
@@ -744,7 +761,7 @@
         </button>
     </div>
 
-    <!-- NOVÉ POLE: Potvrzení hesla -->
+    <!-- POTVRZENÍ HESLA -->
     <div class="password-wrapper">
         <input id="newPasswordConfirmInput" type="password" placeholder="Potvrď nové heslo">
         <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('newPasswordConfirmInput', this)">
@@ -1067,12 +1084,9 @@ let roomAuthenticated = false;
 /* POSLUCHAČ OBNOVY HESLA */
 /* ================================= */
 
-// Supabase automaticky zachytí, když uživatel přijde s tokenem z e-mailu
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
     if (event === 'PASSWORD_RECOVERY') {
-        // Skryjeme všechna okna
         document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
-        // Ukážeme formulář pro zadání nového hesla
         document.getElementById('updatePasswordBox').style.display = 'block';
     }
 });
@@ -1095,7 +1109,6 @@ function verifyRoomPassword() {
         document.getElementById("roomPasswordMessage").innerText = "";
         document.getElementById("roomPasswordInput").value = "";
 
-        // Ukážeme rozcestník
         showDashboard();
 
     } else {
@@ -1105,15 +1118,59 @@ function verifyRoomPassword() {
 }
 
 function showDashboard() {
-    // Skryjeme všechna okna
     document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
-    // Zobrazíme Dashboard
     document.getElementById("dashboardBox").style.display = "block";
 }
 
 function openPolls() {
     document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
     document.getElementById("pollsBox").style.display = "block";
+}
+
+// Otevření nastavení profilu
+async function showProfileSettings() {
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
+    document.getElementById("profileBox").style.display = "block";
+    document.getElementById("profileMessage").innerText = "";
+
+    if (!currentUser) return;
+
+    const { data: profile } = await supabaseClient
+        .from("profiles")
+        .select("color")
+        .eq("id", currentUser.id)
+        .maybeSingle();
+
+    if (profile && profile.color) {
+        document.getElementById("favColor").value = profile.color;
+    }
+}
+
+// Uložení nastavení profilu (barvy)
+async function saveProfileSettings() {
+    if (!currentUser) return;
+
+    const color = document.getElementById("favColor").value;
+    const msg = document.getElementById("profileMessage");
+
+    msg.innerText = "Ukládám...";
+    msg.className = "info";
+
+    const { error } = await supabaseClient
+        .from("profiles")
+        .update({ color: color })
+        .eq("id", currentUser.id);
+
+    if (error) {
+        msg.innerText = "❌ Chyba: " + error.message;
+        msg.className = "error";
+    } else {
+        msg.innerText = "✅ Nastavení uloženo!";
+        msg.className = "success";
+        setTimeout(() => {
+            showDashboard();
+        }, 1500);
+    }
 }
 
 function backToRoomPassword() {
@@ -1163,7 +1220,6 @@ function showResetPassword() {
     document.getElementById("resetPasswordBox").style.display = "block";
 }
 
-// Odeslání e-mailu pro reset (Krok A)
 async function sendResetPassword() {
     const email = document.getElementById("resetEmail").value.trim();
     const msg = document.getElementById("resetMessage");
@@ -1178,7 +1234,7 @@ async function sendResetPassword() {
     msg.className = "info";
 
     const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + window.location.pathname // Dynamicky vygeneruje aktuální adresu aplikace
+        redirectTo: window.location.origin + window.location.pathname
     });
 
     if (error) {
@@ -1191,10 +1247,9 @@ async function sendResetPassword() {
     }
 }
 
-// Uložení nového hesla po kliknutí z e-mailu (Krok B)
 async function updatePassword() {
     const newPassword = document.getElementById("newPasswordInput").value;
-    const confirmPassword = document.getElementById("newPasswordConfirmInput").value; // Načtení druhého hesla
+    const confirmPassword = document.getElementById("newPasswordConfirmInput").value;
     const msg = document.getElementById("updatePasswordMessage");
 
     if (!newPassword || newPassword.length < 6) {
@@ -1203,7 +1258,6 @@ async function updatePassword() {
         return;
     }
 
-    // NOVÁ KONTROLA: Shodují se hesla?
     if (newPassword !== confirmPassword) {
         msg.innerText = "Hesla se neshodují.";
         msg.className = "error";
@@ -1224,7 +1278,6 @@ async function updatePassword() {
         msg.innerText = "✅ Heslo bylo úspěšně změněno! Za chvíli tě vrátíme zpět.";
         msg.className = "success";
         
-        // Po úspěchu vyčistíme hesla a restartujeme aplikaci
         setTimeout(() => {
             document.getElementById("newPasswordInput").value = "";
             document.getElementById("newPasswordConfirmInput").value = "";
@@ -1432,8 +1485,6 @@ async function saveNickname() {
         return;
     }
 
-    console.log("Zkouším uložit ID:", user.id, "Přezdívka:", nickname);
-
     const { data, error } = await supabaseClient
         .from("profiles")
         .insert({
@@ -1449,7 +1500,6 @@ async function saveNickname() {
         return;
     }
 
-    console.log("Úspěch:", data);
     openChat(data.nickname);
 }
 
@@ -1494,7 +1544,7 @@ async function loadUsers() {
     } =
         await supabaseClient
             .from("profiles")
-            .select("id, nickname")
+            .select("id, nickname, color")
             .order("nickname", {
                 ascending: true
             });
@@ -1534,7 +1584,7 @@ function renderUsers(users) {
 
         const avatar = document.createElement("div");
         avatar.className = "avatar avatar-small";
-        avatar.style.backgroundColor = getAvatarColor(user.nickname);
+        avatar.style.backgroundColor = user.color || getAvatarColor(user.nickname);
         avatar.textContent = user.nickname ? user.nickname.charAt(0) : "?";
 
         const nickname =
@@ -1714,6 +1764,18 @@ async function loadMessages() {
         return;
     }
 
+    // Načteme profily, abychom znali vlastní barvy uživatelů
+    let profilesMap = {};
+    const { data: profilesData } = await supabaseClient
+        .from("profiles")
+        .select("id, color");
+    
+    if (profilesData) {
+        profilesData.forEach(p => {
+            profilesMap[p.id] = p.color;
+        });
+    }
+
     let reactionsData = [];
     if (messagesData && messagesData.length > 0) {
         const messageIds = messagesData.map(msg => msg.id);
@@ -1729,11 +1791,11 @@ async function loadMessages() {
 
     messagesData.forEach(msg => {
         msg.reactions = reactionsData.filter(rx => rx.message_id === msg.id);
+        // Přiřadíme uživatelskou barvu (pokud ji má uloženou, jinak fallback na generátor)
+        msg.userColor = profilesMap[msg.user_id] || getAvatarColor(msg.nickname);
     });
 
     const messages = document.getElementById("messages");
-    
-    // Zjistíme, zda je uživatel na spodku chatu (s rezervou 50px)
     const isAtBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 50;
 
     messages.innerHTML = "";
@@ -1744,7 +1806,6 @@ async function loadMessages() {
         });
     }
 
-    // Skrolujeme dolů POUZE pokud uživatel byl dole
     if (isAtBottom) {
         messages.scrollTop = messages.scrollHeight;
     }
@@ -1782,7 +1843,9 @@ function addMessage(message, currentUserId) {
 
     const nickWrapper = document.createElement("div");
     nickWrapper.className = "nickname-wrapper";
-    const avatarColor = getAvatarColor(message.nickname);
+    
+    // Použijeme vlastní barvu zprávy
+    const avatarColor = message.userColor || getAvatarColor(message.nickname);
     nickWrapper.style.backgroundColor = avatarColor;
 
     const avatar = document.createElement("div");
@@ -2082,7 +2145,6 @@ async function sendMessage() {
 
     input.value = "";
     
-    // Po odeslání vlastní zprávy okamžitě skrolujeme dolů
     const messages = document.getElementById("messages");
     messages.scrollTop = messages.scrollHeight;
 }
@@ -2158,8 +2220,6 @@ async function addReaction(messageId, emoji) {
 
 async function checkSession() {
     
-    // Pokud uživatel zrovna přišel z emailu pro obnovu hesla, 
-    // klasickou relaci nespouštíme, chceme ho nechat změnit heslo
     const hash = window.location.hash;
     if (hash && hash.includes("type=recovery")) {
         return;
@@ -2210,6 +2270,17 @@ async function executeSearch() {
         return;
     }
 
+    let profilesMap = {};
+    const { data: profilesData } = await supabaseClient
+        .from("profiles")
+        .select("id, color");
+    
+    if (profilesData) {
+        profilesData.forEach(p => {
+            profilesMap[p.id] = p.color;
+        });
+    }
+
     let reactionsData = [];
     if (messagesData && messagesData.length > 0) {
         const messageIds = messagesData.map(msg => msg.id);
@@ -2222,6 +2293,7 @@ async function executeSearch() {
 
     messagesData.forEach(msg => {
         msg.reactions = reactionsData.filter(rx => rx.message_id === msg.id);
+        msg.userColor = profilesMap[msg.user_id] || getAvatarColor(msg.nickname);
     });
 
     const messages = document.getElementById("messages");
