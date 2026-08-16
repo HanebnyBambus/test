@@ -48,15 +48,9 @@
             --icon-color: #94a3b8;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
-        /* Skrytí ikony očka v Edge */
-        input::-ms-reveal,
-        input::-ms-clear {
-            display: none;
-        }
+        input::-ms-reveal, input::-ms-clear { display: none; }
 
         body {
             margin: 0;
@@ -91,18 +85,11 @@
             border-radius: 6px;
             cursor: pointer;
         }
+        body.dark-mode .theme-btn { background: #e0e0e0; color: #121212; }
 
-        body.dark-mode .theme-btn {
-            background: #e0e0e0;
-            color: #121212;
-        }
+        h1 { text-align: center; }
 
-        h1 {
-            text-align: center;
-        }
-
-        input,
-        button {
+        input, button {
             width: 100%;
             padding: 12px;
             margin-top: 10px;
@@ -113,373 +100,87 @@
             color: var(--text-color);
         }
 
-        .password-wrapper {
-            position: relative;
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .password-wrapper input {
-            margin-top: 0;
-            padding-right: 45px;
-        }
+        .password-wrapper { position: relative; width: 100%; margin-top: 10px; }
+        .password-wrapper input { margin-top: 0; padding-right: 45px; }
 
         .toggle-password-btn {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            margin-top: 0;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            background: transparent; border: none; cursor: pointer; padding: 0; margin-top: 0;
+            width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
             color: var(--icon-color);
         }
+        .toggle-password-btn:hover { background: transparent; opacity: 0.8; }
+        .toggle-password-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-        .toggle-password-btn:hover {
-            background: transparent;
-            opacity: 0.8;
-        }
+        button { background: #222; color: white; cursor: pointer; border: none; }
+        button:hover { background: #444; }
+        .secondary { background: #777; }
+        .logout { background: #b00020; }
 
-        .toggle-password-btn svg {
-            width: 20px;
-            height: 20px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
+        .chatHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .chatHeader p { margin: 0; }
+        .logout-small { width: auto; padding: 8px 16px; margin-top: 0; font-size: 14px; }
 
-        button {
-            background: #222;
-            color: white;
-            cursor: pointer;
-            border: none;
-        }
+        #registerBox, #nicknameBox, #chatPasswordBox, #chat { display: none; }
 
-        button:hover {
-            background: #444;
-        }
+        .chatLayout { display: grid; grid-template-columns: 240px 1fr; gap: 20px; align-items: start; }
+        
+        #usersBox { padding: 15px; border: 1px solid var(--box-border); border-radius: 10px; background: var(--sub-bg); height: 520px; overflow-y: auto; }
+        #usersTitle { font-weight: bold; font-size: 18px; margin-bottom: 12px; }
+        #usersList { display: flex; flex-direction: column; gap: 7px; }
+        
+        .userItem { display: flex; align-items: center; padding: 9px 10px; background: var(--box-bg); border-radius: 8px; border: 1px solid var(--box-border); }
+        .userStatus { margin-right: 8px; font-size: 13px; }
+        .userNickname { font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .offline { color: #888; }
 
-        .secondary {
-            background: #777;
-        }
+        .chatMain { min-width: 0; position: relative; }
+        
+        #messages { height: 420px; overflow-y: auto; border: 1px solid var(--box-border); padding: 12px; border-radius: 10px; background: var(--sub-bg); }
+        
+        #typingIndicator { height: 20px; font-size: 13px; font-style: italic; color: var(--time-color); margin-top: 5px; padding-left: 5px; }
 
-        .logout {
-            background: #b00020;
-        }
+        .inputGroup { display: flex; gap: 8px; margin-top: 5px; position: relative; }
+        .inputGroup input { margin-top: 0; }
+        .emoji-btn { width: 45px; margin-top: 0; font-size: 20px; padding: 0; background: var(--sub-bg); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 8px; flex-shrink: 0; }
+        .emoji-btn:hover { background: var(--box-border); }
+        .inputGroup button.send-btn { width: 120px; margin-top: 0; flex-shrink: 0; }
 
-        .chatHeader {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
+        #emojiPicker { display: none; position: absolute; bottom: 55px; right: 130px; background: var(--box-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); grid-template-columns: repeat(6, 1fr); gap: 8px; z-index: 100; }
+        .emoji-item { font-size: 22px; cursor: pointer; text-align: center; user-select: none; padding: 4px; border-radius: 5px; }
+        .emoji-item:hover { background: var(--sub-bg); }
 
-        .chatHeader p {
-            margin: 0;
-        }
+        .message { position: relative; width: fit-content; max-width: 75%; padding: 10px 14px; margin-bottom: 10px; border-radius: 14px; clear: both; word-wrap: break-word; }
+        .message.other { margin-right: auto; background: var(--msg-other-bg); color: var(--msg-other-text); border-bottom-left-radius: 4px; }
+        
+        /* Prostor pro 2 tlačítka (úprava + mazání) u vlastní zprávy */
+        .message.mine { margin-left: auto; background: var(--msg-mine-bg); color: var(--msg-mine-text); border-bottom-right-radius: 4px; padding-right: 50px; }
 
-        .logout-small {
-            width: auto;
-            padding: 8px 16px;
-            margin-top: 0;
-            font-size: 14px;
-        }
+        .nickname { display: block; font-weight: bold; margin-bottom: 4px; }
+        .text { display: block; margin-bottom: 4px; }
+        .message.mine .nickname { color: #ddd; }
+        .message.other .nickname { color: var(--msg-other-text); }
+        .time { display: block; font-size: 11px; color: var(--time-color); }
+        .message.mine .time { color: var(--mine-time-color); }
 
-        #registerBox,
-        #nicknameBox,
-        #chatPasswordBox,
-        #chat {
-            display: none;
-        }
-
-
-        /* ================================= */
-        /* HLAVNÍ ROZLOŽENÍ CHATU */
-        /* ================================= */
-
-        .chatLayout {
-            display: grid;
-            grid-template-columns: 240px 1fr;
-            gap: 20px;
-            align-items: start;
-        }
-
-
-        /* ================================= */
-        /* LEVÝ PANEL - UŽIVATELÉ */
-        /* ================================= */
-
-        #usersBox {
-            padding: 15px;
-            border: 1px solid var(--box-border);
-            border-radius: 10px;
-            background: var(--sub-bg);
-            height: 520px;
-            overflow-y: auto;
-        }
-
-        #usersTitle {
-            font-weight: bold;
-            font-size: 18px;
-            margin-bottom: 12px;
-        }
-
-        #usersList {
-            display: flex;
-            flex-direction: column;
-            gap: 7px;
-        }
-
-        .userItem {
-            display: flex;
-            align-items: center;
-            padding: 9px 10px;
-            background: var(--box-bg);
-            border-radius: 8px;
-            border: 1px solid var(--box-border);
-        }
-
-        .userStatus {
-            margin-right: 8px;
-            font-size: 13px;
-        }
-
-        .userNickname {
-            font-weight: bold;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .offline {
-            color: #888;
-        }
-
-
-        /* ================================= */
-        /* PRAVÁ ČÁST - CHAT */
-        /* ================================= */
-
-        .chatMain {
-            min-width: 0;
-            position: relative;
-        }
-
-        #messages {
-            height: 420px;
-            overflow-y: auto;
-            border: 1px solid var(--box-border);
-            padding: 12px;
-            border-radius: 10px;
-            background: var(--sub-bg);
-        }
-
-        /* Indikátor psaní */
-        #typingIndicator {
-            height: 20px;
-            font-size: 13px;
-            font-style: italic;
-            color: var(--time-color);
-            margin-top: 5px;
-            padding-left: 5px;
-        }
-
-        .inputGroup {
-            display: flex;
-            gap: 8px;
-            margin-top: 5px;
-            position: relative;
-        }
-
-        .inputGroup input {
-            margin-top: 0;
-        }
-
-        .emoji-btn {
-            width: 45px;
-            margin-top: 0;
-            font-size: 20px;
-            padding: 0;
-            background: var(--sub-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            border-radius: 8px;
-            flex-shrink: 0;
-        }
-
-        .emoji-btn:hover {
-            background: var(--box-border);
-        }
-
-        .inputGroup button.send-btn {
-            width: 120px;
-            margin-top: 0;
-            flex-shrink: 0;
-        }
-
-        /* Emoji nabídka */
-        #emojiPicker {
-            display: none;
-            position: absolute;
-            bottom: 55px;
-            right: 130px;
-            background: var(--box-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            grid-template-columns: repeat(6, 1fr);
-            gap: 8px;
-            z-index: 100;
-        }
-
-        .emoji-item {
-            font-size: 22px;
-            cursor: pointer;
-            text-align: center;
-            user-select: none;
-            padding: 4px;
-            border-radius: 5px;
-        }
-
-        .emoji-item:hover {
-            background: var(--sub-bg);
-        }
-
-
-        /* ================================= */
-        /* ZPRÁVY & MAZÁNÍ */
-        /* ================================= */
-
-        .message {
-            position: relative;
-            width: fit-content;
-            max-width: 75%;
-            padding: 10px 14px;
-            margin-bottom: 10px;
-            border-radius: 14px;
-            clear: both;
-            word-wrap: break-word;
-        }
-
-        .message.other {
-            margin-right: auto;
-            background: var(--msg-other-bg);
-            color: var(--msg-other-text);
-            border-bottom-left-radius: 4px;
-        }
-
-        .message.mine {
-            margin-left: auto;
-            background: var(--msg-mine-bg);
-            color: var(--msg-mine-text);
-            border-bottom-right-radius: 4px;
-            padding-right: 32px; /* Prostor pro popelnici */
-        }
-
-        .nickname {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-
-        .text {
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .message.mine .nickname {
-            color: #ddd;
-        }
-
-        .message.other .nickname {
-            color: var(--msg-other-text);
-        }
-
-        .time {
-            display: block;
-            font-size: 11px;
-            color: var(--time-color);
-        }
-
-        .message.mine .time {
-            color: var(--mine-time-color);
-        }
-
-        /* Tlačítko pro smazání zprávy */
-        .delete-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: transparent;
-            border: none;
-            color: #ff6b6b;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 0;
-            margin: 0;
-            width: auto;
-            opacity: 0.7;
-        }
-
-        .delete-btn:hover {
-            opacity: 1;
-            background: transparent;
-        }
-
-
-        /* ================================= */
-        /* OSTATNÍ */
-        /* ================================= */
+        /* Ikony pro akce (upravit / smazat) */
+        .message-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 5px; }
+        .action-btn { background: transparent; border: none; cursor: pointer; font-size: 13px; padding: 0; margin: 0; width: auto; opacity: 0.6; }
+        .action-btn:hover { opacity: 1; background: transparent; transform: scale(1.1); }
+        .edit-btn { color: #ffca28; }
+        .delete-btn { color: #ff6b6b; }
 
         .error { color: #b00020; }
         .success { color: green; }
         .info { color: #555; }
 
-
-        /* ================================= */
-        /* MOBIL */
-        /* ================================= */
-
         @media (max-width: 700px) {
-            .box {
-                width: 95%;
-                margin: 15px auto;
-                padding: 15px;
-            }
-
-            .chatLayout {
-                grid-template-columns: 1fr;
-            }
-
-            #usersBox {
-                height: auto;
-                max-height: 220px;
-            }
-
-            #messages {
-                height: 380px;
-            }
-
-            .message {
-                max-width: 85%;
-            }
-
-            #emojiPicker {
-                right: 0;
-                left: 0;
-                margin: auto;
-                width: fit-content;
-            }
+            .box { width: 95%; margin: 15px auto; padding: 15px; }
+            .chatLayout { grid-template-columns: 1fr; }
+            #usersBox { height: auto; max-height: 220px; }
+            #messages { height: 380px; }
+            .message { max-width: 85%; }
+            #emojiPicker { right: 0; left: 0; margin: auto; width: fit-content; }
         }
 
     </style>
@@ -487,214 +188,93 @@
 
 <body>
 
-
-<!-- ================================= -->
 <!-- PŘIHLÁŠENÍ -->
-<!-- ================================= -->
-
 <div class="box" id="loginBox">
     <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
-
     <h1>🔐 Přihlášení</h1>
-
-    <input
-        id="loginEmail"
-        type="email"
-        placeholder="E-mail"
-    >
-
+    <input id="loginEmail" type="email" placeholder="E-mail">
     <div class="password-wrapper">
-        <input
-            id="loginPassword"
-            type="password"
-            placeholder="Heslo"
-        >
+        <input id="loginPassword" type="password" placeholder="Heslo">
         <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('loginPassword', this)">
             <svg class="eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
         </button>
     </div>
-
-    <button onclick="login()">
-        Přihlásit
-    </button>
-
-    <button
-        class="secondary"
-        onclick="showRegister()"
-    >
-        Vytvořit nový účet
-    </button>
-
+    <button onclick="login()">Přihlásit</button>
+    <button class="secondary" onclick="showRegister()">Vytvořit nový účet</button>
     <p id="loginMessage"></p>
-
 </div>
 
-
-<!-- ================================= -->
 <!-- REGISTRACE -->
-<!-- ================================= -->
-
 <div class="box" id="registerBox">
     <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
-
     <h1>👤 Registrace</h1>
-
-    <input
-        id="registerEmail"
-        type="email"
-        placeholder="E-mail"
-    >
-
+    <input id="registerEmail" type="email" placeholder="E-mail">
     <div class="password-wrapper">
-        <input
-            id="registerPassword"
-            type="password"
-            placeholder="Heslo (min. 6 znaků)"
-        >
+        <input id="registerPassword" type="password" placeholder="Heslo (min. 6 znaků)">
         <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('registerPassword', this)">
             <svg class="eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
         </button>
     </div>
-    
     <div class="password-wrapper">
-        <input
-            id="registerPasswordConfirm"
-            type="password"
-            placeholder="Potvrď heslo znovu"
-        >
+        <input id="registerPasswordConfirm" type="password" placeholder="Potvrď heslo znovu">
         <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('registerPasswordConfirm', this)">
             <svg class="eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
         </button>
     </div>
-
-    <input
-        id="registerNickname"
-        type="text"
-        maxlength="30"
-        placeholder="Přezdívka"
-    >
-
-    <button onclick="register()">
-        Vytvořit účet
-    </button>
-
-    <button
-        class="secondary"
-        onclick="showLogin()"
-    >
-        Zpět na přihlášení
-    </button>
-
+    <input id="registerNickname" type="text" maxlength="30" placeholder="Přezdívka">
+    <button onclick="register()">Vytvořit účet</button>
+    <button class="secondary" onclick="showLogin()">Zpět na přihlášení</button>
     <p id="registerMessage"></p>
-
 </div>
 
-
-<!-- ================================= -->
 <!-- PŘEZDÍVKA -->
-<!-- ================================= -->
-
 <div class="box" id="nicknameBox">
     <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
-
     <h1>👤 Přezdívka</h1>
-
-    <p>
-        K tomuto účtu zatím nemáš nastavenou přezdívku.
-    </p>
-
-    <input
-        id="nickname"
-        type="text"
-        maxlength="30"
-        placeholder="Zadej přezdívku"
-    >
-
-    <button onclick="saveNickname()">
-        Uložit přezdívku
-    </button>
-
+    <p>K tomuto účtu zatím nemáš nastavenou přezdívku.</p>
+    <input id="nickname" type="text" maxlength="30" placeholder="Zadej přezdívku">
+    <button onclick="saveNickname()">Uložit přezdívku</button>
     <p id="nicknameMessage"></p>
-
 </div>
 
-
-<!-- ================================= -->
-<!-- SPOLEČNÉ HESLO PRO VSTUP DO CHATU -->
-<!-- ================================= -->
-
+<!-- MÍSTNOST HESLO -->
 <div class="box" id="chatPasswordBox">
     <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
-
     <h1>🔒 Tajná místnost</h1>
-
-    <p>
-        Pro vstup do chatu musíš zadat přístupové heslo.
-    </p>
-
+    <p>Pro vstup do chatu musíš zadat přístupové heslo.</p>
     <div class="password-wrapper">
-        <input
-            id="roomPasswordInput"
-            type="password"
-            placeholder="Heslo místnosti"
-            onkeydown="if(event.key === 'Enter') verifyRoomPassword()"
-        >
+        <input id="roomPasswordInput" type="password" placeholder="Heslo místnosti" onkeydown="if(event.key === 'Enter') verifyRoomPassword()">
         <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('roomPasswordInput', this)">
             <svg class="eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
         </button>
     </div>
-
-    <button onclick="verifyRoomPassword()">
-        Vstoupit do chatu
-    </button>
-
-    <button
-        class="logout"
-        onclick="logout()"
-    >
-        Zrušit a odhlásit se
-    </button>
-
+    <button onclick="verifyRoomPassword()">Vstoupit do chatu</button>
+    <button class="logout" onclick="logout()">Zrušit a odhlásit se</button>
     <p id="roomPasswordMessage"></p>
-
 </div>
 
 
-<!-- ================================= -->
 <!-- CHAT -->
-<!-- ================================= -->
-
 <div class="box" id="chat">
     <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
-
     <h1>💬 Můj chat</h1>
-
     <div class="chatHeader">
         <p>Přihlášen jako: <strong id="currentNickname"></strong></p>
         <button class="logout logout-small" onclick="logout()">Odhlásit</button>
     </div>
-
-
     <div class="chatLayout">
-
-        <!-- LEVÝ PANEL -->
         <div id="usersBox">
             <div id="usersTitle">👥 Uživatelé</div>
             <div id="usersList">Načítám uživatele...</div>
         </div>
-
-        <!-- PRAVÝ PANEL CHATU -->
         <div class="chatMain">
-
             <div id="messages">Načítám zprávy...</div>
-
             <div id="typingIndicator"></div>
 
-            <!-- Emoji Picker -->
             <div id="emojiPicker">
                 <span class="emoji-item" onclick="insertEmoji('😀')">😀</span>
                 <span class="emoji-item" onclick="insertEmoji('😂')">😂</span>
@@ -712,50 +292,26 @@
 
             <div class="inputGroup">
                 <button type="button" class="emoji-btn" onclick="toggleEmojiPicker()">😊</button>
-                <input
-                    id="messageInput"
-                    type="text"
-                    maxlength="500"
-                    placeholder="Napiš zprávu..."
-                    onkeydown="if(event.key === 'Enter') sendMessage()"
-                    oninput="handleTyping()"
-                >
+                <input id="messageInput" type="text" maxlength="500" placeholder="Napiš zprávu..." onkeydown="if(event.key === 'Enter') sendMessage()" oninput="handleTyping()">
                 <button class="send-btn" onclick="sendMessage()">Odeslat</button>
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 
 <script>
 
-// ==========================================
-// PŘEPÍNÁNÍ TMAVÉHO REŽIMU
-// ==========================================
-
 function toggleDarkMode() {
     document.body.classList.toggle("dark-mode");
-    const isDark = document.body.classList.contains("dark-mode");
-    localStorage.setItem("chatDarkMode", isDark);
+    localStorage.setItem("chatDarkMode", document.body.classList.contains("dark-mode"));
 }
-
-if (localStorage.getItem("chatDarkMode") === "true") {
-    document.body.classList.add("dark-mode");
-}
-
-
-// ==========================================
-// PREPÍNÁNÍ ZOBRAZENÍ HESLA
-// ==========================================
+if (localStorage.getItem("chatDarkMode") === "true") document.body.classList.add("dark-mode");
 
 function togglePasswordVisibility(inputId, btn) {
     const input = document.getElementById(inputId);
     const eyeOpen = btn.querySelector('.eye-open');
     const eyeClosed = btn.querySelector('.eye-closed');
-
     if (input.type === "password") {
         input.type = "text";
         eyeOpen.style.display = "none";
@@ -767,16 +323,10 @@ function togglePasswordVisibility(inputId, btn) {
     }
 }
 
-
-// ==========================================
-// EMOJI PICKER (BOD 2)
-// ==========================================
-
 function toggleEmojiPicker() {
     const picker = document.getElementById("emojiPicker");
     picker.style.display = (picker.style.display === "grid") ? "none" : "grid";
 }
-
 function insertEmoji(emoji) {
     const input = document.getElementById("messageInput");
     input.value += emoji;
@@ -784,99 +334,53 @@ function insertEmoji(emoji) {
     document.getElementById("emojiPicker").style.display = "none";
 }
 
-
-// ==========================================
-// ZVUKOVÉ A WEBOVÉ NOTIFIKACE (BOD 5)
-// ==========================================
-
-// Žádost o povolená notifikací
 if ("Notification" in window && Notification.permission === "default") {
     Notification.requestPermission();
 }
-
 function playNotificationSound() {
     try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = "sine";
-        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 tón
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); 
         gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.15);
-    } catch(e) { console.error(e); }
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+    } catch(e) {}
 }
-
 function triggerNotification(nickname, text) {
     playNotificationSound();
-    
     if (document.hidden && "Notification" in window && Notification.permission === "granted") {
-        new Notification(`Zpráva od ${nickname}`, {
-            body: text,
-            icon: "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💬</text></svg>"
-        });
+        new Notification(`Zpráva od ${nickname}`, { body: text });
     }
 }
 
-
-// ==========================================
-// SUPABASE CONFIG
-// ==========================================
 
 const SUPABASE_URL = "https://jdvyfigrazambxtnqpkq.supabase.co";
 const SUPABASE_KEY = "sb_publishable_YKO_HGnM6so7hNtg_naIeQ_cYX40nxJ";
-
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
 const CHAT_PASSWORD = "Krsmol2027"; 
 
-let presenceChannel = null;
-let messagesChannel = null;
-let currentUser = null;
-let currentNickname = null;
-let tempNickname = null;
-let typingTimeout = null;
+let presenceChannel = null, messagesChannel = null, currentUser = null, currentNickname = null, tempNickname = null;
 
-
-// ==========================================
-// NAVIGACE A AUTENTIZACE
-// ==========================================
-
-function showRegister() {
-    document.getElementById("loginBox").style.display = "none";
-    document.getElementById("registerBox").style.display = "block";
-}
-
+function showRegister() { document.getElementById("loginBox").style.display = "none"; document.getElementById("registerBox").style.display = "block"; }
 function showLogin() {
-    document.getElementById("registerBox").style.display = "none";
-    document.getElementById("nicknameBox").style.display = "none";
-    document.getElementById("chatPasswordBox").style.display = "none";
-    document.getElementById("chat").style.display = "none";
+    ["registerBox", "nicknameBox", "chatPasswordBox", "chat"].forEach(id => document.getElementById(id).style.display = "none");
     document.getElementById("loginBox").style.display = "block";
 }
-
 function askForRoomPassword(nickname) {
     tempNickname = nickname;
-    document.getElementById("loginBox").style.display = "none";
-    document.getElementById("registerBox").style.display = "none";
-    document.getElementById("nicknameBox").style.display = "none";
-    document.getElementById("chat").style.display = "none";
+    ["loginBox", "registerBox", "nicknameBox", "chat"].forEach(id => document.getElementById(id).style.display = "none");
     document.getElementById("chatPasswordBox").style.display = "block";
 }
-
 function verifyRoomPassword() {
     const input = document.getElementById("roomPasswordInput").value;
     const msg = document.getElementById("roomPasswordMessage");
-
     if (input === CHAT_PASSWORD) {
         document.getElementById("chatPasswordBox").style.display = "none";
         openChat(tempNickname);
-    } else {
-        msg.innerText = "❌ Nesprávné heslo. Zkus to znovu.";
-        msg.className = "error";
-    }
+    } else { msg.innerText = "❌ Nesprávné heslo."; msg.className = "error"; }
 }
 
 async function register() {
@@ -886,155 +390,58 @@ async function register() {
     const nickname = document.getElementById("registerNickname").value.trim();
     const message = document.getElementById("registerMessage");
 
-    if (!email || !password || !passwordConfirm || !nickname) {
-        message.innerText = "Vyplň všechna pole.";
-        message.className = "error";
-        return;
-    }
-    
-    if (password !== passwordConfirm) {
-        message.innerText = "Hesla se neshodují.";
-        message.className = "error";
-        return;
-    }
+    if (!email || !password || !passwordConfirm || !nickname) return (message.innerText = "Vyplň všechna pole.", message.className = "error");
+    if (password !== passwordConfirm) return (message.innerText = "Hesla se neshodují.", message.className = "error");
+    if (password.length < 6) return (message.innerText = "Heslo musí mít alespoň 6 znaků.", message.className = "error");
 
-    if (password.length < 6) {
-        message.innerText = "Heslo musí mít alespoň 6 znaků.";
-        message.className = "error";
-        return;
-    }
-
-    const { data, error } = await supabaseClient.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-            data: { nickname: nickname },
-            emailRedirectTo: "https://hanebnybambus.github.io/test/"
-        }
-    });
-
-    if (error) {
-        message.innerText = "❌ " + error.message;
-        message.className = "error";
-        return;
-    }
-
-    if (data.session) {
-        message.innerText = "✅ Účet vytvořen.";
-        message.className = "success";
-        await checkProfile();
-        return;
-    }
-
-    message.innerText = "✅ Účet vytvořen. Potvrď e-mail.";
-    message.className = "success";
+    const { data, error } = await supabaseClient.auth.signUp({ email, password, options: { data: { nickname }, emailRedirectTo: "https://hanebnybambus.github.io/test/" }});
+    if (error) return (message.innerText = "❌ " + error.message, message.className = "error");
+    if (data.session) { message.innerText = "✅ Účet vytvořen."; message.className = "success"; await checkProfile(); return; }
+    message.innerText = "✅ Účet vytvořen. Potvrď e-mail."; message.className = "success";
 }
 
 async function login() {
     const email = document.getElementById("loginEmail").value.trim();
     const password = document.getElementById("loginPassword").value;
     const message = document.getElementById("loginMessage");
+    if (!email || !password) return (message.innerText = "Vyplň e-mail a heslo.", message.className = "error");
 
-    if (!email || !password) {
-        message.innerText = "Vyplň e-mail a heslo.";
-        message.className = "error";
-        return;
-    }
-
-    const { error } = await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password
-    });
-
-    if (error) {
-        message.innerText = "❌ " + error.message;
-        message.className = "error";
-        return;
-    }
-
-    message.innerText = "✅ Přihlášení úspěšné.";
-    message.className = "success";
-
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) return (message.innerText = "❌ " + error.message, message.className = "error");
     await checkProfile();
 }
 
 async function checkProfile() {
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) return;
-
     currentUser = user;
-
-    const { data: profile } = await supabaseClient
-        .from("profiles")
-        .select("nickname")
-        .eq("id", user.id)
-        .maybeSingle();
-
+    const { data: profile } = await supabaseClient.from("profiles").select("nickname").eq("id", user.id).maybeSingle();
+    
     document.getElementById("loginBox").style.display = "none";
     document.getElementById("registerBox").style.display = "none";
 
-    if (profile) {
-        askForRoomPassword(profile.nickname);
-        return;
-    }
-
+    if (profile) return askForRoomPassword(profile.nickname);
+    
     const savedNickname = user.user_metadata?.nickname;
     if (savedNickname) {
-        const { data: newProfile } = await supabaseClient
-            .from("profiles")
-            .insert({ id: user.id, nickname: savedNickname })
-            .select("nickname")
-            .single();
-
-        if (newProfile) {
-            askForRoomPassword(newProfile.nickname);
-            return;
-        }
+        const { data: newProfile } = await supabaseClient.from("profiles").insert({ id: user.id, nickname: savedNickname }).select("nickname").single();
+        if (newProfile) return askForRoomPassword(newProfile.nickname);
     }
-
     document.getElementById("nicknameBox").style.display = "block";
 }
 
 async function saveNickname() {
     const nickname = document.getElementById("nickname").value.trim();
-    const message = document.getElementById("nicknameMessage");
-
-    if (!nickname) {
-        message.innerText = "Zadej přezdívku.";
-        message.className = "error";
-        return;
-    }
-
+    if (!nickname) return;
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) return;
-
-    const { data, error } = await supabaseClient
-        .from("profiles")
-        .insert({ id: user.id, nickname: nickname })
-        .select("nickname")
-        .single();
-
-    if (error) {
-        message.innerText = "❌ " + error.message;
-        message.className = "error";
-        return;
-    }
-
-    askForRoomPassword(data.nickname);
+    const { data, error } = await supabaseClient.from("profiles").insert({ id: user.id, nickname }).select("nickname").single();
+    if (!error) askForRoomPassword(data.nickname);
 }
 
-
-// ==========================================
-// OTEVŘENÍ CHATU
-// ==========================================
-
 async function openChat(nickname) {
-    document.getElementById("loginBox").style.display = "none";
-    document.getElementById("registerBox").style.display = "none";
-    document.getElementById("nicknameBox").style.display = "none";
-    document.getElementById("chatPasswordBox").style.display = "none";
+    ["loginBox", "registerBox", "nicknameBox", "chatPasswordBox"].forEach(id => document.getElementById(id).style.display = "none");
     document.getElementById("chat").style.display = "block";
-
     currentNickname = nickname;
     document.getElementById("currentNickname").innerText = nickname;
 
@@ -1044,240 +451,149 @@ async function openChat(nickname) {
     startMessagesSubscription();
 }
 
-
-// ==========================================
-// UŽIVATELÉ & PRESENCE
-// ==========================================
-
 async function loadUsers() {
-    const usersList = document.getElementById("usersList");
-    const { data, error } = await supabaseClient
-        .from("profiles")
-        .select("id, nickname")
-        .order("nickname", { ascending: true });
-
-    if (error) {
-        usersList.innerText = "Chyba při načítání uživatelů.";
-        return;
-    }
-
-    renderUsers(data || []);
+    const { data, error } = await supabaseClient.from("profiles").select("id, nickname").order("nickname", { ascending: true });
+    if (!error) renderUsers(data || []);
 }
 
 function renderUsers(users) {
     const usersList = document.getElementById("usersList");
     usersList.innerHTML = "";
-
-    if (!users.length) {
-        usersList.innerText = "Zatím nejsou žádní uživatelé.";
-        return;
-    }
-
+    if (!users.length) return (usersList.innerText = "Zatím nejsou žádní uživatelé.");
     const onlineUsers = getOnlineUserIds();
-
     users.forEach(user => {
-        const div = document.createElement("div");
-        div.className = "userItem";
-
-        const status = document.createElement("span");
-        status.className = "userStatus";
-
-        const nickname = document.createElement("span");
-        nickname.className = "userNickname";
-        nickname.textContent = user.nickname;
-
-        if (onlineUsers.has(user.id)) {
-            status.textContent = "🟢";
-        } else {
-            status.textContent = "⚪";
-            nickname.classList.add("offline");
-        }
-
-        div.appendChild(status);
-        div.appendChild(nickname);
-        usersList.appendChild(div);
+        const div = document.createElement("div"); div.className = "userItem";
+        const status = document.createElement("span"); status.className = "userStatus";
+        const nickname = document.createElement("span"); nickname.className = "userNickname"; nickname.textContent = user.nickname;
+        if (onlineUsers.has(user.id)) status.textContent = "🟢"; else { status.textContent = "⚪"; nickname.classList.add("offline"); }
+        div.appendChild(status); div.appendChild(nickname); usersList.appendChild(div);
     });
 }
 
 function getOnlineUserIds() {
     const onlineUsers = new Set();
-    if (!presenceChannel) return onlineUsers;
-
-    const state = presenceChannel.presenceState();
-    Object.values(state).forEach(entries => {
-        entries.forEach(entry => {
-            if (entry.user_id) onlineUsers.add(entry.user_id);
-        });
-    });
-
+    if (presenceChannel) {
+        Object.values(presenceChannel.presenceState()).forEach(entries => entries.forEach(entry => { if (entry.user_id) onlineUsers.add(entry.user_id); }));
+    }
     return onlineUsers;
 }
 
 async function startPresence() {
     if (!currentUser || !currentNickname || presenceChannel) return;
-
-    presenceChannel = supabaseClient.channel("chat-online-users", {
-        config: { presence: { key: currentUser.id } }
-    });
-
+    presenceChannel = supabaseClient.channel("chat-online-users", { config: { presence: { key: currentUser.id } } });
     presenceChannel
         .on("presence", { event: "sync" }, () => loadUsers())
         .on("presence", { event: "join" }, () => loadUsers())
         .on("presence", { event: "leave" }, () => loadUsers())
-        /* INDIKÁTOR PSANÍ (BOD 4) */
         .on("broadcast", { event: "typing" }, payload => {
             if (payload.payload.user_id !== currentUser.id) {
                 const indicator = document.getElementById("typingIndicator");
                 indicator.innerText = `${payload.payload.nickname} právě píše...`;
                 clearTimeout(window.typingTimeoutTimer);
-                window.typingTimeoutTimer = setTimeout(() => {
-                    indicator.innerText = "";
-                }, 2000);
+                window.typingTimeoutTimer = setTimeout(() => { indicator.innerText = ""; }, 2000);
             }
         });
-
     presenceChannel.subscribe(async status => {
-        if (status !== "SUBSCRIBED") return;
-
-        await presenceChannel.track({
-            user_id: currentUser.id,
-            nickname: currentNickname,
-            online_at: new Date().toISOString()
-        });
-
-        loadUsers();
+        if (status === "SUBSCRIBED") {
+            await presenceChannel.track({ user_id: currentUser.id, nickname: currentNickname, online_at: new Date().toISOString() });
+            loadUsers();
+        }
     });
 }
 
-// Odesílání stavu píše... (bod 4)
 function handleTyping() {
-    if (presenceChannel) {
-        presenceChannel.send({
-            type: "broadcast",
-            event: "typing",
-            payload: { user_id: currentUser.id, nickname: currentNickname }
-        });
-    }
+    if (presenceChannel) presenceChannel.send({ type: "broadcast", event: "typing", payload: { user_id: currentUser.id, nickname: currentNickname } });
 }
-
-
-// ==========================================
-// ZPRÁVY & MAZÁNÍ (BOD 3)
-// ==========================================
 
 function startMessagesSubscription() {
     if (messagesChannel) return;
-
-    try {
-        messagesChannel = supabaseClient
-            .channel("realtime-messages-channel")
-            .on(
-                "postgres_changes",
-                { event: "*", schema: "public", table: "messages" },
-                payload => {
-                    if (payload.eventType === "INSERT") {
-                        const newMessage = payload.new;
-                        addMessage(newMessage, currentUser ? currentUser.id : null);
-                        
-                        // Zvuk / Notifikace pro zprávy od ostatních
-                        if (currentUser && newMessage.user_id !== currentUser.id) {
-                            triggerNotification(newMessage.nickname, newMessage.message);
-                        }
-
-                        const messages = document.getElementById("messages");
-                        if (messages) messages.scrollTop = messages.scrollHeight;
-                    } 
-                    else if (payload.eventType === "DELETE") {
-                        // Smazání zprávy v reálném čase
-                        const msgDiv = document.getElementById(`msg-${payload.old.id}`);
-                        if (msgDiv) msgDiv.remove();
-                    }
+    messagesChannel = supabaseClient.channel("realtime-messages-channel")
+        .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, payload => {
+            if (payload.eventType === "INSERT") {
+                addMessage(payload.new, currentUser ? currentUser.id : null);
+                if (currentUser && payload.new.user_id !== currentUser.id) triggerNotification(payload.new.nickname, payload.new.message);
+                const msgs = document.getElementById("messages"); if (msgs) msgs.scrollTop = msgs.scrollHeight;
+            } 
+            else if (payload.eventType === "DELETE") {
+                const msgDiv = document.getElementById(`msg-${payload.old.id}`);
+                if (msgDiv) msgDiv.remove();
+            }
+            else if (payload.eventType === "UPDATE") {
+                const msgDiv = document.getElementById(`msg-${payload.new.id}`);
+                if (msgDiv) {
+                    const textSpan = msgDiv.querySelector('.text');
+                    if (textSpan) textSpan.textContent = payload.new.message;
+                    const editBtn = msgDiv.querySelector('.edit-btn');
+                    if (editBtn) editBtn.onclick = () => editMessage(payload.new.id, payload.new.message);
                 }
-            )
-            .subscribe();
-
-    } catch (err) { console.error("Realtime error:", err); }
+            }
+        }).subscribe();
 }
 
 async function loadMessages() {
-    const { data, error } = await supabaseClient
-        .from("messages")
-        .select("id, user_id, nickname, message, created_at")
-        .order("created_at", { ascending: true });
-
-    if (error) {
-        document.getElementById("messages").innerText = "Chyba při načítání zpráv.";
-        return;
-    }
-
-    const messages = document.getElementById("messages");
-    messages.innerHTML = "";
-
-    if (data) {
-        data.forEach(message => {
-            addMessage(message, currentUser ? currentUser.id : null);
-        });
-    }
-
+    const { data, error } = await supabaseClient.from("messages").select("id, user_id, nickname, message, created_at").order("created_at", { ascending: true });
+    const messages = document.getElementById("messages"); messages.innerHTML = "";
+    if (data) data.forEach(msg => addMessage(msg, currentUser ? currentUser.id : null));
     messages.scrollTop = messages.scrollHeight;
 }
 
 function addMessage(message, currentUserId) {
-    const messages = document.getElementById("messages");
-    if (!messages) return;
-
-    // Pokud už zpráva existuje (prevence duplicity)
     if (document.getElementById(`msg-${message.id}`)) return;
+    const isMine = message.user_id === currentUserId;
 
     const div = document.createElement("div");
     div.id = `msg-${message.id}`;
-
-    const isMine = message.user_id === currentUserId;
     div.className = "message " + (isMine ? "mine" : "other");
 
-    const nickname = document.createElement("span");
-    nickname.className = "nickname";
-    nickname.textContent = message.nickname;
-
-    const text = document.createElement("span");
-    text.className = "text";
-    text.textContent = message.message;
-
-    const time = document.createElement("span");
-    time.className = "time";
-
+    const nickname = document.createElement("span"); nickname.className = "nickname"; nickname.textContent = message.nickname;
+    const text = document.createElement("span"); text.className = "text"; text.textContent = message.message;
+    const time = document.createElement("span"); time.className = "time";
+    
     const date = new Date(message.created_at);
-    if (!isNaN(date.getTime())) {
-        time.textContent = date.toLocaleString("cs-CZ", {
-            timeZone: "Europe/Prague",
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-        });
-    } else {
-        time.textContent = "čas neznámý";
-    }
+    time.textContent = !isNaN(date.getTime()) ? date.toLocaleString("cs-CZ", { timeZone: "Europe/Prague", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "čas neznámý";
 
-    div.appendChild(nickname);
-    div.appendChild(text);
-    div.appendChild(time);
+    div.appendChild(nickname); div.appendChild(text); div.appendChild(time);
 
-    /* MAZÁNÍ VLASTNÍCH ZPRÁV (BOD 3) */
+    // Ikony UPRAVIT a SMAZAT (Bod 3)
     if (isMine) {
+        const actionsDiv = document.createElement("div");
+        actionsDiv.className = "message-actions";
+
+        const editBtn = document.createElement("button");
+        editBtn.className = "action-btn edit-btn";
+        editBtn.innerHTML = "✏️";
+        editBtn.title = "Upravit zprávu";
+        editBtn.onclick = () => editMessage(message.id, message.message);
+
         const delBtn = document.createElement("button");
-        delBtn.className = "delete-btn";
+        delBtn.className = "action-btn delete-btn";
         delBtn.innerHTML = "🗑️";
         delBtn.title = "Smazat zprávu";
         delBtn.onclick = () => deleteMessage(message.id);
-        div.appendChild(delBtn);
+
+        actionsDiv.appendChild(editBtn);
+        actionsDiv.appendChild(delBtn);
+        div.appendChild(actionsDiv);
     }
 
-    messages.appendChild(div);
+    document.getElementById("messages").appendChild(div);
 }
 
-// Funkce pro smazání zprávy z Supabase
+// Funkce pro UPRAVENÍ zprávy
+async function editMessage(messageId, oldText) {
+    const newText = prompt("Uprav svou zprávu:", oldText);
+    
+    if (newText !== null && newText.trim() !== "" && newText !== oldText) {
+        const { error } = await supabaseClient
+            .from("messages")
+            .update({ message: newText.trim() })
+            .eq("id", messageId);
+
+        if (error) alert("Chyba při úpravě zprávy: " + error.message);
+    }
+}
+
+// Funkce pro SMAZÁNÍ zprávy
 async function deleteMessage(messageId) {
     if (!confirm("Opravdu chceš tuto zprávu smazat?")) return;
 
@@ -1286,68 +602,35 @@ async function deleteMessage(messageId) {
         .delete()
         .eq("id", messageId);
 
-    if (error) {
-        alert("Chyba při mazání zprávy: " + error.message);
-    }
+    if (error) alert("Chyba při mazání zprávy: " + error.message);
 }
 
 async function sendMessage() {
     const input = document.getElementById("messageInput");
     const text = input.value.trim();
-
     if (!text) return;
 
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) {
-        alert("Nejsi přihlášen.");
-        return;
-    }
-
+    if (!currentUser) return alert("Nejsi přihlášen.");
     const nickname = document.getElementById("currentNickname").innerText;
 
-    const { error } = await supabaseClient
-        .from("messages")
-        .insert({
-            user_id: user.id,
-            nickname: nickname,
-            message: text
-        });
-
-    if (error) {
-        alert("Zprávu se nepodařilo odeslat: " + error.message);
-        return;
-    }
-
+    const { error } = await supabaseClient.from("messages").insert({ user_id: currentUser.id, nickname, message: text });
+    if (error) return alert("Zprávu se nepodařilo odeslat: " + error.message);
     input.value = "";
 }
 
 async function logout() {
-    if (presenceChannel) {
-        try { await presenceChannel.untrack(); } catch(e){}
-        try { await supabaseClient.removeChannel(presenceChannel); } catch(e){}
-        presenceChannel = null;
-    }
-
-    if (messagesChannel) {
-        try { await supabaseClient.removeChannel(messagesChannel); } catch(e){}
-        messagesChannel = null;
-    }
-
+    if (presenceChannel) { try { await presenceChannel.untrack(); await supabaseClient.removeChannel(presenceChannel); } catch(e){} }
+    if (messagesChannel) { try { await supabaseClient.removeChannel(messagesChannel); } catch(e){} }
     await supabaseClient.auth.signOut();
     location.reload();
 }
 
 async function checkSession() {
     const { data: { session } } = await supabaseClient.auth.getSession();
-    if (session) {
-        currentUser = session.user;
-        await checkProfile();
-    }
+    if (session) { currentUser = session.user; await checkProfile(); }
 }
-
 checkSession();
 
 </script>
-
 </body>
 </html>
