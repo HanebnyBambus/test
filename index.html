@@ -304,6 +304,11 @@
 
 <script>
 
+function linkify(text) {
+    const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+    return text.replace(urlRegex, (url) => `<a href="${url}" target="_blank" style="color: #0066cc; text-decoration: underline;">${url}</a>`);
+}
+    
 function toggleDarkMode() {
     document.body.classList.toggle("dark-mode");
     localStorage.setItem("chatDarkMode", document.body.classList.contains("dark-mode"));
@@ -555,7 +560,7 @@ function addMessage(message, currentUserId) {
     div.className = "message " + (isMine ? "mine" : "other");
 
     const nickname = document.createElement("span"); nickname.className = "nickname"; nickname.textContent = message.nickname;
-    const text = document.createElement("span"); text.className = "text"; text.textContent = message.message;
+    const text = document.createElement("span"); text.className = "text"; text.innerHTML = linkify(message.message);
     const time = document.createElement("span"); time.className = "time";
     
     const date = new Date(message.created_at);
