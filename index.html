@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="cs">
 <head>
@@ -53,6 +52,12 @@
             box-sizing: border-box;
         }
 
+        /* Skrytí ikony očka v Edge */
+        input::-ms-reveal,
+        input::-ms-clear {
+            display: none;
+        }
+
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -72,7 +77,6 @@
             box-shadow: 0 5px 20px rgba(0,0,0,0.15);
         }
 
-        /* Tlačítko pro tmavý režim */
         .theme-btn {
             position: absolute;
             top: 15px;
@@ -109,7 +113,6 @@
             color: var(--text-color);
         }
 
-        /* Obal pro pole s heslem a ikonu očka */
         .password-wrapper {
             position: relative;
             width: 100%;
@@ -220,7 +223,6 @@
             border: 1px solid var(--box-border);
             border-radius: 10px;
             background: var(--sub-bg);
-
             height: 520px;
             overflow-y: auto;
         }
@@ -269,10 +271,11 @@
 
         .chatMain {
             min-width: 0;
+            position: relative;
         }
 
         #messages {
-            height: 450px;
+            height: 420px;
             overflow-y: auto;
             border: 1px solid var(--box-border);
             padding: 12px;
@@ -280,28 +283,85 @@
             background: var(--sub-bg);
         }
 
+        /* Indikátor psaní */
+        #typingIndicator {
+            height: 20px;
+            font-size: 13px;
+            font-style: italic;
+            color: var(--time-color);
+            margin-top: 5px;
+            padding-left: 5px;
+        }
+
         .inputGroup {
             display: flex;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 8px;
+            margin-top: 5px;
+            position: relative;
         }
 
         .inputGroup input {
             margin-top: 0;
         }
 
-        .inputGroup button {
-            width: 140px;
+        .emoji-btn {
+            width: 45px;
+            margin-top: 0;
+            font-size: 20px;
+            padding: 0;
+            background: var(--sub-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .emoji-btn:hover {
+            background: var(--box-border);
+        }
+
+        .inputGroup button.send-btn {
+            width: 120px;
             margin-top: 0;
             flex-shrink: 0;
         }
 
+        /* Emoji nabídka */
+        #emojiPicker {
+            display: none;
+            position: absolute;
+            bottom: 55px;
+            right: 130px;
+            background: var(--box-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .emoji-item {
+            font-size: 22px;
+            cursor: pointer;
+            text-align: center;
+            user-select: none;
+            padding: 4px;
+            border-radius: 5px;
+        }
+
+        .emoji-item:hover {
+            background: var(--sub-bg);
+        }
+
 
         /* ================================= */
-        /* ZPRÁVY */
+        /* ZPRÁVY & MAZÁNÍ */
         /* ================================= */
 
         .message {
+            position: relative;
             width: fit-content;
             max-width: 75%;
             padding: 10px 14px;
@@ -323,6 +383,7 @@
             background: var(--msg-mine-bg);
             color: var(--msg-mine-text);
             border-bottom-right-radius: 4px;
+            padding-right: 32px; /* Prostor pro popelnici */
         }
 
         .nickname {
@@ -354,22 +415,35 @@
             color: var(--mine-time-color);
         }
 
+        /* Tlačítko pro smazání zprávy */
+        .delete-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: transparent;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            margin: 0;
+            width: auto;
+            opacity: 0.7;
+        }
+
+        .delete-btn:hover {
+            opacity: 1;
+            background: transparent;
+        }
+
 
         /* ================================= */
         /* OSTATNÍ */
         /* ================================= */
 
-        .error {
-            color: #b00020;
-        }
-
-        .success {
-            color: green;
-        }
-
-        .info {
-            color: #555;
-        }
+        .error { color: #b00020; }
+        .success { color: green; }
+        .info { color: #555; }
 
 
         /* ================================= */
@@ -377,7 +451,6 @@
         /* ================================= */
 
         @media (max-width: 700px) {
-
             .box {
                 width: 95%;
                 margin: 15px auto;
@@ -394,13 +467,19 @@
             }
 
             #messages {
-                height: 400px;
+                height: 380px;
             }
 
             .message {
                 max-width: 85%;
             }
 
+            #emojiPicker {
+                right: 0;
+                left: 0;
+                margin: auto;
+                width: fit-content;
+            }
         }
 
     </style>
@@ -600,52 +679,48 @@
     </div>
 
 
-    <!-- ================================= -->
-    <!-- LEVÝ PANEL + CHAT -->
-    <!-- ================================= -->
-
     <div class="chatLayout">
 
-
-        <!-- ================================= -->
-        <!-- UŽIVATELÉ VLEVO -->
-        <!-- ================================= -->
-
+        <!-- LEVÝ PANEL -->
         <div id="usersBox">
-
-            <div id="usersTitle">
-                👥 Uživatelé
-            </div>
-
-            <div id="usersList">
-                Načítám uživatele...
-            </div>
-
+            <div id="usersTitle">👥 Uživatelé</div>
+            <div id="usersList">Načítám uživatele...</div>
         </div>
 
-
-        <!-- ================================= -->
-        <!-- CHAT VPRAVO -->
-        <!-- ================================= -->
-
+        <!-- PRAVÝ PANEL CHATU -->
         <div class="chatMain">
 
-            <div id="messages">
-                Načítám zprávy...
+            <div id="messages">Načítám zprávy...</div>
+
+            <div id="typingIndicator"></div>
+
+            <!-- Emoji Picker -->
+            <div id="emojiPicker">
+                <span class="emoji-item" onclick="insertEmoji('😀')">😀</span>
+                <span class="emoji-item" onclick="insertEmoji('😂')">😂</span>
+                <span class="emoji-item" onclick="insertEmoji('😍')">😍</span>
+                <span class="emoji-item" onclick="insertEmoji('👍')">👍</span>
+                <span class="emoji-item" onclick="insertEmoji('🔥')">🔥</span>
+                <span class="emoji-item" onclick="insertEmoji('❤️')">❤️</span>
+                <span class="emoji-item" onclick="insertEmoji('🎉')">🎉</span>
+                <span class="emoji-item" onclick="insertEmoji('😎')">😎</span>
+                <span class="emoji-item" onclick="insertEmoji('🤔')">🤔</span>
+                <span class="emoji-item" onclick="insertEmoji('💩')">💩</span>
+                <span class="emoji-item" onclick="insertEmoji('🙌')">🙌</span>
+                <span class="emoji-item" onclick="insertEmoji('💬')">💬</span>
             </div>
 
             <div class="inputGroup">
+                <button type="button" class="emoji-btn" onclick="toggleEmojiPicker()">😊</button>
                 <input
                     id="messageInput"
                     type="text"
                     maxlength="500"
                     placeholder="Napiš zprávu..."
                     onkeydown="if(event.key === 'Enter') sendMessage()"
+                    oninput="handleTyping()"
                 >
-
-                <button onclick="sendMessage()">
-                    Odeslat
-                </button>
+                <button class="send-btn" onclick="sendMessage()">Odeslat</button>
             </div>
 
         </div>
@@ -657,7 +732,6 @@
 
 <script>
 
-
 // ==========================================
 // PŘEPÍNÁNÍ TMAVÉHO REŽIMU
 // ==========================================
@@ -668,14 +742,13 @@ function toggleDarkMode() {
     localStorage.setItem("chatDarkMode", isDark);
 }
 
-// Načtení uloženého režimu při otevření stránky
 if (localStorage.getItem("chatDarkMode") === "true") {
     document.body.classList.add("dark-mode");
 }
 
 
 // ==========================================
-// PREPÍNÁNÍ ZOBRAZENÍ HESLA (SVG IONY)
+// PREPÍNÁNÍ ZOBRAZENÍ HESLA
 // ==========================================
 
 function togglePasswordVisibility(inputId, btn) {
@@ -696,1179 +769,585 @@ function togglePasswordVisibility(inputId, btn) {
 
 
 // ==========================================
-// SUPABASE
+// EMOJI PICKER (BOD 2)
 // ==========================================
 
-const SUPABASE_URL =
-    "https://jdvyfigrazambxtnqpkq.supabase.co";
+function toggleEmojiPicker() {
+    const picker = document.getElementById("emojiPicker");
+    picker.style.display = (picker.style.display === "grid") ? "none" : "grid";
+}
 
-
-const SUPABASE_KEY =
-    "sb_publishable_YKO_HGnM6so7hNtg_naIeQ_cYX40nxJ";
-
-
-const supabaseClient =
-    supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
+function insertEmoji(emoji) {
+    const input = document.getElementById("messageInput");
+    input.value += emoji;
+    input.focus();
+    document.getElementById("emojiPicker").style.display = "none";
+}
 
 
 // ==========================================
-// PROMĚNNÉ PRO ONLINE STAV, REALTIME A HESLO
+// ZVUKOVÉ A WEBOVÉ NOTIFIKACE (BOD 5)
 // ==========================================
 
-// TADY SI NASTAV SVÉ TAJNÉ HESLO PRO VSTUP DO CHATU:
+// Žádost o povolená notifikací
+if ("Notification" in window && Notification.permission === "default") {
+    Notification.requestPermission();
+}
+
+function playNotificationSound() {
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 tón
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+    } catch(e) { console.error(e); }
+}
+
+function triggerNotification(nickname, text) {
+    playNotificationSound();
+    
+    if (document.hidden && "Notification" in window && Notification.permission === "granted") {
+        new Notification(`Zpráva od ${nickname}`, {
+            body: text,
+            icon: "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💬</text></svg>"
+        });
+    }
+}
+
+
+// ==========================================
+// SUPABASE CONFIG
+// ==========================================
+
+const SUPABASE_URL = "https://jdvyfigrazambxtnqpkq.supabase.co";
+const SUPABASE_KEY = "sb_publishable_YKO_HGnM6so7hNtg_naIeQ_cYX40nxJ";
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const CHAT_PASSWORD = "Krsmol2027"; 
-
 
 let presenceChannel = null;
 let messagesChannel = null;
 let currentUser = null;
 let currentNickname = null;
-let tempNickname = null; // Dočasná proměnná, než zadá heslo
+let tempNickname = null;
+let typingTimeout = null;
 
 
 // ==========================================
-// ZOBRAZENÍ REGISTRACE
+// NAVIGACE A AUTENTIZACE
 // ==========================================
 
 function showRegister() {
-
-    document.getElementById("loginBox").style.display =
-        "none";
-
-    document.getElementById("registerBox").style.display =
-        "block";
-
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("registerBox").style.display = "block";
 }
-
-
-// ==========================================
-// ZOBRAZENÍ PŘIHLÁŠENÍ
-// ==========================================
 
 function showLogin() {
-
-    document.getElementById("registerBox").style.display =
-        "none";
-
-    document.getElementById("nicknameBox").style.display =
-        "none";
-        
-    document.getElementById("chatPasswordBox").style.display =
-        "none";
-
-    document.getElementById("chat").style.display =
-        "none";
-
-    document.getElementById("loginBox").style.display =
-        "block";
-
+    document.getElementById("registerBox").style.display = "none";
+    document.getElementById("nicknameBox").style.display = "none";
+    document.getElementById("chatPasswordBox").style.display = "none";
+    document.getElementById("chat").style.display = "none";
+    document.getElementById("loginBox").style.display = "block";
 }
 
-
-// ==========================================
-// ZOBRAZENÍ ZADÁNÍ HESLA MÍSTNOSTI
-// ==========================================
-
 function askForRoomPassword(nickname) {
-    tempNickname = nickname; // Uložíme si přezdívku na později
-
+    tempNickname = nickname;
     document.getElementById("loginBox").style.display = "none";
     document.getElementById("registerBox").style.display = "none";
     document.getElementById("nicknameBox").style.display = "none";
     document.getElementById("chat").style.display = "none";
-
     document.getElementById("chatPasswordBox").style.display = "block";
 }
-
-
-// ==========================================
-// OVĚŘENÍ HESLA MÍSTNOSTI
-// ==========================================
 
 function verifyRoomPassword() {
     const input = document.getElementById("roomPasswordInput").value;
     const msg = document.getElementById("roomPasswordMessage");
 
     if (input === CHAT_PASSWORD) {
-        // Heslo je správné, pustíme ho do chatu
         document.getElementById("chatPasswordBox").style.display = "none";
         openChat(tempNickname);
     } else {
-        // Špatné heslo
         msg.innerText = "❌ Nesprávné heslo. Zkus to znovu.";
         msg.className = "error";
     }
 }
 
-
-// ==========================================
-// REGISTRACE
-// ==========================================
-
 async function register() {
-
-    const email =
-        document.getElementById("registerEmail")
-            .value
-            .trim();
-
-    const password =
-        document.getElementById("registerPassword")
-            .value;
-            
-    const passwordConfirm =
-        document.getElementById("registerPasswordConfirm")
-            .value;
-
-    const nickname =
-        document.getElementById("registerNickname")
-            .value
-            .trim();
-
-    const message =
-        document.getElementById("registerMessage");
-
+    const email = document.getElementById("registerEmail").value.trim();
+    const password = document.getElementById("registerPassword").value;
+    const passwordConfirm = document.getElementById("registerPasswordConfirm").value;
+    const nickname = document.getElementById("registerNickname").value.trim();
+    const message = document.getElementById("registerMessage");
 
     if (!email || !password || !passwordConfirm || !nickname) {
-
-        message.innerText =
-            "Vyplň všechna pole.";
-
-        message.className =
-            "error";
-
+        message.innerText = "Vyplň všechna pole.";
+        message.className = "error";
         return;
     }
     
     if (password !== passwordConfirm) {
-
-        message.innerText =
-            "Hesla se neshodují. Zkontroluj je a zkus to znovu.";
-
-        message.className =
-            "error";
-
+        message.innerText = "Hesla se neshodují.";
+        message.className = "error";
         return;
     }
 
     if (password.length < 6) {
-
-        message.innerText =
-            "Heslo musí mít alespoň 6 znaků.";
-
-        message.className =
-            "error";
-
+        message.innerText = "Heslo musí mít alespoň 6 znaků.";
+        message.className = "error";
         return;
     }
 
-
-    const { data, error } =
-        await supabaseClient.auth.signUp({
-
-            email: email,
-
-            password: password,
-
-            options: {
-
-                data: {
-                    nickname: nickname
-                },
-
-                emailRedirectTo:
-                    "https://hanebnybambus.github.io/test/"
-
-            }
-
-        });
-
+    const { data, error } = await supabaseClient.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+            data: { nickname: nickname },
+            emailRedirectTo: "https://hanebnybambus.github.io/test/"
+        }
+    });
 
     if (error) {
-
-        console.error(error);
-
-        message.innerText =
-            "❌ " + error.message;
-
-        message.className =
-            "error";
-
+        message.innerText = "❌ " + error.message;
+        message.className = "error";
         return;
     }
-
 
     if (data.session) {
-
-        message.innerText =
-            "✅ Účet vytvořen.";
-
-        message.className =
-            "success";
-
+        message.innerText = "✅ Účet vytvořen.";
+        message.className = "success";
         await checkProfile();
-
         return;
     }
 
-
-    message.innerText =
-        "✅ Účet vytvořen. Zkontroluj e-mail a potvrď registraci.";
-
-    message.className =
-        "success";
-
+    message.innerText = "✅ Účet vytvořen. Potvrď e-mail.";
+    message.className = "success";
 }
-
-
-// ==========================================
-// PŘIHLÁŠENÍ
-// ==========================================
 
 async function login() {
-
-    const email =
-        document.getElementById("loginEmail")
-            .value
-            .trim();
-
-    const password =
-        document.getElementById("loginPassword")
-            .value;
-
-    const message =
-        document.getElementById("loginMessage");
-
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    const message = document.getElementById("loginMessage");
 
     if (!email || !password) {
-
-        message.innerText =
-            "Vyplň e-mail a heslo.";
-
-        message.className =
-            "error";
-
+        message.innerText = "Vyplň e-mail a heslo.";
+        message.className = "error";
         return;
     }
 
-
-    const { error } =
-        await supabaseClient.auth.signInWithPassword({
-
-            email: email,
-
-            password: password
-
-        });
-
+    const { error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+    });
 
     if (error) {
-
-        console.error(error);
-
-        message.innerText =
-            "❌ " + error.message;
-
-        message.className =
-            "error";
-
+        message.innerText = "❌ " + error.message;
+        message.className = "error";
         return;
     }
 
-
-    message.innerText =
-        "✅ Přihlášení úspěšné.";
-
-    message.className =
-        "success";
-
+    message.innerText = "✅ Přihlášení úspěšné.";
+    message.className = "success";
 
     await checkProfile();
-
 }
 
-
-// ==========================================
-// KONTROLA PROFILU
-// ==========================================
-
 async function checkProfile() {
-
-    const {
-        data: { user }
-    } =
-        await supabaseClient.auth.getUser();
-
-
-    if (!user) {
-
-        return;
-
-    }
-
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) return;
 
     currentUser = user;
 
+    const { data: profile } = await supabaseClient
+        .from("profiles")
+        .select("nickname")
+        .eq("id", user.id)
+        .maybeSingle();
 
-    const { data: profile, error } =
-        await supabaseClient
-            .from("profiles")
-            .select("nickname")
-            .eq("id", user.id)
-            .maybeSingle();
-
-
-    if (error) {
-
-        console.error(error);
-
-        alert(
-            "Chyba při načítání profilu: " +
-            error.message
-        );
-
-        return;
-    }
-
-
-    document.getElementById("loginBox").style.display =
-        "none";
-
-    document.getElementById("registerBox").style.display =
-        "none";
-
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("registerBox").style.display = "none";
 
     if (profile) {
-
-        // Už má profil, zeptáme se ho na heslo do místnosti
         askForRoomPassword(profile.nickname);
-
         return;
-
     }
 
-
-    const savedNickname =
-        user.user_metadata?.nickname;
-
-
+    const savedNickname = user.user_metadata?.nickname;
     if (savedNickname) {
-
-        const { data: newProfile, error: insertError } =
-            await supabaseClient
-                .from("profiles")
-                .insert({
-
-                    id: user.id,
-
-                    nickname: savedNickname
-
-                })
-                .select("nickname")
-                .single();
-
-
-        if (!insertError && newProfile) {
-            
-            // Profil se vytvořil, zeptáme se na heslo do místnosti
-            askForRoomPassword(newProfile.nickname);
-
-            return;
-
-        }
-
-    }
-
-
-    document.getElementById("nicknameBox").style.display =
-        "block";
-
-}
-
-
-// ==========================================
-// ULOŽENÍ PŘEZDÍVKY
-// ==========================================
-
-async function saveNickname() {
-
-    const nickname =
-        document.getElementById("nickname")
-            .value
-            .trim();
-
-    const message =
-        document.getElementById("nicknameMessage");
-
-
-    if (!nickname) {
-
-        message.innerText =
-            "Zadej přezdívku.";
-
-        message.className =
-            "error";
-
-        return;
-    }
-
-
-    const {
-        data: { user }
-    } =
-        await supabaseClient.auth.getUser();
-
-
-    if (!user) {
-
-        alert("Nejsi přihlášen.");
-
-        return;
-
-    }
-
-
-    const { data, error } =
-        await supabaseClient
+        const { data: newProfile } = await supabaseClient
             .from("profiles")
-            .insert({
-
-                id: user.id,
-
-                nickname: nickname
-
-            })
+            .insert({ id: user.id, nickname: savedNickname })
             .select("nickname")
             .single();
 
+        if (newProfile) {
+            askForRoomPassword(newProfile.nickname);
+            return;
+        }
+    }
 
-    if (error) {
+    document.getElementById("nicknameBox").style.display = "block";
+}
 
-        console.error(error);
+async function saveNickname() {
+    const nickname = document.getElementById("nickname").value.trim();
+    const message = document.getElementById("nicknameMessage");
 
-        message.innerText =
-            "❌ " + error.message;
-
-        message.className =
-            "error";
-
+    if (!nickname) {
+        message.innerText = "Zadej přezdívku.";
+        message.className = "error";
         return;
     }
 
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) return;
 
-    // Uloženo, teď chceme heslo k místnosti
+    const { data, error } = await supabaseClient
+        .from("profiles")
+        .insert({ id: user.id, nickname: nickname })
+        .select("nickname")
+        .single();
+
+    if (error) {
+        message.innerText = "❌ " + error.message;
+        message.className = "error";
+        return;
+    }
+
     askForRoomPassword(data.nickname);
-
 }
 
 
 // ==========================================
-// OTEVŘENÍ CHATU (PO ZADÁNÍ HESLA)
+// OTEVŘENÍ CHATU
 // ==========================================
 
 async function openChat(nickname) {
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("registerBox").style.display = "none";
+    document.getElementById("nicknameBox").style.display = "none";
+    document.getElementById("chatPasswordBox").style.display = "none";
+    document.getElementById("chat").style.display = "block";
 
-    document.getElementById("loginBox").style.display =
-        "none";
-
-    document.getElementById("registerBox").style.display =
-        "none";
-
-    document.getElementById("nicknameBox").style.display =
-        "none";
-        
-    document.getElementById("chatPasswordBox").style.display =
-        "none";
-
-    document.getElementById("chat").style.display =
-        "block";
-
-
-    currentNickname =
-        nickname;
-
-
-    document.getElementById("currentNickname").innerText =
-        nickname;
-
+    currentNickname = nickname;
+    document.getElementById("currentNickname").innerText = nickname;
 
     await loadMessages();
-
     await loadUsers();
-
     await startPresence();
-
     startMessagesSubscription();
-
 }
 
 
 // ==========================================
-// NAČTENÍ UŽIVATELŮ
+// UŽIVATELÉ & PRESENCE
 // ==========================================
 
 async function loadUsers() {
-
-    const usersList =
-        document.getElementById("usersList");
-
-
-    const { data, error } =
-        await supabaseClient
-            .from("profiles")
-            .select("id, nickname")
-            .order("nickname", {
-                ascending: true
-            });
-
+    const usersList = document.getElementById("usersList");
+    const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("id, nickname")
+        .order("nickname", { ascending: true });
 
     if (error) {
-
-        console.error(error);
-
-        usersList.innerText =
-            "Chyba při načítání uživatelů.";
-
+        usersList.innerText = "Chyba při načítání uživatelů.";
         return;
     }
-
 
     renderUsers(data || []);
-
 }
-
-
-// ==========================================
-// ZOBRAZENÍ UŽIVATELŮ
-// ==========================================
 
 function renderUsers(users) {
-
-    const usersList =
-        document.getElementById("usersList");
-
-
+    const usersList = document.getElementById("usersList");
     usersList.innerHTML = "";
 
-
     if (!users.length) {
-
-        usersList.innerText =
-            "Zatím nejsou žádní uživatelé.";
-
+        usersList.innerText = "Zatím nejsou žádní uživatelé.";
         return;
     }
 
-
-    const onlineUsers =
-        getOnlineUserIds();
-
+    const onlineUsers = getOnlineUserIds();
 
     users.forEach(user => {
+        const div = document.createElement("div");
+        div.className = "userItem";
 
-        const div =
-            document.createElement("div");
+        const status = document.createElement("span");
+        status.className = "userStatus";
 
-
-        div.className =
-            "userItem";
-
-
-        const status =
-            document.createElement("span");
-
-
-        status.className =
-            "userStatus";
-
-
-        const nickname =
-            document.createElement("span");
-
-
-        nickname.className =
-            "userNickname";
-
-
-        nickname.textContent =
-            user.nickname;
-
+        const nickname = document.createElement("span");
+        nickname.className = "userNickname";
+        nickname.textContent = user.nickname;
 
         if (onlineUsers.has(user.id)) {
-
-            status.textContent =
-                "🟢";
-
+            status.textContent = "🟢";
         } else {
-
-            status.textContent =
-                "⚪";
-
+            status.textContent = "⚪";
             nickname.classList.add("offline");
-
         }
-
 
         div.appendChild(status);
-
         div.appendChild(nickname);
-
-
         usersList.appendChild(div);
-
     });
-
 }
-
-
-// ==========================================
-// ZÍSKÁNÍ ONLINE UŽIVATELŮ
-// ==========================================
 
 function getOnlineUserIds() {
+    const onlineUsers = new Set();
+    if (!presenceChannel) return onlineUsers;
 
-    const onlineUsers =
-        new Set();
-
-
-    if (!presenceChannel) {
-
-        return onlineUsers;
-
-    }
-
-
-    const state =
-        presenceChannel.presenceState();
-
-
+    const state = presenceChannel.presenceState();
     Object.values(state).forEach(entries => {
-
         entries.forEach(entry => {
-
-            if (entry.user_id) {
-
-                onlineUsers.add(
-                    entry.user_id
-                );
-
-            }
-
+            if (entry.user_id) onlineUsers.add(entry.user_id);
         });
-
     });
 
-
     return onlineUsers;
-
 }
-
-
-// ==========================================
-// SPUŠTĚNÍ ONLINE STAVU
-// ==========================================
 
 async function startPresence() {
+    if (!currentUser || !currentNickname || presenceChannel) return;
 
-    if (!currentUser || !currentNickname) {
-
-        return;
-
-    }
-
-
-    if (presenceChannel) {
-
-        return;
-
-    }
-
-
-    presenceChannel =
-        supabaseClient.channel(
-            "chat-online-users",
-            {
-                config: {
-                    presence: {
-                        key: currentUser.id
-                    }
-                }
-            }
-        );
-
+    presenceChannel = supabaseClient.channel("chat-online-users", {
+        config: { presence: { key: currentUser.id } }
+    });
 
     presenceChannel
-        .on(
-            "presence",
-            {
-                event: "sync"
-            },
-            () => {
-
-                loadUsers();
-
+        .on("presence", { event: "sync" }, () => loadUsers())
+        .on("presence", { event: "join" }, () => loadUsers())
+        .on("presence", { event: "leave" }, () => loadUsers())
+        /* INDIKÁTOR PSANÍ (BOD 4) */
+        .on("broadcast", { event: "typing" }, payload => {
+            if (payload.payload.user_id !== currentUser.id) {
+                const indicator = document.getElementById("typingIndicator");
+                indicator.innerText = `${payload.payload.nickname} právě píše...`;
+                clearTimeout(window.typingTimeoutTimer);
+                window.typingTimeoutTimer = setTimeout(() => {
+                    indicator.innerText = "";
+                }, 2000);
             }
-        )
-        .on(
-            "presence",
-            {
-                event: "join"
-            },
-            () => {
+        });
 
-                loadUsers();
+    presenceChannel.subscribe(async status => {
+        if (status !== "SUBSCRIBED") return;
 
-            }
-        )
-        .on(
-            "presence",
-            {
-                event: "leave"
-            },
-            () => {
+        await presenceChannel.track({
+            user_id: currentUser.id,
+            nickname: currentNickname,
+            online_at: new Date().toISOString()
+        });
 
-                loadUsers();
+        loadUsers();
+    });
+}
 
-            }
-        );
-
-
-    presenceChannel.subscribe(
-        async status => {
-
-            if (status !== "SUBSCRIBED") {
-
-                return;
-
-            }
-
-
-            await presenceChannel.track({
-
-                user_id:
-                    currentUser.id,
-
-                nickname:
-                    currentNickname,
-
-                online_at:
-                    new Date().toISOString()
-
-            });
-
-
-            loadUsers();
-
-        }
-    );
-
+// Odesílání stavu píše... (bod 4)
+function handleTyping() {
+    if (presenceChannel) {
+        presenceChannel.send({
+            type: "broadcast",
+            event: "typing",
+            payload: { user_id: currentUser.id, nickname: currentNickname }
+        });
+    }
 }
 
 
 // ==========================================
-// REALTIME ODBĚR NOVÝCH ZPRÁV
+// ZPRÁVY & MAZÁNÍ (BOD 3)
 // ==========================================
 
 function startMessagesSubscription() {
-
-    if (messagesChannel) {
-
-        return;
-
-    }
-
+    if (messagesChannel) return;
 
     try {
-
-        messagesChannel =
-            supabaseClient
-                .channel("realtime-messages-channel")
-                .on(
-                    "postgres_changes",
-                    {
-                        event: "INSERT",
-                        schema: "public",
-                        table: "messages"
-                    },
-                    payload => {
-
-                        const newMessage =
-                            payload.new;
-
-
-                        addMessage(
-                            newMessage,
-                            currentUser ? currentUser.id : null
-                        );
-
-
-                        const messages =
-                            document.getElementById("messages");
-
-
-                        if (messages) {
-
-                            messages.scrollTop =
-                                messages.scrollHeight;
-
+        messagesChannel = supabaseClient
+            .channel("realtime-messages-channel")
+            .on(
+                "postgres_changes",
+                { event: "*", schema: "public", table: "messages" },
+                payload => {
+                    if (payload.eventType === "INSERT") {
+                        const newMessage = payload.new;
+                        addMessage(newMessage, currentUser ? currentUser.id : null);
+                        
+                        // Zvuk / Notifikace pro zprávy od ostatních
+                        if (currentUser && newMessage.user_id !== currentUser.id) {
+                            triggerNotification(newMessage.nickname, newMessage.message);
                         }
 
+                        const messages = document.getElementById("messages");
+                        if (messages) messages.scrollTop = messages.scrollHeight;
+                    } 
+                    else if (payload.eventType === "DELETE") {
+                        // Smazání zprávy v reálném čase
+                        const msgDiv = document.getElementById(`msg-${payload.old.id}`);
+                        if (msgDiv) msgDiv.remove();
                     }
-                )
-                .subscribe();
+                }
+            )
+            .subscribe();
 
-    } catch (err) {
-
-        console.error("Chyba Realtime připojení:", err);
-
-    }
-
+    } catch (err) { console.error("Realtime error:", err); }
 }
-
-
-// ==========================================
-// NAČTENÍ ZPRÁV
-// ==========================================
 
 async function loadMessages() {
-
-    const { data, error } =
-        await supabaseClient
-            .from("messages")
-            .select(
-                "id, user_id, nickname, message, created_at"
-            )
-            .order(
-                "created_at",
-                {
-                    ascending: true
-                }
-            );
-
+    const { data, error } = await supabaseClient
+        .from("messages")
+        .select("id, user_id, nickname, message, created_at")
+        .order("created_at", { ascending: true });
 
     if (error) {
-
-        console.error(error);
-
-        document.getElementById("messages").innerText =
-            "Chyba při načítání zpráv.";
-
+        document.getElementById("messages").innerText = "Chyba při načítání zpráv.";
         return;
     }
 
-
-    const messages =
-        document.getElementById("messages");
-
-
+    const messages = document.getElementById("messages");
     messages.innerHTML = "";
 
-
-    const {
-        data: { user }
-    } =
-        await supabaseClient.auth.getUser();
-
-
     if (data) {
-
         data.forEach(message => {
-
-            addMessage(
-                message,
-                user ? user.id : null
-            );
-
+            addMessage(message, currentUser ? currentUser.id : null);
         });
-
     }
 
-
-    messages.scrollTop =
-        messages.scrollHeight;
-
+    messages.scrollTop = messages.scrollHeight;
 }
-
-
-// ==========================================
-// ZOBRAZENÍ ZPRÁVY
-// ==========================================
 
 function addMessage(message, currentUserId) {
+    const messages = document.getElementById("messages");
+    if (!messages) return;
 
-    const messages =
-        document.getElementById("messages");
+    // Pokud už zpráva existuje (prevence duplicity)
+    if (document.getElementById(`msg-${message.id}`)) return;
 
+    const div = document.createElement("div");
+    div.id = `msg-${message.id}`;
 
-    if (!messages) {
+    const isMine = message.user_id === currentUserId;
+    div.className = "message " + (isMine ? "mine" : "other");
 
-        return;
+    const nickname = document.createElement("span");
+    nickname.className = "nickname";
+    nickname.textContent = message.nickname;
 
-    }
+    const text = document.createElement("span");
+    text.className = "text";
+    text.textContent = message.message;
 
+    const time = document.createElement("span");
+    time.className = "time";
 
-    const div =
-        document.createElement("div");
-
-
-    const isMine =
-        message.user_id === currentUserId;
-
-
-    div.className =
-        "message " +
-        (isMine ? "mine" : "other");
-
-
-    const nickname =
-        document.createElement("span");
-
-
-    nickname.className =
-        "nickname";
-
-
-    nickname.textContent =
-        message.nickname;
-
-
-    const text =
-        document.createElement("span");
-
-
-    text.className =
-        "text";
-
-
-    text.textContent =
-        message.message;
-
-
-    const time =
-        document.createElement("span");
-
-
-    time.className =
-        "time";
-
-
-    const date =
-        new Date(message.created_at);
-
-
+    const date = new Date(message.created_at);
     if (!isNaN(date.getTime())) {
-
-        time.textContent =
-            date.toLocaleString("cs-CZ", {
-
-                timeZone: "Europe/Prague",
-
-                day: "2-digit",
-
-                month: "2-digit",
-
-                year: "numeric",
-
-                hour: "2-digit",
-
-                minute: "2-digit"
-
-            });
-
+        time.textContent = date.toLocaleString("cs-CZ", {
+            timeZone: "Europe/Prague",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
     } else {
-
-        time.textContent =
-            "čas neznámý";
-
+        time.textContent = "čas neznámý";
     }
-
 
     div.appendChild(nickname);
-
     div.appendChild(text);
-
     div.appendChild(time);
 
+    /* MAZÁNÍ VLASTNÍCH ZPRÁV (BOD 3) */
+    if (isMine) {
+        const delBtn = document.createElement("button");
+        delBtn.className = "delete-btn";
+        delBtn.innerHTML = "🗑️";
+        delBtn.title = "Smazat zprávu";
+        delBtn.onclick = () => deleteMessage(message.id);
+        div.appendChild(delBtn);
+    }
 
     messages.appendChild(div);
-
 }
 
+// Funkce pro smazání zprávy z Supabase
+async function deleteMessage(messageId) {
+    if (!confirm("Opravdu chceš tuto zprávu smazat?")) return;
 
-// ==========================================
-// ODESLÁNÍ ZPRÁVY
-// ==========================================
-
-async function sendMessage() {
-
-    const input =
-        document.getElementById("messageInput");
-
-
-    const text =
-        input.value.trim();
-
-
-    if (!text) {
-
-        return;
-
-    }
-
-
-    const {
-        data: { user }
-    } =
-        await supabaseClient.auth.getUser();
-
-
-    if (!user) {
-
-        alert("Nejsi přihlášen.");
-
-        return;
-
-    }
-
-
-    const nickname =
-        document.getElementById(
-            "currentNickname"
-        ).innerText;
-
-
-    const { error } =
-        await supabaseClient
-            .from("messages")
-            .insert({
-
-                user_id: user.id,
-
-                nickname: nickname,
-
-                message: text
-
-            });
-
+    const { error } = await supabaseClient
+        .from("messages")
+        .delete()
+        .eq("id", messageId);
 
     if (error) {
+        alert("Chyba při mazání zprávy: " + error.message);
+    }
+}
 
-        console.error(error);
+async function sendMessage() {
+    const input = document.getElementById("messageInput");
+    const text = input.value.trim();
 
-        alert(
-            "Zprávu se nepodařilo odeslat: " +
-            error.message
-        );
+    if (!text) return;
 
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) {
+        alert("Nejsi přihlášen.");
         return;
-
     }
 
+    const nickname = document.getElementById("currentNickname").innerText;
+
+    const { error } = await supabaseClient
+        .from("messages")
+        .insert({
+            user_id: user.id,
+            nickname: nickname,
+            message: text
+        });
+
+    if (error) {
+        alert("Zprávu se nepodařilo odeslat: " + error.message);
+        return;
+    }
 
     input.value = "";
-
 }
-
-
-// ==========================================
-// ODHLÁŠENÍ
-// ==========================================
 
 async function logout() {
-
     if (presenceChannel) {
-
-        try {
-
-            await presenceChannel.untrack();
-
-        } catch (error) {
-
-            console.error(error);
-
-        }
-
-
-        try {
-
-            await supabaseClient.removeChannel(
-                presenceChannel
-            );
-
-        } catch (error) {
-
-            console.error(error);
-
-        }
-
-
-        presenceChannel =
-            null;
-
+        try { await presenceChannel.untrack(); } catch(e){}
+        try { await supabaseClient.removeChannel(presenceChannel); } catch(e){}
+        presenceChannel = null;
     }
-
 
     if (messagesChannel) {
-
-        try {
-
-            await supabaseClient.removeChannel(
-                messagesChannel
-            );
-
-        } catch (error) {
-
-            console.error(error);
-
-        }
-
-
-        messagesChannel =
-            null;
-
+        try { await supabaseClient.removeChannel(messagesChannel); } catch(e){}
+        messagesChannel = null;
     }
-
 
     await supabaseClient.auth.signOut();
-
     location.reload();
-
 }
-
-
-// ==========================================
-// KONTROLA EXISTUJÍCÍHO PŘIHLÁŠENÍ
-// ==========================================
 
 async function checkSession() {
-
-    const {
-        data: { session }
-    } =
-        await supabaseClient.auth.getSession();
-
-
+    const { data: { session } } = await supabaseClient.auth.getSession();
     if (session) {
-
-        currentUser =
-            session.user;
-
+        currentUser = session.user;
         await checkProfile();
-
     }
-
 }
 
-
 checkSession();
-
 
 </script>
 
 </body>
 </html>
-
-```
