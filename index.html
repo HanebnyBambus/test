@@ -22,7 +22,7 @@
 
         .box {
             width: 90%;
-            max-width: 650px;
+            max-width: 1100px;
             margin: 40px auto;
             background: white;
             padding: 25px;
@@ -68,21 +68,37 @@
             display: none;
         }
 
-        /* ============================= */
-        /* UŽIVATELÉ */
-        /* ============================= */
+
+        /* ================================= */
+        /* HLAVNÍ ROZLOŽENÍ CHATU */
+        /* ================================= */
+
+        .chatLayout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+
+        /* ================================= */
+        /* LEVÝ PANEL - UŽIVATELÉ */
+        /* ================================= */
 
         #usersBox {
-            margin-bottom: 15px;
             padding: 15px;
             border: 1px solid #ddd;
             border-radius: 10px;
             background: #fafafa;
+
+            height: 455px;
+            overflow-y: auto;
         }
 
         #usersTitle {
             font-weight: bold;
-            margin-bottom: 10px;
+            font-size: 18px;
+            margin-bottom: 12px;
         }
 
         #usersList {
@@ -94,7 +110,7 @@
         .userItem {
             display: flex;
             align-items: center;
-            padding: 8px 10px;
+            padding: 9px 10px;
             background: white;
             border-radius: 8px;
             border: 1px solid #eee;
@@ -107,15 +123,23 @@
 
         .userNickname {
             font-weight: bold;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .offline {
             color: #888;
         }
 
-        /* ============================= */
-        /* ZPRÁVY */
-        /* ============================= */
+
+        /* ================================= */
+        /* PRAVÁ ČÁST - CHAT */
+        /* ================================= */
+
+        .chatMain {
+            min-width: 0;
+        }
 
         #messages {
             height: 400px;
@@ -126,6 +150,11 @@
             border-radius: 10px;
             background: #fafafa;
         }
+
+
+        /* ================================= */
+        /* ZPRÁVY */
+        /* ================================= */
 
         .message {
             width: fit-content;
@@ -176,6 +205,11 @@
             color: #ccc;
         }
 
+
+        /* ================================= */
+        /* OSTATNÍ */
+        /* ================================= */
+
         .error {
             color: #b00020;
         }
@@ -186,6 +220,38 @@
 
         .info {
             color: #555;
+        }
+
+
+        /* ================================= */
+        /* MOBIL */
+        /* ================================= */
+
+        @media (max-width: 700px) {
+
+            .box {
+                width: 95%;
+                margin: 15px auto;
+                padding: 15px;
+            }
+
+            .chatLayout {
+                grid-template-columns: 1fr;
+            }
+
+            #usersBox {
+                height: auto;
+                max-height: 220px;
+            }
+
+            #messages {
+                height: 400px;
+            }
+
+            .message {
+                max-width: 85%;
+            }
+
         }
 
     </style>
@@ -316,51 +382,64 @@
 
 
     <!-- ================================= -->
-    <!-- UŽIVATELÉ -->
+    <!-- LEVÝ PANEL + CHAT -->
     <!-- ================================= -->
 
-    <div id="usersBox">
+    <div class="chatLayout">
 
-        <div id="usersTitle">
-            👥 Uživatelé
+
+        <!-- ================================= -->
+        <!-- UŽIVATELÉ VLEVO -->
+        <!-- ================================= -->
+
+        <div id="usersBox">
+
+            <div id="usersTitle">
+                👥 Uživatelé
+            </div>
+
+            <div id="usersList">
+                Načítám uživatele...
+            </div>
+
         </div>
 
-        <div id="usersList">
-            Načítám uživatele...
+
+        <!-- ================================= -->
+        <!-- CHAT VPRAVO -->
+        <!-- ================================= -->
+
+        <div class="chatMain">
+
+            <div id="messages">
+                Načítám zprávy...
+            </div>
+
+
+            <input
+                id="messageInput"
+                type="text"
+                maxlength="500"
+                placeholder="Napiš zprávu..."
+                onkeydown="if(event.key === 'Enter') sendMessage()"
+            >
+
+
+            <button onclick="sendMessage()">
+                Odeslat
+            </button>
+
+
+            <button
+                class="logout"
+                onclick="logout()"
+            >
+                Odhlásit
+            </button>
+
         </div>
 
     </div>
-
-
-    <!-- ================================= -->
-    <!-- ZPRÁVY -->
-    <!-- ================================= -->
-
-    <div id="messages">
-        Načítám zprávy...
-    </div>
-
-
-    <input
-        id="messageInput"
-        type="text"
-        maxlength="500"
-        placeholder="Napiš zprávu..."
-        onkeydown="if(event.key === 'Enter') sendMessage()"
-    >
-
-
-    <button onclick="sendMessage()">
-        Odeslat
-    </button>
-
-
-    <button
-        class="logout"
-        onclick="logout()"
-    >
-        Odhlásit
-    </button>
 
 </div>
 
@@ -871,7 +950,6 @@ function renderUsers(users) {
     }
 
 
-    // Získáme seznam právě online uživatelů
     const onlineUsers =
         getOnlineUserIds();
 
@@ -989,7 +1067,6 @@ async function startPresence() {
     }
 
 
-    // Pokud už kanál existuje, nepřidáváme další
     if (presenceChannel) {
 
         return;
