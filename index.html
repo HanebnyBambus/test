@@ -544,10 +544,28 @@ function startMessagesSubscription() {
 }
 
 async function loadMessages() {
-    // Nově vybíráme i is_edited
-    const { data, error } = await supabaseClient.from("messages").select("id, user_id, nickname, message, created_at, is_edited").order("created_at", { ascending: true });
-    const messages = document.getElementById("messages"); messages.innerHTML = "";
-    if (data) data.forEach(msg => addMessage(msg, currentUser ? currentUser.id : null));
+    // Načteme pouze posledních 50 zpráv, aby se chat nezpomaloval
+    const { data, error } = await supabaseClient
+        .from("messages")
+        .select("id, user_id, nickname, message, created_at, is_edited")
+        .order("created_at", { ascending: false }) // Nejdříve ty nejnovější
+        .limit(50); 
+
+    if (error) {
+        document.getElementById("messages").innerText = "Chyba při načítání zpráv.";
+        return;
+    }
+
+    const messages = document.getElementById("messages");
+    messages.innerHTML = "";
+
+    // Otočíme data, abychom je vypsali od nejstarších po nejnovější
+    if (data) {
+        data.reverse().forEach(message => {
+            addMessage(message, currentUser ? currentUser.id : null);
+        });
+    }
+
     messages.scrollTop = messages.scrollHeight;
 }
 
