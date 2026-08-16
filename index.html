@@ -426,7 +426,7 @@
         }
 
         /* ================================= */
-        /* AVATARY (PILL / ŠTÍTEK) */
+        /* AVATARY */
         /* ================================= */
 
         .avatar {
@@ -440,7 +440,7 @@
             font-weight: bold;
             font-size: 11px;
             flex-shrink: 0;
-            background: rgba(0, 0, 0, 0.2); /* Tmavší kroužek uvnitř štítku */
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .avatar-small {
@@ -448,27 +448,29 @@
             height: 24px;
             font-size: 12px;
             margin-right: 8px;
-            background: transparent; /* V seznamu uživatelů zůstane plná barva */
+            background: transparent;
         }
 
         .nickname-wrapper {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 3px 10px 3px 5px; /* Roztáhne pozadí přes celé jméno */
+            padding: 3px 10px 3px 5px;
             border-radius: 12px;
             margin-bottom: 4px;
         }
 
         /* ================================= */
-        /* REAKCE */
+        /* ROZBALOVACÍ REAKCE */
         /* ================================= */
 
-        .reaction-bar {
+        .reaction-container {
             display: flex;
             flex-wrap: wrap;
+            align-items: center;
             gap: 5px;
-            margin-top: 5px;
+            margin-top: 6px;
+            position: relative;
         }
 
         .reaction-pill {
@@ -479,40 +481,63 @@
             padding: 2px 7px;
             font-size: 11px;
             cursor: default;
+            color: var(--text-color);
         }
 
-        .reaction-add {
-            display: flex;
-            gap: 5px;
-            margin-top: 5px;
-        }
-
-        .reaction-btn {
+        .reaction-trigger-btn {
             background: var(--sub-bg);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 2px 6px;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            font-size: 12px;
-            width: auto;
+            font-size: 11px;
+            padding: 0;
             margin-top: 0;
+            opacity: 0.7;
         }
 
-        .reaction-btn:hover {
+        .reaction-trigger-btn:hover {
+            opacity: 1;
             background: var(--box-border);
         }
 
-        .error {
-            color: #b00020;
+        .reaction-popup {
+            display: none;
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            background: var(--box-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            gap: 4px;
+            z-index: 50;
         }
 
-        .success {
-            color: green;
+        .reaction-popup button {
+            background: transparent;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px;
+            width: auto;
+            margin-top: 0;
+            border-radius: 6px;
         }
 
-        .info {
-            color: #555;
+        .reaction-popup button:hover {
+            background: var(--sub-bg);
+            transform: scale(1.2);
         }
+
+        .error { color: #b00020; }
+        .success { color: green; }
+        .info { color: #555; }
 
         @media (max-width: 700px) {
             .box {
@@ -1459,7 +1484,6 @@ function startMessagesSubscription() {
 
                 if (payload.eventType === "INSERT") {
 
-                    // PŘIDÁNA PODMÍNKA ZDE:
                     if (!isSearching) {
                         addMessage(
                             payload.new,
@@ -1561,7 +1585,6 @@ function startMessagesSubscription() {
                 table: "reactions"
             },
             payload => {
-                // Pošle se notifikace všem, stačí znovu načíst
                 loadMessages();
             }
         )
@@ -1571,12 +1594,11 @@ function startMessagesSubscription() {
 
 
 /* ================================= */
-/* NAČTENÍ ZPRÁV + REAKCÍ (OPRAVENO) */
+/* NAČTENÍ ZPRÁV + REAKCÍ */
 /* ================================= */
 
 async function loadMessages() {
     
-    // 1. Načteme POUZE zprávy (bez vnucené vazby na tabulku reakcí)
     const { data: messagesData, error: messagesError } = await supabaseClient
         .from("messages")
         .select("id, user_id, nickname, message, created_at, is_edited")
@@ -1589,7 +1611,6 @@ async function loadMessages() {
         return;
     }
 
-    // 2. Zjistíme ID načtených zpráv a stáhneme k nim reakce
     let reactionsData = [];
     if (messagesData && messagesData.length > 0) {
         const messageIds = messagesData.map(msg => msg.id);
@@ -1603,12 +1624,10 @@ async function loadMessages() {
         }
     }
 
-    // 3. Propojíme reakce se zprávami
     messagesData.forEach(msg => {
         msg.reactions = reactionsData.filter(rx => rx.message_id === msg.id);
     });
 
-    // 4. Vykreslíme
     const messages = document.getElementById("messages");
     messages.innerHTML = "";
 
@@ -1649,7 +1668,7 @@ function addMessage(message, currentUserId) {
         (isMine ? "mine" : "other");
 
 
-    /* PŘEZDÍVKA A AVATAR (JEDNOTNÝ ŠTÍTEK) */
+    /* PŘEZDÍVKA A AVATAR */
 
     const nickWrapper = document.createElement("div");
     nickWrapper.className = "nickname-wrapper";
@@ -1666,8 +1685,6 @@ function addMessage(message, currentUserId) {
 
     if (isMine) {
         nickWrapper.style.flexDirection = "row-reverse";
-        // Pro tvoji zprávu případně otočíme vnitřek štítku, aby byl avatar vpravo, 
-        // nebo to může zůstat vlevo jako u ostatních (zde ponecháno přirozeně).
     }
 
     nickWrapper.appendChild(avatar);
@@ -1724,78 +1741,62 @@ function addMessage(message, currentUserId) {
 
 
     /* ================================= */
-    /* REAKCE */
+    /* ROZBALOVACÍ REAKCE */
     /* ================================= */
 
-    const reactionsDiv =
-        document.createElement("div");
+    const reactionContainer = document.createElement("div");
+    reactionContainer.className = "reaction-container";
 
-    reactionsDiv.className =
-        "reaction-bar";
-
-    if (
-        message.reactions &&
-        message.reactions.length > 0
-    ) {
-
+    // 1. Zobrazení existujících reakcí
+    if (message.reactions && message.reactions.length > 0) {
         const counts = {};
+        message.reactions.forEach(reaction => {
+            counts[reaction.emoji] = (counts[reaction.emoji] || 0) + 1;
+        });
 
-        message.reactions.forEach(
-            reaction => {
-
-                counts[reaction.emoji] =
-                    (counts[reaction.emoji] || 0) + 1;
-            }
-        );
-
-        Object.entries(counts).forEach(
-            ([emoji, count]) => {
-
-                const span =
-                    document.createElement("span");
-
-                span.className =
-                    "reaction-pill";
-
-                span.textContent =
-                    `${emoji} ${count}`;
-
-                reactionsDiv.appendChild(span);
-            }
-        );
+        Object.entries(counts).forEach(([emoji, count]) => {
+            const span = document.createElement("span");
+            span.className = "reaction-pill";
+            span.textContent = `${emoji} ${count}`;
+            reactionContainer.appendChild(span);
+        });
     }
 
+    // 2. Tlačítko pro otevření nabídky reakcí (+)
+    const triggerBtn = document.createElement("button");
+    triggerBtn.className = "reaction-trigger-btn";
+    triggerBtn.textContent = "➕";
+    triggerBtn.title = "Přidat reakci";
 
-    /* TLAČÍTKA PRO PŘIDÁNÍ REAKCE */
-
-    const addReactionDiv =
-        document.createElement("div");
-
-    addReactionDiv.className =
-        "reaction-add";
-
-    addReactionDiv.innerHTML = `
-        <button
-            class="reaction-btn"
-            onclick="addReaction(${message.id}, '👍')"
-            title="👍"
-        >👍</button>
-
-        <button
-            class="reaction-btn"
-            onclick="addReaction(${message.id}, '😂')"
-            title="😂"
-        >😂</button>
-
-        <button
-            class="reaction-btn"
-            onclick="addReaction(${message.id}, '❤️')"
-            title="❤️"
-        >❤️</button>
+    // 3. Vysouvací popup s emoji
+    const popup = document.createElement("div");
+    popup.className = "reaction-popup";
+    popup.innerHTML = `
+        <button onclick="addReaction(${message.id}, '👍')">👍</button>
+        <button onclick="addReaction(${message.id}, '😂')">😂</button>
+        <button onclick="addReaction(${message.id}, '❤️')">❤️</button>
+        <button onclick="addReaction(${message.id}, '🔥')">🔥</button>
+        <button onclick="addReaction(${message.id}, '🎉')">🎉</button>
     `;
 
-    div.appendChild(reactionsDiv);
-    div.appendChild(addReactionDiv);
+    // Interakce pro rozbalení / zavření
+    triggerBtn.onclick = (e) => {
+        e.stopPropagation();
+        // Zavře případné jiné otevřené popupy
+        document.querySelectorAll('.reaction-popup').forEach(p => {
+            if (p !== popup) p.style.display = 'none';
+        });
+        popup.style.display = popup.style.display === 'flex' ? 'none' : 'flex';
+    };
+
+    reactionContainer.appendChild(triggerBtn);
+    reactionContainer.appendChild(popup);
+    div.appendChild(reactionContainer);
+
+    // Zavření popupu při kliknutí kamkoliv jinam na stránku
+    document.addEventListener('click', () => {
+        popup.style.display = 'none';
+    });
 
 
     /* ČAS */
@@ -2056,7 +2057,7 @@ async function checkSession() {
     }
 }
 
-    /* ================================= */
+/* ================================= */
 /* VYHLEDÁVÁNÍ ZPRÁV */
 /* ================================= */
 
@@ -2073,7 +2074,6 @@ async function executeSearch() {
     document.getElementById("clearSearchBtn").style.display = "block";
     document.getElementById("messages").innerHTML = "Hledám...";
 
-    // Hledání v Supabase (ilike ignoruje velká/malá písmena)
     const { data: messagesData, error: messagesError } = await supabaseClient
         .from("messages")
         .select("id, user_id, nickname, message, created_at, is_edited")
@@ -2086,7 +2086,6 @@ async function executeSearch() {
         return;
     }
 
-    // Načtení reakcí pro nalezené zprávy
     let reactionsData = [];
     if (messagesData && messagesData.length > 0) {
         const messageIds = messagesData.map(msg => msg.id);
@@ -2101,7 +2100,6 @@ async function executeSearch() {
         msg.reactions = reactionsData.filter(rx => rx.message_id === msg.id);
     });
 
-    // Vykreslení výsledků
     const messages = document.getElementById("messages");
     messages.innerHTML = "";
 
@@ -2119,7 +2117,7 @@ function clearSearch() {
     isSearching = false;
     document.getElementById("searchInput").value = "";
     document.getElementById("clearSearchBtn").style.display = "none";
-    loadMessages(); // Načte zpět normální chat
+    loadMessages();
 }
     
 checkSession();
