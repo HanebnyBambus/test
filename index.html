@@ -6,7 +6,6 @@
 
     <title>Můj chat</title>
     
-    <!-- Přidaná ikonka pro odstranění favicon.ico erroru -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💬</text></svg>">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -63,6 +62,24 @@
 
         .logout {
             background: #b00020;
+        }
+
+        /* Třída pro checkbox na zobrazení hesla */
+        .show-password-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #555;
+            cursor: pointer;
+        }
+
+        .show-password-label input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+            padding: 0;
+            cursor: pointer;
         }
 
         #registerBox,
@@ -283,6 +300,11 @@
         type="password"
         placeholder="Heslo"
     >
+    <!-- Checkbox pro zobrazení hesla -->
+    <label class="show-password-label">
+        <input type="checkbox" onchange="document.getElementById('loginPassword').type = this.checked ? 'text' : 'password'">
+        Zobrazit heslo
+    </label>
 
     <button onclick="login()">
         Přihlásit
@@ -319,6 +341,11 @@
         type="password"
         placeholder="Heslo (min. 6 znaků)"
     >
+    <!-- Checkbox pro zobrazení hesla -->
+    <label class="show-password-label">
+        <input type="checkbox" onchange="document.getElementById('registerPassword').type = this.checked ? 'text' : 'password'">
+        Zobrazit heslo
+    </label>
 
     <input
         id="registerNickname"
@@ -389,6 +416,11 @@
         placeholder="Heslo místnosti"
         onkeydown="if(event.key === 'Enter') verifyRoomPassword()"
     >
+    <!-- Checkbox pro zobrazení hesla -->
+    <label class="show-password-label">
+        <input type="checkbox" onchange="document.getElementById('roomPasswordInput').type = this.checked ? 'text' : 'password'">
+        Zobrazit heslo
+    </label>
 
     <button onclick="verifyRoomPassword()">
         Vstoupit do chatu
