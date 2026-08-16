@@ -1768,14 +1768,16 @@ function addMessage(message, currentUserId) {
     triggerBtn.textContent = "➕";
     triggerBtn.title = "Přidat reakci";
 
-    // 3. Vysouvací popup s emoji
+    // 3. Vysouvací popup s emoji (přidán palec dolů 👎 a hovno 💩)
     const popup = document.createElement("div");
     popup.className = "reaction-popup";
     popup.innerHTML = `
         <button onclick="addReaction(${message.id}, '👍')">👍</button>
+        <button onclick="addReaction(${message.id}, '👎')">👎</button>
         <button onclick="addReaction(${message.id}, '😂')">😂</button>
         <button onclick="addReaction(${message.id}, '❤️')">❤️</button>
         <button onclick="addReaction(${message.id}, '🔥')">🔥</button>
+        <button onclick="addReaction(${message.id}, '💩')">💩</button>
         <button onclick="addReaction(${message.id}, '🎉')">🎉</button>
     `;
 
