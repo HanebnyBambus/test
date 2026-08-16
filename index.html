@@ -1242,7 +1242,12 @@ async function openChat(nickname) {
     await loadUsers();
     await startPresence();
 
-    startMessagesSubscription();
+    // Zrušíme problematický websocket a nahradíme ho spolehlivým intervalem (polling každé 3 sekundy)
+    setInterval(() => {
+        if (!isSearching) {
+            loadMessages(); // Každé 3 sekundy tiše stáhne nové zprávy a reakce
+        }
+    }, 3000);
 }
 
 
