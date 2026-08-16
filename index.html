@@ -386,37 +386,69 @@ async function showChat() {
 
     const {
         data: { user }
-    } =
-        await supabaseClient.auth.getUser();
-
+    } = await supabaseClient.auth.getUser();
 
     if (!user) {
-
         showLogin();
-
         return;
     }
 
 
-    const { data: profile, error } =
+    // Zkusíme najít existující profil
+    let { data: profile, error } =
         await supabaseClient
             .from("profiles")
             .select("nickname")
             .eq("id", user.id)
-            .single();
+            .maybeSingle();
 
 
-    if (error) {
+    // Pokud profil neexistuje, vytvoříme ho
+    if (!profile) {
 
-        alert(
-            "Nepodařilo se načíst profil: " +
-            error.message
-        );
+        const nickname =
+            user.user_metadata?.nickname;
 
-        return;
+
+        if (!nickname) {
+
+            alert(
+                "K tomuto účtu není uložená přezdívka."
+            );
+
+            return;
+        }
+
+
+        const { data: newProfile, error: profileError } =
+            await supabaseClient
+                .from("profiles")
+                .insert({
+                    id: user.id,
+                    nickname: nickname
+                })
+                .select("nickname")
+                .single();
+
+
+        if (profileError) {
+
+            console.error(profileError);
+
+            alert(
+                "Nepodařilo se vytvořit profil: " +
+                profileError.message
+            );
+
+            return;
+        }
+
+
+        profile = newProfile;
     }
 
 
+    // Zobrazíme chat
     document.getElementById("loginBox").style.display =
         "none";
 
