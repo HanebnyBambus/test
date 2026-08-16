@@ -172,6 +172,10 @@
         .edit-btn { color: #ffca28; }
         .delete-btn { color: #ff6b6b; }
 
+        .reaction-bar { display: flex; gap: 5px; margin-top: 5px; }
+        .reaction-btn { background: var(--sub-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 2px 6px; cursor: pointer; font-size: 12px; }
+        .reaction-btn:hover { background: var(--box-border); }
+
         .error { color: #b00020; }
         .success { color: green; }
         .info { color: #555; }
@@ -589,7 +593,18 @@ function addMessage(message, currentUserId) {
         time.innerHTML += ' <span class="edited-label">(upraveno)</span>';
     }
 
-    div.appendChild(nickname); div.appendChild(text); div.appendChild(time);
+    div.appendChild(nickname); div.appendChild(text);
+
+    const reactionsDiv = document.createElement("div");
+    reactionsDiv.className = "reaction-bar";
+    reactionsDiv.innerHTML = `
+        <button class="reaction-btn" onclick="addReaction(${message.id}, '👍')">👍</button>
+        <button class="reaction-btn" onclick="addReaction(${message.id}, '😂')">😂</button>
+        <button class="reaction-btn" onclick="addReaction(${message.id}, '❤️')">❤️</button>
+    `;
+    div.appendChild(reactionsDiv);
+
+    div.appendChild(time);
 
     // Ikony UPRAVIT a SMAZAT
     if (isMine) {
@@ -661,6 +676,24 @@ async function logout() {
     if (messagesChannel) { try { await supabaseClient.removeChannel(messagesChannel); } catch(e){} }
     await supabaseClient.auth.signOut();
     location.reload();
+}
+
+async function addReaction(messageId, emoji) {
+    if (!currentUser) return;
+    
+    const { error } = await supabaseClient
+        .from("reactions")
+        .insert({ 
+            message_id: messageId, 
+            user_id: currentUser.id, 
+            emoji: emoji 
+        });
+
+    if (error) {
+        console.error("Chyba při reakci:", error);
+    } else {
+        // Reakce byla uložena do databáze.
+    }
 }
 
 async function checkSession() {
