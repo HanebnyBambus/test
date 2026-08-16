@@ -172,6 +172,24 @@
             background: #b00020;
         }
 
+        .chatHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .chatHeader p {
+            margin: 0;
+        }
+
+        .logout-small {
+            width: auto;
+            padding: 8px 16px;
+            margin-top: 0;
+            font-size: 14px;
+        }
+
         #registerBox,
         #nicknameBox,
         #chatPasswordBox,
@@ -202,7 +220,7 @@
             border-radius: 10px;
             background: var(--sub-bg);
 
-            height: 455px;
+            height: 520px;
             overflow-y: auto;
         }
 
@@ -253,13 +271,28 @@
         }
 
         #messages {
-            height: 400px;
+            height: 450px;
             overflow-y: auto;
             border: 1px solid var(--box-border);
             padding: 12px;
-            margin-top: 15px;
             border-radius: 10px;
             background: var(--sub-bg);
+        }
+
+        .inputGroup {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .inputGroup input {
+            margin-top: 0;
+        }
+
+        .inputGroup button {
+            width: 140px;
+            margin-top: 0;
+            flex-shrink: 0;
         }
 
 
@@ -297,6 +330,11 @@
             margin-bottom: 4px;
         }
 
+        .text {
+            display: block;
+            margin-bottom: 4px;
+        }
+
         .message.mine .nickname {
             color: #ddd;
         }
@@ -308,7 +346,6 @@
         .time {
             display: block;
             font-size: 11px;
-            margin-top: 6px;
             color: var(--time-color);
         }
 
@@ -556,10 +593,10 @@
 
     <h1>💬 Můj chat</h1>
 
-    <p>
-        Přihlášen jako:
-        <strong id="currentNickname"></strong>
-    </p>
+    <div class="chatHeader">
+        <p>Přihlášen jako: <strong id="currentNickname"></strong></p>
+        <button class="logout logout-small" onclick="logout()">Odhlásit</button>
+    </div>
 
 
     <!-- ================================= -->
@@ -596,27 +633,19 @@
                 Načítám zprávy...
             </div>
 
+            <div class="inputGroup">
+                <input
+                    id="messageInput"
+                    type="text"
+                    maxlength="500"
+                    placeholder="Napiš zprávu..."
+                    onkeydown="if(event.key === 'Enter') sendMessage()"
+                >
 
-            <input
-                id="messageInput"
-                type="text"
-                maxlength="500"
-                placeholder="Napiš zprávu..."
-                onkeydown="if(event.key === 'Enter') sendMessage()"
-            >
-
-
-            <button onclick="sendMessage()">
-                Odeslat
-            </button>
-
-
-            <button
-                class="logout"
-                onclick="logout()"
-            >
-                Odhlásit
-            </button>
+                <button onclick="sendMessage()">
+                    Odeslat
+                </button>
+            </div>
 
         </div>
 
@@ -1607,6 +1636,10 @@ function addMessage(message, currentUserId) {
 
     const text =
         document.createElement("span");
+
+
+    text.className =
+        "text";
 
 
     text.textContent =
