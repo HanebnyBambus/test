@@ -11,87 +11,58 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* CSS PROMĚNNÉ PRO SNADNÉ PŘEPÍNÁNÍ */
-        :root {
-            --bg-color: #f2f2f2;
-            --box-bg: white;
-            --text-color: #333;
-            --input-bg: white;
-            --border-color: #ddd;
-            --msg-other-bg: #e8e8e8;
-            --msg-mine-bg: #222;
-            --msg-mine-text: white;
-        }
 
-        body.dark-mode {
-            --bg-color: #121212;
-            --box-bg: #1e1e1e;
-            --text-color: #e0e0e0;
-            --input-bg: #2d2d2d;
-            --border-color: #444;
-            --msg-other-bg: #333;
-            --msg-mine-bg: #007bff;
-            --msg-mine-text: white;
+        * {
+            box-sizing: border-box;
         }
-
-        * { box-sizing: border-box; }
 
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: var(--bg-color);
-            color: var(--text-color);
-            transition: background 0.3s, color 0.3s;
+            background: #f2f2f2;
         }
 
         .box {
             width: 90%;
             max-width: 1100px;
             margin: 40px auto;
-            background: var(--box-bg);
+            background: white;
             padding: 25px;
             border-radius: 15px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.15);
         }
 
-        #theme-toggle {
-            float: right;
-            cursor: pointer;
-            padding: 8px 12px;
-            background: #555;
-            color: white;
-            border-radius: 5px;
-            border: none;
-            font-size: 14px;
+        h1 {
+            text-align: center;
         }
 
-        input {
-            background: var(--input-bg);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            font-size: 16px;
-            border-radius: 8px;
-        }
-
+        input,
         button {
             width: 100%;
             padding: 12px;
             margin-top: 10px;
             font-size: 16px;
             border-radius: 8px;
-            border: none;
+            border: 1px solid #ccc;
+        }
+
+        button {
             background: #222;
             color: white;
             cursor: pointer;
         }
 
-        button:hover { background: #444; }
+        button:hover {
+            background: #444;
+        }
 
-        .secondary { background: #777; }
-        .logout { background: #b00020; }
+        .secondary {
+            background: #777;
+        }
+
+        .logout {
+            background: #b00020;
+        }
 
         .show-password-label {
             display: flex;
@@ -99,85 +70,1631 @@
             gap: 8px;
             margin-top: 8px;
             font-size: 14px;
+            color: #555;
             cursor: pointer;
         }
 
-        #registerBox, #nicknameBox, #chatPasswordBox, #chat { display: none; }
+        .show-password-label input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+            padding: 0;
+            cursor: pointer;
+        }
 
-        .chatLayout { display: grid; grid-template-columns: 240px 1fr; gap: 20px; align-items: start; }
-        #usersBox { padding: 15px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--input-bg); height: 455px; overflow-y: auto; }
-        
-        .userItem { display: flex; align-items: center; padding: 9px 10px; background: var(--box-bg); border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 7px; }
-        .userNickname { font-weight: bold; }
+        #registerBox,
+        #nicknameBox,
+        #chatPasswordBox,
+        #chat {
+            display: none;
+        }
 
-        #messages { height: 400px; overflow-y: auto; border: 1px solid var(--border-color); padding: 12px; margin-top: 15px; border-radius: 10px; background: var(--input-bg); }
 
-        .message { width: fit-content; max-width: 75%; padding: 10px 14px; margin-bottom: 10px; border-radius: 14px; clear: both; word-wrap: break-word; }
-        .message.other { margin-right: auto; background: var(--msg-other-bg); color: var(--text-color); }
-        .message.mine { margin-left: auto; background: var(--msg-mine-bg); color: var(--msg-mine-text); }
-        .nickname { display: block; font-weight: bold; margin-bottom: 4px; }
-        .time { display: block; font-size: 11px; margin-top: 6px; color: #777; }
-        
-        .error { color: #b00020; }
-        .success { color: green; }
+        /* ================================= */
+        /* HLAVNÍ ROZLOŽENÍ CHATU */
+        /* ================================= */
+
+        .chatLayout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+
+        /* ================================= */
+        /* LEVÝ PANEL - UŽIVATELÉ */
+        /* ================================= */
+
+        #usersBox {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #fafafa;
+
+            height: 455px;
+            overflow-y: auto;
+        }
+
+        #usersTitle {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        #usersList {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .userItem {
+            display: flex;
+            align-items: center;
+            padding: 9px 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
+        .userStatus {
+            margin-right: 8px;
+            font-size: 13px;
+        }
+
+        .userNickname {
+            font-weight: bold;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .offline {
+            color: #888;
+        }
+
+
+        /* ================================= */
+        /* PRAVÁ ČÁST - CHAT */
+        /* ================================= */
+
+        .chatMain {
+            min-width: 0;
+        }
+
+        #messages {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+
+
+        /* ================================= */
+        /* ZPRÁVY */
+        /* ================================= */
+
+        .message {
+            width: fit-content;
+            max-width: 75%;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            border-radius: 14px;
+            clear: both;
+            word-wrap: break-word;
+        }
+
+        .message.other {
+            margin-right: auto;
+            background: #e8e8e8;
+            color: #222;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.mine {
+            margin-left: auto;
+            background: #222;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .nickname {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .message.mine .nickname {
+            color: #ddd;
+        }
+
+        .message.other .nickname {
+            color: #333;
+        }
+
+        .time {
+            display: block;
+            font-size: 11px;
+            margin-top: 6px;
+            color: #777;
+        }
+
+        .message.mine .time {
+            color: #ccc;
+        }
+
+
+        /* ================================= */
+        /* OSTATNÍ */
+        /* ================================= */
+
+        .error {
+            color: #b00020;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .info {
+            color: #555;
+        }
+
+
+        /* ================================= */
+        /* MOBIL */
+        /* ================================= */
 
         @media (max-width: 700px) {
-            .chatLayout { grid-template-columns: 1fr; }
+
+            .box {
+                width: 95%;
+                margin: 15px auto;
+                padding: 15px;
+            }
+
+            .chatLayout {
+                grid-template-columns: 1fr;
+            }
+
+            #usersBox {
+                height: auto;
+                max-height: 220px;
+            }
+
+            #messages {
+                height: 400px;
+            }
+
+            .message {
+                max-width: 85%;
+            }
+
         }
+
     </style>
 </head>
 
 <body>
 
+
+<!-- ================================= -->
+<!-- PŘIHLÁŠENÍ -->
+<!-- ================================= -->
+
 <div class="box" id="loginBox">
-    <button id="theme-toggle" onclick="toggleDarkMode()">Tmavý režim</button>
+
     <h1>🔐 Přihlášení</h1>
-    <input id="loginEmail" type="email" placeholder="E-mail">
-    <input id="loginPassword" type="password" placeholder="Heslo">
+
+    <input
+        id="loginEmail"
+        type="email"
+        placeholder="E-mail"
+    >
+
+    <input
+        id="loginPassword"
+        type="password"
+        placeholder="Heslo"
+    >
+    
     <label class="show-password-label">
-        <input type="checkbox" onchange="document.getElementById('loginPassword').type = this.checked ? 'text' : 'password'"> Zobrazit heslo
+        <input type="checkbox" onchange="document.getElementById('loginPassword').type = this.checked ? 'text' : 'password'">
+        Zobrazit heslo
     </label>
-    <button onclick="login()">Přihlásit</button>
-    <button class="secondary" onclick="showRegister()">Vytvořit nový účet</button>
+
+    <button onclick="login()">
+        Přihlásit
+    </button>
+
+    <button
+        class="secondary"
+        onclick="showRegister()"
+    >
+        Vytvořit nový účet
+    </button>
+
     <p id="loginMessage"></p>
+
 </div>
 
-<!-- ... OSTATNÍ BOXY ZŮSTÁVAJÍ STEJNÉ, POUZE DO NICH PŘIDEJ TLAČÍTKO PRO DARK MODE ... -->
-<!-- (Pro zjednodušení kódu zde uvádím zbytek logiky) -->
+
+<!-- ================================= -->
+<!-- REGISTRACE -->
+<!-- ================================= -->
+
+<div class="box" id="registerBox">
+
+    <h1>👤 Registrace</h1>
+
+    <input
+        id="registerEmail"
+        type="email"
+        placeholder="E-mail"
+    >
+
+    <input
+        id="registerPassword"
+        type="password"
+        placeholder="Heslo (min. 6 znaků)"
+    >
+    
+    <input
+        id="registerPasswordConfirm"
+        type="password"
+        placeholder="Potvrď heslo znovu"
+    >
+    
+    <label class="show-password-label">
+        <input type="checkbox" onchange="
+            const isChecked = this.checked;
+            document.getElementById('registerPassword').type = isChecked ? 'text' : 'password';
+            document.getElementById('registerPasswordConfirm').type = isChecked ? 'text' : 'password';
+        ">
+        Zobrazit hesla
+    </label>
+
+    <input
+        id="registerNickname"
+        type="text"
+        maxlength="30"
+        placeholder="Přezdívka"
+    >
+
+    <button onclick="register()">
+        Vytvořit účet
+    </button>
+
+    <button
+        class="secondary"
+        onclick="showLogin()"
+    >
+        Zpět na přihlášení
+    </button>
+
+    <p id="registerMessage"></p>
+
+</div>
+
+
+<!-- ================================= -->
+<!-- PŘEZDÍVKA -->
+<!-- ================================= -->
+
+<div class="box" id="nicknameBox">
+
+    <h1>👤 Přezdívka</h1>
+
+    <p>
+        K tomuto účtu zatím nemáš nastavenou přezdívku.
+    </p>
+
+    <input
+        id="nickname"
+        type="text"
+        maxlength="30"
+        placeholder="Zadej přezdívku"
+    >
+
+    <button onclick="saveNickname()">
+        Uložit přezdívku
+    </button>
+
+    <p id="nicknameMessage"></p>
+
+</div>
+
+
+<!-- ================================= -->
+<!-- SPOLEČNÉ HESLO PRO VSTUP DO CHATU -->
+<!-- ================================= -->
+
+<div class="box" id="chatPasswordBox">
+
+    <h1>🔒 Tajná místnost</h1>
+
+    <p>
+        Pro vstup do chatu musíš zadat přístupové heslo.
+    </p>
+
+    <input
+        id="roomPasswordInput"
+        type="password"
+        placeholder="Heslo místnosti"
+        onkeydown="if(event.key === 'Enter') verifyRoomPassword()"
+    >
+    
+    <label class="show-password-label">
+        <input type="checkbox" onchange="document.getElementById('roomPasswordInput').type = this.checked ? 'text' : 'password'">
+        Zobrazit heslo
+    </label>
+
+    <button onclick="verifyRoomPassword()">
+        Vstoupit do chatu
+    </button>
+
+    <button
+        class="logout"
+        onclick="logout()"
+    >
+        Zrušit a odhlásit se
+    </button>
+
+    <p id="roomPasswordMessage"></p>
+
+</div>
+
+
+<!-- ================================= -->
+<!-- CHAT -->
+<!-- ================================= -->
 
 <div class="box" id="chat">
-    <button id="theme-toggle-chat" onclick="toggleDarkMode()" style="width: auto; padding: 5px 10px; font-size: 12px;">Přepnout režim</button>
+
     <h1>💬 Můj chat</h1>
-    <p>Přihlášen jako: <strong id="currentNickname"></strong></p>
+
+    <p>
+        Přihlášen jako:
+        <strong id="currentNickname"></strong>
+    </p>
+
+
+    <!-- ================================= -->
+    <!-- LEVÝ PANEL + CHAT -->
+    <!-- ================================= -->
+
     <div class="chatLayout">
+
+
+        <!-- ================================= -->
+        <!-- UŽIVATELÉ VLEVO -->
+        <!-- ================================= -->
+
         <div id="usersBox">
-            <div id="usersTitle">👥 Uživatelé</div>
-            <div id="usersList">Načítám uživatele...</div>
+
+            <div id="usersTitle">
+                👥 Uživatelé
+            </div>
+
+            <div id="usersList">
+                Načítám uživatele...
+            </div>
+
         </div>
+
+
+        <!-- ================================= -->
+        <!-- CHAT VPRAVO -->
+        <!-- ================================= -->
+
         <div class="chatMain">
-            <div id="messages">Načítám zprávy...</div>
-            <input id="messageInput" type="text" maxlength="500" placeholder="Napiš zprávu..." onkeydown="if(event.key === 'Enter') sendMessage()">
-            <button onclick="sendMessage()">Odeslat</button>
-            <button class="logout" onclick="logout()">Odhlásit</button>
+
+            <div id="messages">
+                Načítám zprávy...
+            </div>
+
+
+            <input
+                id="messageInput"
+                type="text"
+                maxlength="500"
+                placeholder="Napiš zprávu..."
+                onkeydown="if(event.key === 'Enter') sendMessage()"
+            >
+
+
+            <button onclick="sendMessage()">
+                Odeslat
+            </button>
+
+
+            <button
+                class="logout"
+                onclick="logout()"
+            >
+                Odhlásit
+            </button>
+
         </div>
+
     </div>
+
 </div>
 
+
 <script>
-// --- LOGIKA PRO DARK MODE ---
-function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('darkMode', isDark);
+
+
+// ==========================================
+// SUPABASE
+// ==========================================
+
+const SUPABASE_URL =
+    "https://jdvyfigrazambxtnqpkq.supabase.co";
+
+
+const SUPABASE_KEY =
+    "sb_publishable_YKO_HGnM6so7hNtg_naIeQ_cYX40nxJ";
+
+
+const supabaseClient =
+    supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+// ==========================================
+// PROMĚNNÉ PRO ONLINE STAV, REALTIME A HESLO
+// ==========================================
+
+// TADY SI NASTAV SVÉ TAJNÉ HESLO PRO VSTUP DO CHATU:
+const CHAT_PASSWORD = "Krsmol2027"; 
+
+
+let presenceChannel = null;
+let messagesChannel = null;
+let currentUser = null;
+let currentNickname = null;
+let tempNickname = null; // Dočasná proměnná, než zadá heslo
+
+
+// ==========================================
+// ZOBRAZENÍ REGISTRACE
+// ==========================================
+
+function showRegister() {
+
+    document.getElementById("loginBox").style.display =
+        "none";
+
+    document.getElementById("registerBox").style.display =
+        "block";
+
 }
 
-// Při načtení zjistí, zda uživatel měl zapnuto
-if (localStorage.getItem('darkMode') === 'true') {
-    document.body.classList.add('dark-mode');
+
+// ==========================================
+// ZOBRAZENÍ PŘIHLÁŠENÍ
+// ==========================================
+
+function showLogin() {
+
+    document.getElementById("registerBox").style.display =
+        "none";
+
+    document.getElementById("nicknameBox").style.display =
+        "none";
+        
+    document.getElementById("chatPasswordBox").style.display =
+        "none";
+
+    document.getElementById("chat").style.display =
+        "none";
+
+    document.getElementById("loginBox").style.display =
+        "block";
+
 }
 
-// ... (Zbytek tvého JS kódu zůstává stejný) ...
-// (Nezapomeň zkopírovat zbytek funkcí ze svého předchozího souboru!)
+
+// ==========================================
+// ZOBRAZENÍ ZADÁNÍ HESLA MÍSTNOSTI
+// ==========================================
+
+function askForRoomPassword(nickname) {
+    tempNickname = nickname; // Uložíme si přezdívku na později
+
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("registerBox").style.display = "none";
+    document.getElementById("nicknameBox").style.display = "none";
+    document.getElementById("chat").style.display = "none";
+
+    document.getElementById("chatPasswordBox").style.display = "block";
+}
+
+
+// ==========================================
+// OVĚŘENÍ HESLA MÍSTNOSTI
+// ==========================================
+
+function verifyRoomPassword() {
+    const input = document.getElementById("roomPasswordInput").value;
+    const msg = document.getElementById("roomPasswordMessage");
+
+    if (input === CHAT_PASSWORD) {
+        // Heslo je správné, pustíme ho do chatu
+        document.getElementById("chatPasswordBox").style.display = "none";
+        openChat(tempNickname);
+    } else {
+        // Špatné heslo
+        msg.innerText = "❌ Nesprávné heslo. Zkus to znovu.";
+        msg.className = "error";
+    }
+}
+
+
+// ==========================================
+// REGISTRACE
+// ==========================================
+
+async function register() {
+
+    const email =
+        document.getElementById("registerEmail")
+            .value
+            .trim();
+
+    const password =
+        document.getElementById("registerPassword")
+            .value;
+            
+    const passwordConfirm =
+        document.getElementById("registerPasswordConfirm")
+            .value;
+
+    const nickname =
+        document.getElementById("registerNickname")
+            .value
+            .trim();
+
+    const message =
+        document.getElementById("registerMessage");
+
+
+    if (!email || !password || !passwordConfirm || !nickname) {
+
+        message.innerText =
+            "Vyplň všechna pole.";
+
+        message.className =
+            "error";
+
+        return;
+    }
+    
+    if (password !== passwordConfirm) {
+
+        message.innerText =
+            "Hesla se neshodují. Zkontroluj je a zkus to znovu.";
+
+        message.className =
+            "error";
+
+        return;
+    }
+
+    if (password.length < 6) {
+
+        message.innerText =
+            "Heslo musí mít alespoň 6 znaků.";
+
+        message.className =
+            "error";
+
+        return;
+    }
+
+
+    const { data, error } =
+        await supabaseClient.auth.signUp({
+
+            email: email,
+
+            password: password,
+
+            options: {
+
+                data: {
+                    nickname: nickname
+                },
+
+                emailRedirectTo:
+                    "https://hanebnybambus.github.io/test/"
+
+            }
+
+        });
+
+
+    if (error) {
+
+        console.error(error);
+
+        message.innerText =
+            "❌ " + error.message;
+
+        message.className =
+            "error";
+
+        return;
+    }
+
+
+    if (data.session) {
+
+        message.innerText =
+            "✅ Účet vytvořen.";
+
+        message.className =
+            "success";
+
+        await checkProfile();
+
+        return;
+    }
+
+
+    message.innerText =
+        "✅ Účet vytvořen. Zkontroluj e-mail a potvrď registraci.";
+
+    message.className =
+        "success";
+
+}
+
+
+// ==========================================
+// PŘIHLÁŠENÍ
+// ==========================================
+
+async function login() {
+
+    const email =
+        document.getElementById("loginEmail")
+            .value
+            .trim();
+
+    const password =
+        document.getElementById("loginPassword")
+            .value;
+
+    const message =
+        document.getElementById("loginMessage");
+
+
+    if (!email || !password) {
+
+        message.innerText =
+            "Vyplň e-mail a heslo.";
+
+        message.className =
+            "error";
+
+        return;
+    }
+
+
+    const { error } =
+        await supabaseClient.auth.signInWithPassword({
+
+            email: email,
+
+            password: password
+
+        });
+
+
+    if (error) {
+
+        console.error(error);
+
+        message.innerText =
+            "❌ " + error.message;
+
+        message.className =
+            "error";
+
+        return;
+    }
+
+
+    message.innerText =
+        "✅ Přihlášení úspěšné.";
+
+    message.className =
+        "success";
+
+
+    await checkProfile();
+
+}
+
+
+// ==========================================
+// KONTROLA PROFILU
+// ==========================================
+
+async function checkProfile() {
+
+    const {
+        data: { user }
+    } =
+        await supabaseClient.auth.getUser();
+
+
+    if (!user) {
+
+        return;
+
+    }
+
+
+    currentUser = user;
+
+
+    const { data: profile, error } =
+        await supabaseClient
+            .from("profiles")
+            .select("nickname")
+            .eq("id", user.id)
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.error(error);
+
+        alert(
+            "Chyba při načítání profilu: " +
+            error.message
+        );
+
+        return;
+    }
+
+
+    document.getElementById("loginBox").style.display =
+        "none";
+
+    document.getElementById("registerBox").style.display =
+        "none";
+
+
+    if (profile) {
+
+        // Už má profil, zeptáme se ho na heslo do místnosti
+        askForRoomPassword(profile.nickname);
+
+        return;
+
+    }
+
+
+    const savedNickname =
+        user.user_metadata?.nickname;
+
+
+    if (savedNickname) {
+
+        const { data: newProfile, error: insertError } =
+            await supabaseClient
+                .from("profiles")
+                .insert({
+
+                    id: user.id,
+
+                    nickname: savedNickname
+
+                })
+                .select("nickname")
+                .single();
+
+
+        if (!insertError && newProfile) {
+            
+            // Profil se vytvořil, zeptáme se na heslo do místnosti
+            askForRoomPassword(newProfile.nickname);
+
+            return;
+
+        }
+
+    }
+
+
+    document.getElementById("nicknameBox").style.display =
+        "block";
+
+}
+
+
+// ==========================================
+// ULOŽENÍ PŘEZDÍVKY
+// ==========================================
+
+async function saveNickname() {
+
+    const nickname =
+        document.getElementById("nickname")
+            .value
+            .trim();
+
+    const message =
+        document.getElementById("nicknameMessage");
+
+
+    if (!nickname) {
+
+        message.innerText =
+            "Zadej přezdívku.";
+
+        message.className =
+            "error";
+
+        return;
+    }
+
+
+    const {
+        data: { user }
+    } =
+        await supabaseClient.auth.getUser();
+
+
+    if (!user) {
+
+        alert("Nejsi přihlášen.");
+
+        return;
+
+    }
+
+
+    const { data, error } =
+        await supabaseClient
+            .from("profiles")
+            .insert({
+
+                id: user.id,
+
+                nickname: nickname
+
+            })
+            .select("nickname")
+            .single();
+
+
+    if (error) {
+
+        console.error(error);
+
+        message.innerText =
+            "❌ " + error.message;
+
+        message.className =
+            "error";
+
+        return;
+    }
+
+
+    // Uloženo, teď chceme heslo k místnosti
+    askForRoomPassword(data.nickname);
+
+}
+
+
+// ==========================================
+// OTEVŘENÍ CHATU (PO ZADÁNÍ HESLA)
+// ==========================================
+
+async function openChat(nickname) {
+
+    document.getElementById("loginBox").style.display =
+        "none";
+
+    document.getElementById("registerBox").style.display =
+        "none";
+
+    document.getElementById("nicknameBox").style.display =
+        "none";
+        
+    document.getElementById("chatPasswordBox").style.display =
+        "none";
+
+    document.getElementById("chat").style.display =
+        "block";
+
+
+    currentNickname =
+        nickname;
+
+
+    document.getElementById("currentNickname").innerText =
+        nickname;
+
+
+    await loadMessages();
+
+    await loadUsers();
+
+    await startPresence();
+
+    startMessagesSubscription();
+
+}
+
+
+// ==========================================
+// NAČTENÍ UŽIVATELŮ
+// ==========================================
+
+async function loadUsers() {
+
+    const usersList =
+        document.getElementById("usersList");
+
+
+    const { data, error } =
+        await supabaseClient
+            .from("profiles")
+            .select("id, nickname")
+            .order("nickname", {
+                ascending: true
+            });
+
+
+    if (error) {
+
+        console.error(error);
+
+        usersList.innerText =
+            "Chyba při načítání uživatelů.";
+
+        return;
+    }
+
+
+    renderUsers(data || []);
+
+}
+
+
+// ==========================================
+// ZOBRAZENÍ UŽIVATELŮ
+// ==========================================
+
+function renderUsers(users) {
+
+    const usersList =
+        document.getElementById("usersList");
+
+
+    usersList.innerHTML = "";
+
+
+    if (!users.length) {
+
+        usersList.innerText =
+            "Zatím nejsou žádní uživatelé.";
+
+        return;
+    }
+
+
+    const onlineUsers =
+        getOnlineUserIds();
+
+
+    users.forEach(user => {
+
+        const div =
+            document.createElement("div");
+
+
+        div.className =
+            "userItem";
+
+
+        const status =
+            document.createElement("span");
+
+
+        status.className =
+            "userStatus";
+
+
+        const nickname =
+            document.createElement("span");
+
+
+        nickname.className =
+            "userNickname";
+
+
+        nickname.textContent =
+            user.nickname;
+
+
+        if (onlineUsers.has(user.id)) {
+
+            status.textContent =
+                "🟢";
+
+        } else {
+
+            status.textContent =
+                "⚪";
+
+            nickname.classList.add("offline");
+
+        }
+
+
+        div.appendChild(status);
+
+        div.appendChild(nickname);
+
+
+        usersList.appendChild(div);
+
+    });
+
+}
+
+
+// ==========================================
+// ZÍSKÁNÍ ONLINE UŽIVATELŮ
+// ==========================================
+
+function getOnlineUserIds() {
+
+    const onlineUsers =
+        new Set();
+
+
+    if (!presenceChannel) {
+
+        return onlineUsers;
+
+    }
+
+
+    const state =
+        presenceChannel.presenceState();
+
+
+    Object.values(state).forEach(entries => {
+
+        entries.forEach(entry => {
+
+            if (entry.user_id) {
+
+                onlineUsers.add(
+                    entry.user_id
+                );
+
+            }
+
+        });
+
+    });
+
+
+    return onlineUsers;
+
+}
+
+
+// ==========================================
+// SPUŠTĚNÍ ONLINE STAVU
+// ==========================================
+
+async function startPresence() {
+
+    if (!currentUser || !currentNickname) {
+
+        return;
+
+    }
+
+
+    if (presenceChannel) {
+
+        return;
+
+    }
+
+
+    presenceChannel =
+        supabaseClient.channel(
+            "chat-online-users",
+            {
+                config: {
+                    presence: {
+                        key: currentUser.id
+                    }
+                }
+            }
+        );
+
+
+    presenceChannel
+        .on(
+            "presence",
+            {
+                event: "sync"
+            },
+            () => {
+
+                loadUsers();
+
+            }
+        )
+        .on(
+            "presence",
+            {
+                event: "join"
+            },
+            () => {
+
+                loadUsers();
+
+            }
+        )
+        .on(
+            "presence",
+            {
+                event: "leave"
+            },
+            () => {
+
+                loadUsers();
+
+            }
+        );
+
+
+    presenceChannel.subscribe(
+        async status => {
+
+            if (status !== "SUBSCRIBED") {
+
+                return;
+
+            }
+
+
+            await presenceChannel.track({
+
+                user_id:
+                    currentUser.id,
+
+                nickname:
+                    currentNickname,
+
+                online_at:
+                    new Date().toISOString()
+
+            });
+
+
+            loadUsers();
+
+        }
+    );
+
+}
+
+
+// ==========================================
+// REALTIME ODBĚR NOVÝCH ZPRÁV
+// ==========================================
+
+function startMessagesSubscription() {
+
+    if (messagesChannel) {
+
+        return;
+
+    }
+
+
+    try {
+
+        messagesChannel =
+            supabaseClient
+                .channel("realtime-messages-channel")
+                .on(
+                    "postgres_changes",
+                    {
+                        event: "INSERT",
+                        schema: "public",
+                        table: "messages"
+                    },
+                    payload => {
+
+                        const newMessage =
+                            payload.new;
+
+
+                        addMessage(
+                            newMessage,
+                            currentUser ? currentUser.id : null
+                        );
+
+
+                        const messages =
+                            document.getElementById("messages");
+
+
+                        if (messages) {
+
+                            messages.scrollTop =
+                                messages.scrollHeight;
+
+                        }
+
+                    }
+                )
+                .subscribe();
+
+    } catch (err) {
+
+        console.error("Chyba Realtime připojení:", err);
+
+    }
+
+}
+
+
+// ==========================================
+// NAČTENÍ ZPRÁV
+// ==========================================
+
+async function loadMessages() {
+
+    const { data, error } =
+        await supabaseClient
+            .from("messages")
+            .select(
+                "id, user_id, nickname, message, created_at"
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: true
+                }
+            );
+
+
+    if (error) {
+
+        console.error(error);
+
+        document.getElementById("messages").innerText =
+            "Chyba při načítání zpráv.";
+
+        return;
+    }
+
+
+    const messages =
+        document.getElementById("messages");
+
+
+    messages.innerHTML = "";
+
+
+    const {
+        data: { user }
+    } =
+        await supabaseClient.auth.getUser();
+
+
+    if (data) {
+
+        data.forEach(message => {
+
+            addMessage(
+                message,
+                user ? user.id : null
+            );
+
+        });
+
+    }
+
+
+    messages.scrollTop =
+        messages.scrollHeight;
+
+}
+
+
+// ==========================================
+// ZOBRAZENÍ ZPRÁVY
+// ==========================================
+
+function addMessage(message, currentUserId) {
+
+    const messages =
+        document.getElementById("messages");
+
+
+    if (!messages) {
+
+        return;
+
+    }
+
+
+    const div =
+        document.createElement("div");
+
+
+    const isMine =
+        message.user_id === currentUserId;
+
+
+    div.className =
+        "message " +
+        (isMine ? "mine" : "other");
+
+
+    const nickname =
+        document.createElement("span");
+
+
+    nickname.className =
+        "nickname";
+
+
+    nickname.textContent =
+        message.nickname;
+
+
+    const text =
+        document.createElement("span");
+
+
+    text.textContent =
+        message.message;
+
+
+    const time =
+        document.createElement("span");
+
+
+    time.className =
+        "time";
+
+
+    const date =
+        new Date(message.created_at);
+
+
+    if (!isNaN(date.getTime())) {
+
+        time.textContent =
+            date.toLocaleString("cs-CZ", {
+
+                timeZone: "Europe/Prague",
+
+                day: "2-digit",
+
+                month: "2-digit",
+
+                year: "numeric",
+
+                hour: "2-digit",
+
+                minute: "2-digit"
+
+            });
+
+    } else {
+
+        time.textContent =
+            "čas neznámý";
+
+    }
+
+
+    div.appendChild(nickname);
+
+    div.appendChild(text);
+
+    div.appendChild(time);
+
+
+    messages.appendChild(div);
+
+}
+
+
+// ==========================================
+// ODESLÁNÍ ZPRÁVY
+// ==========================================
+
+async function sendMessage() {
+
+    const input =
+        document.getElementById("messageInput");
+
+
+    const text =
+        input.value.trim();
+
+
+    if (!text) {
+
+        return;
+
+    }
+
+
+    const {
+        data: { user }
+    } =
+        await supabaseClient.auth.getUser();
+
+
+    if (!user) {
+
+        alert("Nejsi přihlášen.");
+
+        return;
+
+    }
+
+
+    const nickname =
+        document.getElementById(
+            "currentNickname"
+        ).innerText;
+
+
+    const { error } =
+        await supabaseClient
+            .from("messages")
+            .insert({
+
+                user_id: user.id,
+
+                nickname: nickname,
+
+                message: text
+
+            });
+
+
+    if (error) {
+
+        console.error(error);
+
+        alert(
+            "Zprávu se nepodařilo odeslat: " +
+            error.message
+        );
+
+        return;
+
+    }
+
+
+    input.value = "";
+
+}
+
+
+// ==========================================
+// ODHLÁŠENÍ
+// ==========================================
+
+async function logout() {
+
+    if (presenceChannel) {
+
+        try {
+
+            await presenceChannel.untrack();
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+
+        try {
+
+            await supabaseClient.removeChannel(
+                presenceChannel
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+
+        presenceChannel =
+            null;
+
+    }
+
+
+    if (messagesChannel) {
+
+        try {
+
+            await supabaseClient.removeChannel(
+                messagesChannel
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+
+        messagesChannel =
+            null;
+
+    }
+
+
+    await supabaseClient.auth.signOut();
+
+    location.reload();
+
+}
+
+
+// ==========================================
+// KONTROLA EXISTUJÍCÍHO PŘIHLÁŠENÍ
+// ==========================================
+
+async function checkSession() {
+
+    const {
+        data: { session }
+    } =
+        await supabaseClient.auth.getSession();
+
+
+    if (session) {
+
+        currentUser =
+            session.user;
+
+        await checkProfile();
+
+    }
+
+}
+
+
+checkSession();
+
+
 </script>
+
 </body>
 </html>
