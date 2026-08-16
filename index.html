@@ -49,9 +49,16 @@
         }
 
         * {
-            box-sizing: border-box;
-        }
+        box-sizing: border-box;
+    }
 
+    /* Skrytí ikony očka v Edge */
+    input::-ms-reveal,
+    input::-ms-clear {
+        display: none;
+    }
+
+    /* ...
         body {
             margin: 0;
             font-family: Arial, sans-serif;
