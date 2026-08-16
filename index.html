@@ -796,16 +796,16 @@ function addMessage(message) {
         "time";
 
 
-    time.textContent =
-        new Date(
-            message.created_at
-        ).toLocaleTimeString(
-            "cs-CZ",
-            {
-                hour: "2-digit",
-                minute: "2-digit"
-            }
-        );
+    const date = new Date(message.created_at);
+
+time.textContent =
+    date.toLocaleString("cs-CZ", {
+        timeZone: "Europe/Prague",
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
 
 
     div.appendChild(nickname);
