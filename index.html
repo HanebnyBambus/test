@@ -68,6 +68,55 @@
             display: none;
         }
 
+        /* ============================= */
+        /* UŽIVATELÉ */
+        /* ============================= */
+
+        #usersBox {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+
+        #usersTitle {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        #usersList {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .userItem {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
+        .userStatus {
+            margin-right: 8px;
+            font-size: 13px;
+        }
+
+        .userNickname {
+            font-weight: bold;
+        }
+
+        .offline {
+            color: #888;
+        }
+
+        /* ============================= */
+        /* ZPRÁVY */
+        /* ============================= */
+
         #messages {
             height: 400px;
             overflow-y: auto;
@@ -77,10 +126,6 @@
             border-radius: 10px;
             background: #fafafa;
         }
-
-        /* ============================= */
-        /* ZPRÁVY */
-        /* ============================= */
 
         .message {
             width: fit-content;
@@ -92,7 +137,6 @@
             word-wrap: break-word;
         }
 
-        /* Zpráva někoho jiného */
         .message.other {
             margin-right: auto;
             background: #e8e8e8;
@@ -100,7 +144,6 @@
             border-bottom-left-radius: 4px;
         }
 
-        /* Moje zpráva */
         .message.mine {
             margin-left: auto;
             background: #222;
@@ -126,7 +169,6 @@
             display: block;
             font-size: 11px;
             margin-top: 6px;
-            margin-left: 0;
             color: #777;
         }
 
@@ -272,9 +314,32 @@
         <strong id="currentNickname"></strong>
     </p>
 
+
+    <!-- ================================= -->
+    <!-- UŽIVATELÉ -->
+    <!-- ================================= -->
+
+    <div id="usersBox">
+
+        <div id="usersTitle">
+            👥 Uživatelé
+        </div>
+
+        <div id="usersList">
+            Načítám uživatele...
+        </div>
+
+    </div>
+
+
+    <!-- ================================= -->
+    <!-- ZPRÁVY -->
+    <!-- ================================= -->
+
     <div id="messages">
         Načítám zprávy...
     </div>
+
 
     <input
         id="messageInput"
@@ -284,9 +349,11 @@
         onkeydown="if(event.key === 'Enter') sendMessage()"
     >
 
+
     <button onclick="sendMessage()">
         Odeslat
     </button>
+
 
     <button
         class="logout"
@@ -318,6 +385,17 @@ const supabaseClient =
         SUPABASE_URL,
         SUPABASE_KEY
     );
+
+
+// ==========================================
+// PROMĚNNÉ PRO ONLINE STAV
+// ==========================================
+
+let presenceChannel = null;
+
+let currentUser = null;
+
+let currentNickname = null;
 
 
 // ==========================================
@@ -548,6 +626,9 @@ async function checkProfile() {
     }
 
 
+    currentUser = user;
+
+
     const { data: profile, error } =
         await supabaseClient
             .from("profiles")
@@ -716,11 +797,283 @@ async function openChat(nickname) {
         "block";
 
 
+    currentNickname =
+        nickname;
+
+
     document.getElementById("currentNickname").innerText =
         nickname;
 
 
     await loadMessages();
+
+    await loadUsers();
+
+    await startPresence();
+
+}
+
+
+// ==========================================
+// NAČTENÍ UŽIVATELŮ
+// ==========================================
+
+async function loadUsers() {
+
+    const usersList =
+        document.getElementById("usersList");
+
+
+    const { data, error } =
+        await supabaseClient
+            .from("profiles")
+            .select("id, nickname")
+            .order("nickname", {
+                ascending: true
+            });
+
+
+    if (error) {
+
+        console.error(error);
+
+        usersList.innerText =
+            "Chyba při načítání uživatelů.";
+
+        return;
+    }
+
+
+    renderUsers(data || []);
+
+}
+
+
+// ==========================================
+// ZOBRAZENÍ UŽIVATELŮ
+// ==========================================
+
+function renderUsers(users) {
+
+    const usersList =
+        document.getElementById("usersList");
+
+
+    usersList.innerHTML = "";
+
+
+    if (!users.length) {
+
+        usersList.innerText =
+            "Zatím nejsou žádní uživatelé.";
+
+        return;
+    }
+
+
+    // Získáme seznam právě online uživatelů
+    const onlineUsers =
+        getOnlineUserIds();
+
+
+    users.forEach(user => {
+
+        const div =
+            document.createElement("div");
+
+
+        div.className =
+            "userItem";
+
+
+        const status =
+            document.createElement("span");
+
+
+        status.className =
+            "userStatus";
+
+
+        const nickname =
+            document.createElement("span");
+
+
+        nickname.className =
+            "userNickname";
+
+
+        nickname.textContent =
+            user.nickname;
+
+
+        if (onlineUsers.has(user.id)) {
+
+            status.textContent =
+                "🟢";
+
+        } else {
+
+            status.textContent =
+                "⚪";
+
+            nickname.classList.add("offline");
+
+        }
+
+
+        div.appendChild(status);
+
+        div.appendChild(nickname);
+
+
+        usersList.appendChild(div);
+
+    });
+
+}
+
+
+// ==========================================
+// ZÍSKÁNÍ ONLINE UŽIVATELŮ
+// ==========================================
+
+function getOnlineUserIds() {
+
+    const onlineUsers =
+        new Set();
+
+
+    if (!presenceChannel) {
+
+        return onlineUsers;
+
+    }
+
+
+    const state =
+        presenceChannel.presenceState();
+
+
+    Object.values(state).forEach(entries => {
+
+        entries.forEach(entry => {
+
+            if (entry.user_id) {
+
+                onlineUsers.add(
+                    entry.user_id
+                );
+
+            }
+
+        });
+
+    });
+
+
+    return onlineUsers;
+
+}
+
+
+// ==========================================
+// SPUŠTĚNÍ ONLINE STAVU
+// ==========================================
+
+async function startPresence() {
+
+    if (!currentUser || !currentNickname) {
+
+        return;
+
+    }
+
+
+    // Pokud už kanál existuje, nepřidáváme další
+    if (presenceChannel) {
+
+        return;
+
+    }
+
+
+    presenceChannel =
+        supabaseClient.channel(
+            "chat-online-users",
+            {
+                config: {
+                    presence: {
+                        key: currentUser.id
+                    }
+                }
+            }
+        );
+
+
+    presenceChannel
+        .on(
+            "presence",
+            {
+                event: "sync"
+            },
+            () => {
+
+                loadUsers();
+
+            }
+        )
+        .on(
+            "presence",
+            {
+                event: "join"
+            },
+            () => {
+
+                loadUsers();
+
+            }
+        )
+        .on(
+            "presence",
+            {
+                event: "leave"
+            },
+            () => {
+
+                loadUsers();
+
+            }
+        );
+
+
+    presenceChannel.subscribe(
+        async status => {
+
+            if (status !== "SUBSCRIBED") {
+
+                return;
+
+            }
+
+
+            await presenceChannel.track({
+
+                user_id:
+                    currentUser.id,
+
+                nickname:
+                    currentNickname,
+
+                online_at:
+                    new Date().toISOString()
+
+            });
+
+
+            loadUsers();
+
+        }
+    );
 
 }
 
@@ -799,7 +1152,6 @@ function addMessage(message, currentUserId) {
         document.createElement("div");
 
 
-    // Zjistíme, jestli je zpráva moje
     const isMine =
         message.user_id === currentUserId;
 
@@ -983,6 +1335,30 @@ setInterval(() => {
 
 async function logout() {
 
+    if (presenceChannel) {
+
+        try {
+
+            await presenceChannel.untrack();
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+
+        await supabaseClient.removeChannel(
+            presenceChannel
+        );
+
+
+        presenceChannel =
+            null;
+
+    }
+
+
     await supabaseClient.auth.signOut();
 
     location.reload();
@@ -1003,6 +1379,9 @@ async function checkSession() {
 
 
     if (session) {
+
+        currentUser =
+            session.user;
 
         await checkProfile();
 
