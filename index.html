@@ -1167,6 +1167,12 @@ async function saveProfileSettings() {
     } else {
         msg.innerText = "✅ Nastavení uloženo!";
         msg.className = "success";
+        
+        // Okamžitě překreslíme aktuální zprávy i seznam uživatelů, 
+        // aby se nová barva projevila hned po návratu do chatu
+        await loadMessages();
+        await loadUsers();
+
         setTimeout(() => {
             showDashboard();
         }, 1500);
