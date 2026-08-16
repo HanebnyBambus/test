@@ -185,6 +185,7 @@
             font-size: 14px;
         }
 
+        #registerBox,
         #nicknameBox,
         #chatPasswordBox,
         #chat {
@@ -576,7 +577,7 @@
 <body>
 
 <!-- PŘIHLÁŠENÍ -->
-<div class="box" id="loginBox" style="display: none;">
+<div class="box" id="loginBox">
     <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
     <h1>🔐 Přihlášení</h1>
     <input id="loginEmail" type="email" placeholder="E-mail">
@@ -602,7 +603,7 @@
 </div>
 
 <!-- REGISTRACE -->
-<div class="box" id="registerBox" style="display: none;">
+<div class="box" id="registerBox">
     <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
     <h1>👤 Registrace</h1>
 
@@ -693,6 +694,7 @@
     </div>
 
     <button onclick="verifyRoomPassword()">Vstoupit do chatu</button>
+    <button class="logout" onclick="logout()">Zrušit a odhlásit se</button>
 
     <p id="roomPasswordMessage"></p>
 </div>
@@ -926,7 +928,7 @@ const supabaseClient =
         SUPABASE_KEY
     );
 
-const CORRECT_ROOM_PASSWORD = "Krsmol2027";
+const CHAT_PASSWORD = "Krsmol2027";
 
 let presenceChannel = null;
 let messagesChannel = null;
@@ -977,19 +979,22 @@ function askForRoomPassword(nickname) {
 
 function verifyRoomPassword() {
 
-    const inputPassword =
+    const input =
         document.getElementById("roomPasswordInput").value;
 
-    if (inputPassword === CORRECT_ROOM_PASSWORD) {
+    const msg =
+        document.getElementById("roomPasswordMessage");
+
+    if (input === CHAT_PASSWORD) {
 
         document.getElementById("chatPasswordBox").style.display = "none";
 
-        document.getElementById("loginBox").style.display = "block";
-        document.getElementById("registerBox").style.display = "block";
+        openChat(tempNickname);
 
     } else {
 
-        alert("Nesprávné heslo!");
+        msg.innerText = "❌ Nesprávné heslo.";
+        msg.className = "error";
     }
 }
 
@@ -1240,7 +1245,7 @@ async function openChat(nickname) {
     // Zrušíme problematický websocket a nahradíme ho spolehlivým intervalem (polling každé 3 sekundy)
     setInterval(() => {
         if (!isSearching) {
-            loadMessages();
+            loadMessages(); // Každé 3 sekundy tiše stáhne nové zprávy a reakce
         }
     }, 3000);
 }
@@ -1488,6 +1493,7 @@ function startMessagesSubscription() {
                             currentUser ? currentUser.id : null
                         );
                     }
+                    // ...
 
                     if (
                         currentUser &&
@@ -1571,6 +1577,10 @@ function startMessagesSubscription() {
             }
         )
 
+        /* ================================= */
+        /* REALTIME REAKCE */
+        /* ================================= */
+
         .on(
             "postgres_changes",
             {
@@ -1579,7 +1589,8 @@ function startMessagesSubscription() {
                 table: "messages"
             },
             payload => {
-
+                // Místo ručního přidávání rovnou načteme čerstvá data, 
+                // čímž se vyhneme případným chybám v parsování nebo cachování
                 loadMessages();
 
                 if (
@@ -1594,6 +1605,10 @@ function startMessagesSubscription() {
             }
         )
 
+        /* ================================= */
+        /* REALTIME PROFILY (PŘIDÁNO) */
+        /* ================================= */
+
         .on(
             "postgres_changes",
             {
@@ -1602,7 +1617,7 @@ function startMessagesSubscription() {
                 table: "profiles"
             },
             payload => {
-                loadUsers();
+                loadUsers(); // Automaticky aktualizuje seznam uživatelů při přihlášení nebo změně profilu
             }
         )
 
@@ -1764,6 +1779,7 @@ function addMessage(message, currentUserId) {
     const reactionContainer = document.createElement("div");
     reactionContainer.className = "reaction-container";
 
+    // 1. Zobrazení existujících reakcí
     if (message.reactions && message.reactions.length > 0) {
         const counts = {};
         message.reactions.forEach(reaction => {
@@ -1778,11 +1794,13 @@ function addMessage(message, currentUserId) {
         });
     }
 
+    // 2. Tlačítko pro otevření nabídky reakcí (+)
     const triggerBtn = document.createElement("button");
     triggerBtn.className = "reaction-trigger-btn";
     triggerBtn.textContent = "➕";
     triggerBtn.title = "Přidat reakci";
 
+    // 3. Vysouvací popup s emoji
     const popup = document.createElement("div");
     popup.className = "reaction-popup";
     popup.innerHTML = `
@@ -1795,6 +1813,7 @@ function addMessage(message, currentUserId) {
         <button onclick="addReaction(${message.id}, '🎉')">🎉</button>
     `;
 
+    // Interakce pro rozbalení / zavření
     triggerBtn.onclick = (e) => {
         e.stopPropagation();
         document.querySelectorAll('.reaction-popup').forEach(p => {
@@ -1807,6 +1826,7 @@ function addMessage(message, currentUserId) {
     reactionContainer.appendChild(popup);
     div.appendChild(reactionContainer);
 
+    // Zavření popupu při kliknutí kamkoliv jinam na stránku
     document.addEventListener('click', () => {
         popup.style.display = 'none';
     });
