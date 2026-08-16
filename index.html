@@ -185,11 +185,17 @@
             font-size: 14px;
         }
 
+        /* Výchozí stav: Všechno kromě hesla je skryté */
+        #loginBox,
         #registerBox,
         #nicknameBox,
-        #chatPasswordBox,
         #chat {
             display: none;
+        }
+
+        /* Heslo je viditelné jako první */
+        #chatPasswordBox {
+            display: block;
         }
 
         .chatLayout {
@@ -576,6 +582,42 @@
 
 <body>
 
+<!-- MÍSTNOST HESLO (ZOBRAZENO JAKO PRVNÍ) -->
+<div class="box" id="chatPasswordBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
+    <h1>🔒 Krsmol 2027</h1>
+
+    <p>Pro vstup do chatu musíš zadat přístupové heslo.</p>
+
+    <div class="password-wrapper">
+        <input
+            id="roomPasswordInput"
+            type="password"
+            placeholder="Heslo místnosti"
+            onkeydown="if(event.key === 'Enter') verifyRoomPassword()"
+        >
+
+        <button
+            type="button"
+            class="toggle-password-btn"
+            onclick="togglePasswordVisibility('roomPasswordInput', this)"
+        >
+            <svg class="eye-open" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+
+            <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+        </button>
+    </div>
+
+    <button onclick="verifyRoomPassword()">Vstoupit do chatu</button>
+    <p id="roomPasswordMessage"></p>
+</div>
+
 <!-- PŘIHLÁŠENÍ -->
 <div class="box" id="loginBox">
     <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
@@ -599,6 +641,7 @@
 
     <button onclick="login()">Přihlásit</button>
     <button class="secondary" onclick="showRegister()">Vytvořit nový účet</button>
+    <button class="logout logout-small" style="width:100%; margin-top:10px;" onclick="backToRoomPassword()">Zpět na zadání hesla</button>
     <p id="loginMessage"></p>
 </div>
 
@@ -661,49 +704,11 @@
     <p id="nicknameMessage"></p>
 </div>
 
-<!-- MÍSTNOST HESLO -->
-<div class="box" id="chatPasswordBox">
-    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
-    <h1>🔒 Tajná místnost</h1>
-
-    <p>Pro vstup do chatu musíš zadat přístupové heslo negře.</p>
-
-    <div class="password-wrapper">
-        <input
-            id="roomPasswordInput"
-            type="password"
-            placeholder="Heslo místnosti"
-            onkeydown="if(event.key === 'Enter') verifyRoomPassword()"
-        >
-
-        <button
-            type="button"
-            class="toggle-password-btn"
-            onclick="togglePasswordVisibility('roomPasswordInput', this)"
-        >
-            <svg class="eye-open" viewBox="0 0 24 24">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                <circle cx="12" cy="12" r="3"/>
-            </svg>
-
-            <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;">
-                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                <line x1="1" y1="1" x2="23" y2="23"/>
-            </svg>
-        </button>
-    </div>
-
-    <button onclick="verifyRoomPassword()">Vstoupit do chatu</button>
-    <button class="logout" onclick="logout()">Zrušit a odhlásit se</button>
-
-    <p id="roomPasswordMessage"></p>
-</div>
-
 <!-- CHAT -->
 <div class="box" id="chat">
     <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
 
-    <h1>💬 Můj chat</h1>
+    <h1>💬 Krsmol 2027</h1>
 
     <div class="chatHeader">
         <p>
@@ -934,48 +939,13 @@ let presenceChannel = null;
 let messagesChannel = null;
 let currentUser = null;
 let currentNickname = null;
-let tempNickname = null;
+let chatInterval = null;
+let roomAuthenticated = false; // Sleduje, zda už uživatel zadal správné heslo
 
 
 /* ================================= */
-/* PŘIHLAŠOVÁNÍ */
+/* HESLO MÍSTNOSTI */
 /* ================================= */
-
-function showRegister() {
-
-    document.getElementById("loginBox").style.display = "none";
-    document.getElementById("registerBox").style.display = "block";
-}
-
-function showLogin() {
-
-    [
-        "registerBox",
-        "nicknameBox",
-        "chatPasswordBox",
-        "chat"
-    ].forEach(id =>
-        document.getElementById(id).style.display = "none"
-    );
-
-    document.getElementById("loginBox").style.display = "block";
-}
-
-function askForRoomPassword(nickname) {
-
-    tempNickname = nickname;
-
-    [
-        "loginBox",
-        "registerBox",
-        "nicknameBox",
-        "chat"
-    ].forEach(id =>
-        document.getElementById(id).style.display = "none"
-    );
-
-    document.getElementById("chatPasswordBox").style.display = "block";
-}
 
 function verifyRoomPassword() {
 
@@ -986,16 +956,54 @@ function verifyRoomPassword() {
         document.getElementById("roomPasswordMessage");
 
     if (input === CHAT_PASSWORD) {
+        roomAuthenticated = true;
+        document.getElementById("roomPasswordMessage").innerText = "";
+        document.getElementById("roomPasswordInput").value = "";
 
         document.getElementById("chatPasswordBox").style.display = "none";
 
-        openChat(tempNickname);
+        // Pokud je uživatel už přihlášený, zkontrolujeme profil, jinak otevřeme login
+        checkSession();
 
     } else {
-
-        msg.innerText = "❌ Nesprávné heslo negře.";
+        msg.innerText = "❌ Nesprávné heslo.";
         msg.className = "error";
     }
+}
+
+function backToRoomPassword() {
+    roomAuthenticated = false;
+    [
+        "loginBox",
+        "registerBox",
+        "nicknameBox",
+        "chat"
+    ].forEach(id =>
+        document.getElementById(id).style.display = "none"
+    );
+    document.getElementById("chatPasswordBox").style.display = "block";
+}
+
+
+/* ================================= */
+/* PŘIHLAŠOVÁNÍ */
+/* ================================= */
+
+function showRegister() {
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("registerBox").style.display = "block";
+}
+
+function showLogin() {
+    [
+        "registerBox",
+        "nicknameBox",
+        "chat"
+    ].forEach(id =>
+        document.getElementById(id).style.display = "none"
+    );
+
+    document.getElementById("loginBox").style.display = "block";
 }
 
 
@@ -1149,7 +1157,7 @@ async function checkProfile() {
     document.getElementById("registerBox").style.display = "none";
 
     if (profile) {
-        return askForRoomPassword(profile.nickname);
+        return openChat(profile.nickname);
     }
 
     const savedNickname =
@@ -1170,7 +1178,7 @@ async function checkProfile() {
                 .single();
 
         if (newProfile) {
-            return askForRoomPassword(
+            return openChat(
                 newProfile.nickname
             );
         }
@@ -1211,7 +1219,7 @@ async function saveNickname() {
             .single();
 
     if (!error) {
-        askForRoomPassword(data.nickname);
+        openChat(data.nickname);
     }
 }
 
@@ -1242,10 +1250,11 @@ async function openChat(nickname) {
     await loadUsers();
     await startPresence();
 
-    // Zrušíme problematický websocket a nahradíme ho spolehlivým intervalem (polling každé 3 sekundy)
-    setInterval(() => {
+    if (chatInterval) clearInterval(chatInterval);
+
+    chatInterval = setInterval(() => {
         if (!isSearching) {
-            loadMessages(); // Každé 3 sekundy tiše stáhne nové zprávy a reakce
+            loadMessages();
         }
     }, 3000);
 }
@@ -1466,166 +1475,6 @@ function handleTyping() {
 
 
 /* ================================= */
-/* REALTIME ZPRÁVY + REAKCE + PROFILY */
-/* ================================= */
-
-function startMessagesSubscription() {
-
-    if (messagesChannel) return;
-
-    messagesChannel =
-        supabaseClient.channel(
-            "realtime-messages-channel"
-        )
-
-        .on(
-            "postgres_changes",
-            {
-                event: "*",
-                schema: "public",
-                table: "messages"
-            },
-            payload => {
-                if (payload.eventType === "INSERT") {
-                    if (!isSearching) {
-                        addMessage(
-                            payload.new,
-                            currentUser ? currentUser.id : null
-                        );
-                    }
-                    // ...
-
-                    if (
-                        currentUser &&
-                        payload.new.user_id !== currentUser.id
-                    ) {
-
-                        triggerNotification(
-                            payload.new.nickname,
-                            payload.new.message
-                        );
-                    }
-
-                    const msgs =
-                        document.getElementById(
-                            "messages"
-                        );
-
-                    if (msgs) {
-                        msgs.scrollTop =
-                            msgs.scrollHeight;
-                    }
-                }
-
-                else if (payload.eventType === "DELETE") {
-
-                    const msgDiv =
-                        document.getElementById(
-                            `msg-${payload.old.id}`
-                        );
-
-                    if (msgDiv) {
-                        msgDiv.remove();
-                    }
-                }
-
-                else if (payload.eventType === "UPDATE") {
-
-                    const msgDiv =
-                        document.getElementById(
-                            `msg-${payload.new.id}`
-                        );
-
-                    if (msgDiv) {
-
-                        const textSpan =
-                            msgDiv.querySelector(".text");
-
-                        if (textSpan) {
-                            textSpan.textContent =
-                                payload.new.message;
-                        }
-
-                        const timeSpan =
-                            msgDiv.querySelector(".time");
-
-                        if (
-                            timeSpan &&
-                            payload.new.is_edited &&
-                            !timeSpan.innerHTML.includes(
-                                "(upraveno)"
-                            )
-                        ) {
-
-                            timeSpan.innerHTML +=
-                                ' <span class="edited-label">(upraveno)</span>';
-                        }
-
-                        const editBtn =
-                            msgDiv.querySelector(".edit-btn");
-
-                        if (editBtn) {
-
-                            editBtn.onclick = () =>
-                                editMessage(
-                                    payload.new.id,
-                                    payload.new.message
-                                );
-                        }
-                    }
-                }
-            }
-        )
-
-        /* ================================= */
-        /* REALTIME REAKCE */
-        /* ================================= */
-
-        .on(
-            "postgres_changes",
-            {
-                event: "INSERT",
-                schema: "public",
-                table: "messages"
-            },
-            payload => {
-                // Místo ručního přidávání rovnou načteme čerstvá data, 
-                // čímž se vyhneme případným chybám v parsování nebo cachování
-                loadMessages();
-
-                if (
-                    currentUser &&
-                    payload.new.user_id !== currentUser.id
-                ) {
-                    triggerNotification(
-                        payload.new.nickname,
-                        payload.new.message
-                    );
-                }
-            }
-        )
-
-        /* ================================= */
-        /* REALTIME PROFILY (PŘIDÁNO) */
-        /* ================================= */
-
-        .on(
-            "postgres_changes",
-            {
-                event: "*",
-                schema: "public",
-                table: "profiles"
-            },
-            payload => {
-                loadUsers(); // Automaticky aktualizuje seznam uživatelů při přihlášení nebo změně profilu
-            }
-        )
-
-        .subscribe();
-}
-
-
-/* ================================= */
 /* NAČTENÍ ZPRÁV + REAKCÍ */
 /* ================================= */
 
@@ -1779,7 +1628,6 @@ function addMessage(message, currentUserId) {
     const reactionContainer = document.createElement("div");
     reactionContainer.className = "reaction-container";
 
-    // 1. Zobrazení existujících reakcí
     if (message.reactions && message.reactions.length > 0) {
         const counts = {};
         message.reactions.forEach(reaction => {
@@ -1794,13 +1642,11 @@ function addMessage(message, currentUserId) {
         });
     }
 
-    // 2. Tlačítko pro otevření nabídky reakcí (+)
     const triggerBtn = document.createElement("button");
     triggerBtn.className = "reaction-trigger-btn";
     triggerBtn.textContent = "➕";
     triggerBtn.title = "Přidat reakci";
 
-    // 3. Vysouvací popup s emoji
     const popup = document.createElement("div");
     popup.className = "reaction-popup";
     popup.innerHTML = `
@@ -1813,7 +1659,6 @@ function addMessage(message, currentUserId) {
         <button onclick="addReaction(${message.id}, '🎉')">🎉</button>
     `;
 
-    // Interakce pro rozbalení / zavření
     triggerBtn.onclick = (e) => {
         e.stopPropagation();
         document.querySelectorAll('.reaction-popup').forEach(p => {
@@ -1826,7 +1671,6 @@ function addMessage(message, currentUserId) {
     reactionContainer.appendChild(popup);
     div.appendChild(reactionContainer);
 
-    // Zavření popupu při kliknutí kamkoliv jinam na stránku
     document.addEventListener('click', () => {
         popup.style.display = 'none';
     });
@@ -2018,6 +1862,11 @@ async function sendMessage() {
 
 async function logout() {
 
+    if (chatInterval) {
+        clearInterval(chatInterval);
+        chatInterval = null;
+    }
+
     if (presenceChannel) {
 
         try {
@@ -2083,12 +1932,16 @@ async function checkSession() {
         await supabaseClient.auth.getSession();
 
     if (session) {
-
         currentUser = session.user;
-
         await checkProfile();
+    } else {
+        // Pokud není uživatel přihlášený a heslo místnosti je správné, ukážeme přihlašovací box
+        if (roomAuthenticated) {
+            document.getElementById("loginBox").style.display = "block";
+        }
     }
 }
+
 
 /* ================================= */
 /* VYHLEDÁVÁNÍ ZPRÁV */
@@ -2152,7 +2005,8 @@ function clearSearch() {
     document.getElementById("clearSearchBtn").style.display = "none";
     loadMessages();
 }
-    
+
+// Spustíme kontrolu relace při načtení (zůstane viditelné pouze pole pro heslo)
 checkSession();
 
 </script>
