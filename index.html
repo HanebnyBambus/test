@@ -153,17 +153,19 @@
         .message { position: relative; width: fit-content; max-width: 75%; padding: 10px 14px; margin-bottom: 10px; border-radius: 14px; clear: both; word-wrap: break-word; }
         .message.other { margin-right: auto; background: var(--msg-other-bg); color: var(--msg-other-text); border-bottom-left-radius: 4px; }
         
-        /* Prostor pro 2 tlačítka (úprava + mazání) u vlastní zprávy */
         .message.mine { margin-left: auto; background: var(--msg-mine-bg); color: var(--msg-mine-text); border-bottom-right-radius: 4px; padding-right: 50px; }
 
         .nickname { display: block; font-weight: bold; margin-bottom: 4px; }
-        .text { display: block; margin-bottom: 4px; }
+        .text { display: block; margin-bottom: 4px; font-size: 15px; }
         .message.mine .nickname { color: #ddd; }
         .message.other .nickname { color: var(--msg-other-text); }
-        .time { display: block; font-size: 11px; color: var(--time-color); }
+        
+        .time { display: block; font-size: 11px; color: var(--time-color); margin-top: 4px;}
         .message.mine .time { color: var(--mine-time-color); }
+        
+        /* Styl pro text (upraveno) */
+        .edited-label { font-style: italic; opacity: 0.8; }
 
-        /* Ikony pro akce (upravit / smazat) */
         .message-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 5px; }
         .action-btn { background: transparent; border: none; cursor: pointer; font-size: 13px; padding: 0; margin: 0; width: auto; opacity: 0.6; }
         .action-btn:hover { opacity: 1; background: transparent; transform: scale(1.1); }
@@ -523,6 +525,12 @@ function startMessagesSubscription() {
                 if (msgDiv) {
                     const textSpan = msgDiv.querySelector('.text');
                     if (textSpan) textSpan.textContent = payload.new.message;
+                    
+                    const timeSpan = msgDiv.querySelector('.time');
+                    if (timeSpan && payload.new.is_edited && !timeSpan.innerHTML.includes("(upraveno)")) {
+                        timeSpan.innerHTML += ' <span class="edited-label">(upraveno)</span>';
+                    }
+
                     const editBtn = msgDiv.querySelector('.edit-btn');
                     if (editBtn) editBtn.onclick = () => editMessage(payload.new.id, payload.new.message);
                 }
@@ -531,7 +539,8 @@ function startMessagesSubscription() {
 }
 
 async function loadMessages() {
-    const { data, error } = await supabaseClient.from("messages").select("id, user_id, nickname, message, created_at").order("created_at", { ascending: true });
+    // Nově vybíráme i is_edited
+    const { data, error } = await supabaseClient.from("messages").select("id, user_id, nickname, message, created_at, is_edited").order("created_at", { ascending: true });
     const messages = document.getElementById("messages"); messages.innerHTML = "";
     if (data) data.forEach(msg => addMessage(msg, currentUser ? currentUser.id : null));
     messages.scrollTop = messages.scrollHeight;
@@ -552,9 +561,14 @@ function addMessage(message, currentUserId) {
     const date = new Date(message.created_at);
     time.textContent = !isNaN(date.getTime()) ? date.toLocaleString("cs-CZ", { timeZone: "Europe/Prague", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "čas neznámý";
 
+    // Zobrazení (upraveno)
+    if (message.is_edited) {
+        time.innerHTML += ' <span class="edited-label">(upraveno)</span>';
+    }
+
     div.appendChild(nickname); div.appendChild(text); div.appendChild(time);
 
-    // Ikony UPRAVIT a SMAZAT (Bod 3)
+    // Ikony UPRAVIT a SMAZAT
     if (isMine) {
         const actionsDiv = document.createElement("div");
         actionsDiv.className = "message-actions";
@@ -584,9 +598,10 @@ async function editMessage(messageId, oldText) {
     const newText = prompt("Uprav svou zprávu:", oldText);
     
     if (newText !== null && newText.trim() !== "" && newText !== oldText) {
+        // Posíláme info is_edited: true
         const { error } = await supabaseClient
             .from("messages")
-            .update({ message: newText.trim() })
+            .update({ message: newText.trim(), is_edited: true })
             .eq("id", messageId);
 
         if (error) alert("Chyba při úpravě zprávy: " + error.message);
