@@ -945,7 +945,7 @@ let messagesChannel = null;
 let currentUser = null;
 let currentNickname = null;
 let chatInterval = null;
-let roomAuthenticated = false; // Sleduje, zda už uživatel zadal správné heslo
+let roomAuthenticated = false;
 
 
 /* ================================= */
@@ -967,7 +967,6 @@ function verifyRoomPassword() {
 
         document.getElementById("chatPasswordBox").style.display = "none";
 
-        // Pokud je uživatel už přihlášený, zkontrolujeme profil, jinak otevřeme login
         checkSession();
 
     } else {
@@ -1515,6 +1514,10 @@ async function loadMessages() {
     });
 
     const messages = document.getElementById("messages");
+    
+    // Zjistíme, zda je uživatel na spodku chatu (s rezervou 50px)
+    const isAtBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 50;
+
     messages.innerHTML = "";
 
     if (messagesData) {
@@ -1523,7 +1526,10 @@ async function loadMessages() {
         });
     }
 
-    messages.scrollTop = messages.scrollHeight;
+    // Skrolujeme dolů POUZE pokud uživatel byl dole
+    if (isAtBottom) {
+        messages.scrollTop = messages.scrollHeight;
+    }
 }
 
 
@@ -1739,9 +1745,8 @@ function addMessage(message, currentUserId) {
     }
 
 
-    document
-        .getElementById("messages")
-        .appendChild(div);
+    const messagesContainer = document.getElementById("messages");
+    messagesContainer.appendChild(div);
 }
 
 
@@ -1858,6 +1863,10 @@ async function sendMessage() {
     }
 
     input.value = "";
+    
+    // Po odeslání vlastní zprávy okamžitě skrolujeme dolů
+    const messages = document.getElementById("messages");
+    messages.scrollTop = messages.scrollHeight;
 }
 
 
@@ -1940,7 +1949,6 @@ async function checkSession() {
         currentUser = session.user;
         await checkProfile();
     } else {
-        // Pokud není uživatel přihlášený a heslo místnosti je správné, ukážeme přihlašovací box
         if (roomAuthenticated) {
             document.getElementById("loginBox").style.display = "block";
         }
@@ -2011,7 +2019,6 @@ function clearSearch() {
     loadMessages();
 }
 
-// Spustíme kontrolu relace při načtení (zůstane viditelné pouze pole pro heslo)
 checkSession();
 
 </script>
