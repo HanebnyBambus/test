@@ -78,21 +78,60 @@
             background: #fafafa;
         }
 
+        /* ============================= */
+        /* ZPRÁVY */
+        /* ============================= */
+
         .message {
+            width: fit-content;
+            max-width: 75%;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            border-radius: 14px;
+            clear: both;
+            word-wrap: break-word;
+        }
+
+        /* Zpráva někoho jiného */
+        .message.other {
+            margin-right: auto;
             background: #e8e8e8;
-            padding: 10px;
-            margin-bottom: 8px;
-            border-radius: 8px;
+            color: #222;
+            border-bottom-left-radius: 4px;
+        }
+
+        /* Moje zpráva */
+        .message.mine {
+            margin-left: auto;
+            background: #222;
+            color: white;
+            border-bottom-right-radius: 4px;
         }
 
         .nickname {
+            display: block;
             font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .message.mine .nickname {
+            color: #ddd;
+        }
+
+        .message.other .nickname {
+            color: #333;
         }
 
         .time {
+            display: block;
+            font-size: 11px;
+            margin-top: 6px;
+            margin-left: 0;
             color: #777;
-            font-size: 12px;
-            margin-left: 6px;
+        }
+
+        .message.mine .time {
+            color: #ccc;
         }
 
         .error {
@@ -270,8 +309,6 @@ const SUPABASE_URL =
     "https://jdvyfigrazambxtnqpkq.supabase.co";
 
 
-// ⚠️ SEM VLOŽ SVŮJ SKUTEČNÝ PUBLISHABLE/ANON KEY
-
 const SUPABASE_KEY =
     "sb_publishable_YKO_HGnM6so7hNtg_naIeQ_cYX40nxJ";
 
@@ -367,7 +404,6 @@ async function register() {
     }
 
 
-    // Vytvoření účtu
     const { data, error } =
         await supabaseClient.auth.signUp({
 
@@ -403,7 +439,6 @@ async function register() {
     }
 
 
-    // Pokud Supabase vytvořil rovnou session
     if (data.session) {
 
         message.innerText =
@@ -418,7 +453,6 @@ async function register() {
     }
 
 
-    // Pokud je nutné potvrzení e-mailu
     message.innerText =
         "✅ Účet vytvořen. Zkontroluj e-mail a potvrď registraci.";
 
@@ -542,7 +576,6 @@ async function checkProfile() {
         "none";
 
 
-    // Profil existuje
     if (profile) {
 
         openChat(profile.nickname);
@@ -551,10 +584,6 @@ async function checkProfile() {
 
     }
 
-
-    // Profil neexistuje.
-    // Zkusíme použít přezdívku uloženou
-    // při registraci.
 
     const savedNickname =
         user.user_metadata?.nickname;
@@ -586,9 +615,6 @@ async function checkProfile() {
 
     }
 
-
-    // Pokud přezdívku nemáme,
-    // požádáme uživatele o její zadání.
 
     document.getElementById("nicknameBox").style.display =
         "block";
@@ -709,7 +735,7 @@ async function loadMessages() {
         await supabaseClient
             .from("messages")
             .select(
-                "id, nickname, message, created_at"
+                "id, user_id, nickname, message, created_at"
             )
             .order(
                 "created_at",
@@ -737,9 +763,18 @@ async function loadMessages() {
     messages.innerHTML = "";
 
 
+    const {
+        data: { user }
+    } =
+        await supabaseClient.auth.getUser();
+
+
     data.forEach(message => {
 
-        addMessage(message);
+        addMessage(
+            message,
+            user ? user.id : null
+        );
 
     });
 
@@ -754,7 +789,7 @@ async function loadMessages() {
 // ZOBRAZENÍ ZPRÁVY
 // ==========================================
 
-function addMessage(message) {
+function addMessage(message, currentUserId) {
 
     const messages =
         document.getElementById("messages");
@@ -764,8 +799,14 @@ function addMessage(message) {
         document.createElement("div");
 
 
+    // Zjistíme, jestli je zpráva moje
+    const isMine =
+        message.user_id === currentUserId;
+
+
     div.className =
-        "message";
+        "message " +
+        (isMine ? "mine" : "other");
 
 
     const nickname =
@@ -777,7 +818,7 @@ function addMessage(message) {
 
 
     nickname.textContent =
-        message.nickname + ":";
+        message.nickname;
 
 
     const text =
@@ -785,35 +826,46 @@ function addMessage(message) {
 
 
     text.textContent =
-        " " + message.message;
+        message.message;
 
 
     const time =
-    document.createElement("span");
+        document.createElement("span");
 
-time.className =
-    "time";
 
-const date = new Date(message.created_at);
+    time.className =
+        "time";
 
-if (!isNaN(date.getTime())) {
 
-    time.textContent =
-        date.toLocaleString("cs-CZ", {
-            timeZone: "Europe/Prague",
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-        });
+    const date =
+        new Date(message.created_at);
 
-} else {
 
-    time.textContent =
-        "čas neznámý";
+    if (!isNaN(date.getTime())) {
 
-}
+        time.textContent =
+            date.toLocaleString("cs-CZ", {
+
+                timeZone: "Europe/Prague",
+
+                day: "2-digit",
+
+                month: "2-digit",
+
+                year: "numeric",
+
+                hour: "2-digit",
+
+                minute: "2-digit"
+
+            });
+
+    } else {
+
+        time.textContent =
+            "čas neznámý";
+
+    }
 
 
     div.appendChild(nickname);
