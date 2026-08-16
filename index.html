@@ -64,7 +64,6 @@
             background: #b00020;
         }
 
-        /* Třída pro checkbox na zobrazení hesla */
         .show-password-label {
             display: flex;
             align-items: center;
@@ -300,7 +299,7 @@
         type="password"
         placeholder="Heslo"
     >
-    <!-- Checkbox pro zobrazení hesla -->
+    
     <label class="show-password-label">
         <input type="checkbox" onchange="document.getElementById('loginPassword').type = this.checked ? 'text' : 'password'">
         Zobrazit heslo
@@ -341,10 +340,20 @@
         type="password"
         placeholder="Heslo (min. 6 znaků)"
     >
-    <!-- Checkbox pro zobrazení hesla -->
+    
+    <input
+        id="registerPasswordConfirm"
+        type="password"
+        placeholder="Potvrď heslo znovu"
+    >
+    
     <label class="show-password-label">
-        <input type="checkbox" onchange="document.getElementById('registerPassword').type = this.checked ? 'text' : 'password'">
-        Zobrazit heslo
+        <input type="checkbox" onchange="
+            const isChecked = this.checked;
+            document.getElementById('registerPassword').type = isChecked ? 'text' : 'password';
+            document.getElementById('registerPasswordConfirm').type = isChecked ? 'text' : 'password';
+        ">
+        Zobrazit hesla
     </label>
 
     <input
@@ -416,7 +425,7 @@
         placeholder="Heslo místnosti"
         onkeydown="if(event.key === 'Enter') verifyRoomPassword()"
     >
-    <!-- Checkbox pro zobrazení hesla -->
+    
     <label class="show-password-label">
         <input type="checkbox" onchange="document.getElementById('roomPasswordInput').type = this.checked ? 'text' : 'password'">
         Zobrazit heslo
@@ -641,6 +650,10 @@ async function register() {
     const password =
         document.getElementById("registerPassword")
             .value;
+            
+    const passwordConfirm =
+        document.getElementById("registerPasswordConfirm")
+            .value;
 
     const nickname =
         document.getElementById("registerNickname")
@@ -651,7 +664,7 @@ async function register() {
         document.getElementById("registerMessage");
 
 
-    if (!email || !password || !nickname) {
+    if (!email || !password || !passwordConfirm || !nickname) {
 
         message.innerText =
             "Vyplň všechna pole.";
@@ -661,7 +674,17 @@ async function register() {
 
         return;
     }
+    
+    if (password !== passwordConfirm) {
 
+        message.innerText =
+            "Hesla se neshodují. Zkontroluj je a zkus to znovu.";
+
+        message.className =
+            "error";
+
+        return;
+    }
 
     if (password.length < 6) {
 
