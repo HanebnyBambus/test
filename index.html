@@ -3,28 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Můj chat</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            padding: 30px;
+        }
+
+        .box {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+        }
+
+        input,
+        button {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        #nicknameBox,
+        #profile {
+            display: none;
+        }
+
+    </style>
 </head>
 
 <body>
 
-    <h1>Můj chat</h1>
 
-    <input id="loginEmail" type="email" placeholder="E-mail">
+<div class="box">
 
-    <input id="loginPassword" type="password" placeholder="Heslo">
+    <h1>🔐 Přihlášení</h1>
 
-    <button onclick="login()">Přihlásit</button>
+    <input
+        id="loginEmail"
+        type="email"
+        placeholder="E-mail"
+    >
 
-    <p id="message"></p>
+    <input
+        id="loginPassword"
+        type="password"
+        placeholder="Heslo"
+    >
+
+    <button onclick="login()">
+        Přihlásit
+    </button>
+
+    <p id="loginMessage"></p>
+
+</div>
+
+
+<div class="box" id="nicknameBox">
+
+    <h1>👤 Přezdívka</h1>
+
+    <input
+        id="nickname"
+        type="text"
+        maxlength="30"
+        placeholder="Zadej přezdívku"
+    >
+
+    <button onclick="saveNickname()">
+        Uložit přezdívku
+    </button>
+
+    <p id="nicknameMessage"></p>
+
+</div>
+
+
+<div class="box" id="profile">
+
+    <h1>✅ Přihlášeno</h1>
+
+    <p>
+        Tvoje přezdívka:
+        <strong id="currentNickname"></strong>
+    </p>
+
+    <button onclick="logout()">
+        Odhlásit
+    </button>
+
+</div>
 
 
 <script>
 
+
 const SUPABASE_URL =
     "https://jdvyfigrazambxtnqpkq.supabase.co";
+
 
 const SUPABASE_KEY =
     "sb_publishable_YKO_HGnM6so7hNtg_naIeQ_cYX40nxJ";
@@ -37,6 +123,10 @@ const supabaseClient =
     );
 
 
+// ==========================================
+// PŘIHLÁŠENÍ
+// ==========================================
+
 async function login() {
 
     const email =
@@ -44,15 +134,6 @@ async function login() {
 
     const password =
         document.getElementById("loginPassword").value;
-
-
-    if (!email || !password) {
-
-        document.getElementById("message").innerText =
-            "Vyplň e-mail a heslo.";
-
-        return;
-    }
 
 
     const { data, error } =
@@ -67,19 +148,158 @@ async function login() {
 
     if (error) {
 
-        console.error(error);
-
-        document.getElementById("message").innerText =
+        document.getElementById("loginMessage").innerText =
             "❌ " + error.message;
 
         return;
     }
 
 
-    document.getElementById("message").innerText =
+    document.getElementById("loginMessage").innerText =
         "✅ Přihlášení funguje!";
 
-    console.log("Přihlášený uživatel:", data.user);
+
+    await checkProfile();
+}
+
+
+// ==========================================
+// KONTROLA PROFILU
+// ==========================================
+
+async function checkProfile() {
+
+    const {
+        data: { user }
+    } =
+        await supabaseClient.auth.getUser();
+
+
+    if (!user) {
+        return;
+    }
+
+
+    const { data: profile, error } =
+        await supabaseClient
+            .from("profiles")
+            .select("nickname")
+            .eq("id", user.id)
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.error(error);
+
+        document.getElementById("nicknameMessage").innerText =
+            "❌ " + error.message;
+
+        return;
+    }
+
+
+    document.querySelector(".box").style.display =
+        "none";
+
+
+    if (profile) {
+
+        document.getElementById("currentNickname").innerText =
+            profile.nickname;
+
+        document.getElementById("profile").style.display =
+            "block";
+
+    } else {
+
+        document.getElementById("nicknameBox").style.display =
+            "block";
+
+    }
+
+}
+
+
+// ==========================================
+// ULOŽENÍ PŘEZDÍVKY
+// ==========================================
+
+async function saveNickname() {
+
+    const nickname =
+        document.getElementById("nickname").value.trim();
+
+
+    if (!nickname) {
+
+        document.getElementById("nicknameMessage").innerText =
+            "Zadej přezdívku.";
+
+        return;
+    }
+
+
+    const {
+        data: { user }
+    } =
+        await supabaseClient.auth.getUser();
+
+
+    if (!user) {
+
+        alert("Nejsi přihlášen.");
+
+        return;
+    }
+
+
+    const { error } =
+        await supabaseClient
+            .from("profiles")
+            .insert({
+
+                id: user.id,
+
+                nickname: nickname
+
+            });
+
+
+    if (error) {
+
+        console.error(error);
+
+        document.getElementById("nicknameMessage").innerText =
+            "❌ " + error.message;
+
+        return;
+    }
+
+
+    document.getElementById("nicknameBox").style.display =
+        "none";
+
+
+    document.getElementById("currentNickname").innerText =
+        nickname;
+
+
+    document.getElementById("profile").style.display =
+        "block";
+
+}
+
+
+// ==========================================
+// ODHLÁŠENÍ
+// ==========================================
+
+async function logout() {
+
+    await supabaseClient.auth.signOut();
+
+    location.reload();
 
 }
 
