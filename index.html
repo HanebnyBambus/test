@@ -64,6 +64,7 @@
 
         #registerBox,
         #nicknameBox,
+        #chatPasswordBox,
         #chat {
             display: none;
         }
@@ -368,6 +369,41 @@
 
 
 <!-- ================================= -->
+<!-- SPOLEČNÉ HESLO PRO VSTUP DO CHATU -->
+<!-- ================================= -->
+
+<div class="box" id="chatPasswordBox">
+
+    <h1>🔒 Tajná místnost</h1>
+
+    <p>
+        Pro vstup do chatu musíš zadat přístupové heslo.
+    </p>
+
+    <input
+        id="roomPasswordInput"
+        type="password"
+        placeholder="Heslo místnosti"
+        onkeydown="if(event.key === 'Enter') verifyRoomPassword()"
+    >
+
+    <button onclick="verifyRoomPassword()">
+        Vstoupit do chatu
+    </button>
+
+    <button
+        class="logout"
+        onclick="logout()"
+    >
+        Zrušit a odhlásit se
+    </button>
+
+    <p id="roomPasswordMessage"></p>
+
+</div>
+
+
+<!-- ================================= -->
 <!-- CHAT -->
 <!-- ================================= -->
 
@@ -467,16 +503,18 @@ const supabaseClient =
 
 
 // ==========================================
-// PROMĚNNÉ PRO ONLINE STAV A REALTIME
+// PROMĚNNÉ PRO ONLINE STAV, REALTIME A HESLO
 // ==========================================
 
+// TADY SI NASTAV SVÉ TAJNÉ HESLO PRO VSTUP DO CHATU:
+const CHAT_PASSWORD = "Krsmol2027"; 
+
+
 let presenceChannel = null;
-
 let messagesChannel = null;
-
 let currentUser = null;
-
 let currentNickname = null;
+let tempNickname = null; // Dočasná proměnná, než zadá heslo
 
 
 // ==========================================
@@ -505,6 +543,9 @@ function showLogin() {
 
     document.getElementById("nicknameBox").style.display =
         "none";
+        
+    document.getElementById("chatPasswordBox").style.display =
+        "none";
 
     document.getElementById("chat").style.display =
         "none";
@@ -512,6 +553,42 @@ function showLogin() {
     document.getElementById("loginBox").style.display =
         "block";
 
+}
+
+
+// ==========================================
+// ZOBRAZENÍ ZADÁNÍ HESLA MÍSTNOSTI
+// ==========================================
+
+function askForRoomPassword(nickname) {
+    tempNickname = nickname; // Uložíme si přezdívku na později
+
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("registerBox").style.display = "none";
+    document.getElementById("nicknameBox").style.display = "none";
+    document.getElementById("chat").style.display = "none";
+
+    document.getElementById("chatPasswordBox").style.display = "block";
+}
+
+
+// ==========================================
+// OVĚŘENÍ HESLA MÍSTNOSTI
+// ==========================================
+
+function verifyRoomPassword() {
+    const input = document.getElementById("roomPasswordInput").value;
+    const msg = document.getElementById("roomPasswordMessage");
+
+    if (input === CHAT_PASSWORD) {
+        // Heslo je správné, pustíme ho do chatu
+        document.getElementById("chatPasswordBox").style.display = "none";
+        openChat(tempNickname);
+    } else {
+        // Špatné heslo
+        msg.innerText = "❌ Nesprávné heslo. Zkus to znovu.";
+        msg.className = "error";
+    }
 }
 
 
@@ -740,7 +817,8 @@ async function checkProfile() {
 
     if (profile) {
 
-        openChat(profile.nickname);
+        // Už má profil, zeptáme se ho na heslo do místnosti
+        askForRoomPassword(profile.nickname);
 
         return;
 
@@ -768,8 +846,9 @@ async function checkProfile() {
 
 
         if (!insertError && newProfile) {
-
-            openChat(newProfile.nickname);
+            
+            // Profil se vytvořil, zeptáme se na heslo do místnosti
+            askForRoomPassword(newProfile.nickname);
 
             return;
 
@@ -854,13 +933,14 @@ async function saveNickname() {
     }
 
 
-    openChat(data.nickname);
+    // Uloženo, teď chceme heslo k místnosti
+    askForRoomPassword(data.nickname);
 
 }
 
 
 // ==========================================
-// OTEVŘENÍ CHATU
+// OTEVŘENÍ CHATU (PO ZADÁNÍ HESLA)
 // ==========================================
 
 async function openChat(nickname) {
@@ -872,6 +952,9 @@ async function openChat(nickname) {
         "none";
 
     document.getElementById("nicknameBox").style.display =
+        "none";
+        
+    document.getElementById("chatPasswordBox").style.display =
         "none";
 
     document.getElementById("chat").style.display =
