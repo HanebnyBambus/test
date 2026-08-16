@@ -663,6 +663,13 @@
         </div>
 
         <div class="chatMain">
+            
+            <!-- VYHLEDÁVÁNÍ -->
+            <div id="searchBar" style="display: flex; gap: 5px; margin-bottom: 10px;">
+                <input id="searchInput" type="text" placeholder="Hledat ve zprávách..." onkeydown="if(event.key === 'Enter') executeSearch()" style="margin-top: 0;">
+                <button onclick="executeSearch()" style="width: auto; margin-top: 0; padding: 0 15px;" title="Hledat">🔍</button>
+                <button onclick="clearSearch()" id="clearSearchBtn" style="width: auto; margin-top: 0; padding: 0 15px; display: none; background: #b00020;" title="Zrušit hledání">❌</button>
+            </div>
 
             <div id="messages">
                 Načítám zprávy...
@@ -1393,12 +1400,13 @@ function startMessagesSubscription() {
 
                 if (payload.eventType === "INSERT") {
 
-                    addMessage(
-                        payload.new,
-                        currentUser
-                            ? currentUser.id
-                            : null
-                    );
+                    // PŘIDÁNA PODMÍNKA ZDE:
+                    if (!isSearching) {
+                        addMessage(
+                            payload.new,
+                            currentUser ? currentUser.id : null
+                        );
+                    }
 
                     if (
                         currentUser &&
@@ -1976,6 +1984,72 @@ async function checkSession() {
     }
 }
 
+    /* ================================= */
+/* VYHLEDÁVÁNÍ ZPRÁV */
+/* ================================= */
+
+let isSearching = false;
+
+async function executeSearch() {
+    const query = document.getElementById("searchInput").value.trim();
+    if (!query) {
+        clearSearch();
+        return;
+    }
+
+    isSearching = true;
+    document.getElementById("clearSearchBtn").style.display = "block";
+    document.getElementById("messages").innerHTML = "Hledám...";
+
+    // Hledání v Supabase (ilike ignoruje velká/malá písmena)
+    const { data: messagesData, error: messagesError } = await supabaseClient
+        .from("messages")
+        .select("id, user_id, nickname, message, created_at, is_edited")
+        .ilike("message", `%${query}%`) 
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+    if (messagesError) {
+        document.getElementById("messages").innerText = "Chyba při hledání.";
+        return;
+    }
+
+    // Načtení reakcí pro nalezené zprávy
+    let reactionsData = [];
+    if (messagesData && messagesData.length > 0) {
+        const messageIds = messagesData.map(msg => msg.id);
+        const { data: rxData } = await supabaseClient
+            .from("reactions")
+            .select("message_id, emoji, user_id")
+            .in("message_id", messageIds);
+        if (rxData) reactionsData = rxData;
+    }
+
+    messagesData.forEach(msg => {
+        msg.reactions = reactionsData.filter(rx => rx.message_id === msg.id);
+    });
+
+    // Vykreslení výsledků
+    const messages = document.getElementById("messages");
+    messages.innerHTML = "";
+
+    if (messagesData && messagesData.length > 0) {
+        messagesData.reverse().forEach(message => {
+            addMessage(message, currentUser ? currentUser.id : null);
+        });
+    } else {
+        messages.innerHTML = "<div style='text-align:center; padding:20px; color: var(--time-color);'>Žádné zprávy nebyly nalezeny.</div>";
+    }
+    messages.scrollTop = messages.scrollHeight;
+}
+
+function clearSearch() {
+    isSearching = false;
+    document.getElementById("searchInput").value = "";
+    document.getElementById("clearSearchBtn").style.display = "none";
+    loadMessages(); // Načte zpět normální chat
+}
+    
 checkSession();
 
 </script>
