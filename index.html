@@ -1194,10 +1194,18 @@ async function sendResetPassword() {
 // Uložení nového hesla po kliknutí z e-mailu (Krok B)
 async function updatePassword() {
     const newPassword = document.getElementById("newPasswordInput").value;
+    const confirmPassword = document.getElementById("newPasswordConfirmInput").value; // Načtení druhého hesla
     const msg = document.getElementById("updatePasswordMessage");
 
     if (!newPassword || newPassword.length < 6) {
         msg.innerText = "Heslo musí mít alespoň 6 znaků.";
+        msg.className = "error";
+        return;
+    }
+
+    // NOVÁ KONTROLA: Shodují se hesla?
+    if (newPassword !== confirmPassword) {
+        msg.innerText = "Hesla se neshodují.";
         msg.className = "error";
         return;
     }
@@ -1216,10 +1224,11 @@ async function updatePassword() {
         msg.innerText = "✅ Heslo bylo úspěšně změněno! Za chvíli tě vrátíme zpět.";
         msg.className = "success";
         
-        // Po úspěchu vyčistíme heslo a restartujeme aplikaci
+        // Po úspěchu vyčistíme hesla a restartujeme aplikaci
         setTimeout(() => {
             document.getElementById("newPasswordInput").value = "";
-            backToRoomPassword(); // Vrátíme ho čistě na úvodní heslo chatu
+            document.getElementById("newPasswordConfirmInput").value = "";
+            backToRoomPassword(); 
         }, 3000);
     }
 }
