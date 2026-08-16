@@ -345,12 +345,32 @@ async function register() {
     }
 
 
+    if (data.session) {
+
     const { error: profileError } =
         await supabaseClient
             .from("profiles")
             .insert({
                 id: data.user.id,
                 nickname: nickname
+            });
+
+    if (profileError) {
+
+        document.getElementById("registerMessage").innerText =
+            "Účet vznikl, ale přezdívku se nepodařilo uložit: " +
+            profileError.message;
+
+        return;
+    }
+
+    await showChat();
+
+} else {
+
+    document.getElementById("registerMessage").innerText =
+        "✅ Účet vytvořen. Zkontroluj e-mail a potvrď registraci.";
+}
             });
 
 
