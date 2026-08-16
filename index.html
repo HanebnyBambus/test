@@ -298,11 +298,16 @@ async function register() {
     const nickname =
         document.getElementById("registerNickname").value.trim();
 
+    const message =
+        document.getElementById("registerMessage");
+
 
     if (!email || !password || !nickname) {
 
-        document.getElementById("registerMessage").innerText =
+        message.innerText =
             "Vyplň všechna pole.";
+
+        message.className = "error";
 
         return;
     }
@@ -310,105 +315,68 @@ async function register() {
 
     if (password.length < 6) {
 
-        document.getElementById("registerMessage").innerText =
+        message.innerText =
             "Heslo musí mít alespoň 6 znaků.";
+
+        message.className = "error";
 
         return;
     }
 
 
+    // Vytvoření účtu
     const { data, error } =
         await supabaseClient.auth.signUp({
+
             email: email,
-            password: password
+
+            password: password,
+
+            options: {
+
+                emailRedirectTo:
+                    "https://hanebnybambus.github.io/test/"
+
+            }
+
         });
 
 
     if (error) {
 
-        document.getElementById("registerMessage").innerText =
+        console.error(error);
+
+        message.innerText =
             "❌ " + error.message;
 
-        document.getElementById("registerMessage").className =
-            "error";
+        message.className = "error";
 
         return;
     }
 
 
-    if (!data.user) {
+    // Uložíme přezdívku do metadata účtu.
+    // Profil vytvoříme až po skutečném přihlášení.
 
-        document.getElementById("registerMessage").innerText =
-            "Účet se nepodařilo vytvořit.";
+    if (data.user) {
 
-        return;
-    }
+        await supabaseClient.auth.updateUser({
 
-
-    if (data.session) {
-
-    const { error: profileError } =
-        await supabaseClient
-            .from("profiles")
-            .insert({
-                id: data.user.id,
+            data: {
                 nickname: nickname
-            });
+            }
 
-    if (profileError) {
+        });
 
-        document.getElementById("registerMessage").innerText =
-            "Účet vznikl, ale přezdívku se nepodařilo uložit: " +
-            profileError.message;
-
-        return;
-    }
-
-    await showChat();
-
-} else {
-
-    document.getElementById("registerMessage").innerText =
-        "✅ Účet vytvořen. Zkontroluj e-mail a potvrď registraci.";
-}
-            });
-
-
-    if (profileError) {
-
-        document.getElementById("registerMessage").innerText =
-            "Účet vznikl, ale přezdívku se nepodařilo uložit: " +
-            profileError.message;
-
-        return;
     }
 
 
-    document.getElementById("registerMessage").innerText =
-        "✅ Účet byl vytvořen.";
+    message.innerText =
+        "✅ Účet byl vytvořen. Zkontroluj svůj e-mail a klikni na potvrzovací odkaz.";
 
-    document.getElementById("registerMessage").className =
-        "success";
-
-
-    /*
-       Pokud máš v Supabase zapnuté potvrzení
-       e-mailu, uživatel musí nejdříve potvrdit
-       e-mail.
-    */
-
-    if (data.session) {
-
-        await showChat();
-
-    } else {
-
-        document.getElementById("registerMessage").innerText =
-            "✅ Účet vytvořen. Zkontroluj e-mail a potvrď registraci.";
-    }
+    message.className = "success";
 
 }
-
 
 // ==========================================
 // ZOBRAZENÍ CHATE
