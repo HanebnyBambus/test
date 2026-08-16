@@ -1461,7 +1461,7 @@ function handleTyping() {
 
 
 /* ================================= */
-/* REALTIME ZPRÁVY + REAKCE */
+/* REALTIME ZPRÁVY + REAKCE + PROFILY */
 /* ================================= */
 
 function startMessagesSubscription() {
@@ -1586,6 +1586,22 @@ function startMessagesSubscription() {
             },
             payload => {
                 loadMessages();
+            }
+        )
+
+        /* ================================= */
+        /* REALTIME PROFILY (PŘIDÁNO) */
+        /* ================================= */
+
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "profiles"
+            },
+            payload => {
+                loadUsers(); // Automaticky aktualizuje seznam uživatelů při přihlášení nebo změně profilu
             }
         )
 
@@ -1768,7 +1784,7 @@ function addMessage(message, currentUserId) {
     triggerBtn.textContent = "➕";
     triggerBtn.title = "Přidat reakci";
 
-    // 3. Vysouvací popup s emoji (přidán palec dolů 👎 a hovno 💩)
+    // 3. Vysouvací popup s emoji
     const popup = document.createElement("div");
     popup.className = "reaction-popup";
     popup.innerHTML = `
@@ -1784,7 +1800,6 @@ function addMessage(message, currentUserId) {
     // Interakce pro rozbalení / zavření
     triggerBtn.onclick = (e) => {
         e.stopPropagation();
-        // Zavře případné jiné otevřené popupy
         document.querySelectorAll('.reaction-popup').forEach(p => {
             if (p !== popup) p.style.display = 'none';
         });
