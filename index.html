@@ -358,21 +358,22 @@
         .nickname {
             display: block;
             font-weight: bold;
-            margin-bottom: 4px;
+            font-size: 13px;
         }
 
         .text {
             display: block;
+            margin-top: 6px;
             margin-bottom: 4px;
             font-size: 15px;
         }
 
         .message.mine .nickname {
-            color: #ddd;
+            color: #ffffff;
         }
 
         .message.other .nickname {
-            color: var(--msg-other-text);
+            color: #ffffff;
         }
         
         .time {
@@ -425,22 +426,21 @@
         }
 
         /* ================================= */
-        /* AVATARY */
+        /* AVATARY (PILL / ŠTÍTEK) */
         /* ================================= */
 
         .avatar {
-            width: 28px;
-            height: 28px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #ffffff;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 11px;
             flex-shrink: 0;
-            text-transform: uppercase;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            background: rgba(0, 0, 0, 0.2); /* Tmavší kroužek uvnitř štítku */
         }
 
         .avatar-small {
@@ -448,16 +448,16 @@
             height: 24px;
             font-size: 12px;
             margin-right: 8px;
+            background: transparent; /* V seznamu uživatelů zůstane plná barva */
         }
 
         .nickname-wrapper {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-            padding-bottom: 8px;
-            width: 100%; /* Roztáhne hlavičku na celou šířku bubliny */
-            border-bottom: 1px solid var(--box-border); /* Přidá jemnou čáru pod jméno */
+            gap: 6px;
+            padding: 3px 10px 3px 5px; /* Roztáhne pozadí přes celé jméno */
+            border-radius: 12px;
+            margin-bottom: 4px;
         }
 
         /* ================================= */
@@ -1649,23 +1649,25 @@ function addMessage(message, currentUserId) {
         (isMine ? "mine" : "other");
 
 
-    /* PŘEZDÍVKA A AVATAR */
+    /* PŘEZDÍVKA A AVATAR (JEDNOTNÝ ŠTÍTEK) */
 
     const nickWrapper = document.createElement("div");
     nickWrapper.className = "nickname-wrapper";
+    const avatarColor = getAvatarColor(message.nickname);
+    nickWrapper.style.backgroundColor = avatarColor;
 
     const avatar = document.createElement("div");
     avatar.className = "avatar";
-    avatar.style.backgroundColor = getAvatarColor(message.nickname);
     avatar.textContent = message.nickname ? message.nickname.charAt(0) : "?";
 
     const nickname = document.createElement("span");
     nickname.className = "nickname";
-    nickname.style.marginBottom = "0"; 
     nickname.textContent = message.nickname;
 
     if (isMine) {
         nickWrapper.style.flexDirection = "row-reverse";
+        // Pro tvoji zprávu případně otočíme vnitřek štítku, aby byl avatar vpravo, 
+        // nebo to může zůstat vlevo jako u ostatních (zde ponecháno přirozeně).
     }
 
     nickWrapper.appendChild(avatar);
