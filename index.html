@@ -54,15 +54,17 @@
             background: #444;
         }
 
+        .secondary {
+            background: #777;
+        }
+
         .logout {
             background: #b00020;
         }
 
+        #registerBox,
+        #nicknameBox,
         #chat {
-            display: none;
-        }
-
-        #nicknameBox {
             display: none;
         }
 
@@ -97,6 +99,14 @@
             color: #b00020;
         }
 
+        .success {
+            color: green;
+        }
+
+        .info {
+            color: #555;
+        }
+
     </style>
 </head>
 
@@ -127,7 +137,57 @@
         Přihlásit
     </button>
 
+    <button
+        class="secondary"
+        onclick="showRegister()"
+    >
+        Vytvořit nový účet
+    </button>
+
     <p id="loginMessage"></p>
+
+</div>
+
+
+<!-- ================================= -->
+<!-- REGISTRACE -->
+<!-- ================================= -->
+
+<div class="box" id="registerBox">
+
+    <h1>👤 Registrace</h1>
+
+    <input
+        id="registerEmail"
+        type="email"
+        placeholder="E-mail"
+    >
+
+    <input
+        id="registerPassword"
+        type="password"
+        placeholder="Heslo (min. 6 znaků)"
+    >
+
+    <input
+        id="registerNickname"
+        type="text"
+        maxlength="30"
+        placeholder="Přezdívka"
+    >
+
+    <button onclick="register()">
+        Vytvořit účet
+    </button>
+
+    <button
+        class="secondary"
+        onclick="showLogin()"
+    >
+        Zpět na přihlášení
+    </button>
+
+    <p id="registerMessage"></p>
 
 </div>
 
@@ -139,6 +199,10 @@
 <div class="box" id="nicknameBox">
 
     <h1>👤 Přezdívka</h1>
+
+    <p>
+        K tomuto účtu zatím nemáš nastavenou přezdívku.
+    </p>
 
     <input
         id="nickname"
@@ -169,11 +233,9 @@
         <strong id="currentNickname"></strong>
     </p>
 
-
     <div id="messages">
         Načítám zprávy...
     </div>
-
 
     <input
         id="messageInput"
@@ -183,11 +245,9 @@
         onkeydown="if(event.key === 'Enter') sendMessage()"
     >
 
-
     <button onclick="sendMessage()">
         Odeslat
     </button>
-
 
     <button
         class="logout"
@@ -210,6 +270,8 @@ const SUPABASE_URL =
     "https://jdvyfigrazambxtnqpkq.supabase.co";
 
 
+// ⚠️ SEM VLOŽ SVŮJ SKUTEČNÝ PUBLISHABLE/ANON KEY
+
 const SUPABASE_KEY =
     "sb_publishable_YKO_HGnM6so7hNtg_naIeQ_cYX40nxJ";
 
@@ -222,16 +284,179 @@ const supabaseClient =
 
 
 // ==========================================
+// ZOBRAZENÍ REGISTRACE
+// ==========================================
+
+function showRegister() {
+
+    document.getElementById("loginBox").style.display =
+        "none";
+
+    document.getElementById("registerBox").style.display =
+        "block";
+
+}
+
+
+// ==========================================
+// ZOBRAZENÍ PŘIHLÁŠENÍ
+// ==========================================
+
+function showLogin() {
+
+    document.getElementById("registerBox").style.display =
+        "none";
+
+    document.getElementById("nicknameBox").style.display =
+        "none";
+
+    document.getElementById("chat").style.display =
+        "none";
+
+    document.getElementById("loginBox").style.display =
+        "block";
+
+}
+
+
+// ==========================================
+// REGISTRACE
+// ==========================================
+
+async function register() {
+
+    const email =
+        document.getElementById("registerEmail")
+            .value
+            .trim();
+
+    const password =
+        document.getElementById("registerPassword")
+            .value;
+
+    const nickname =
+        document.getElementById("registerNickname")
+            .value
+            .trim();
+
+    const message =
+        document.getElementById("registerMessage");
+
+
+    if (!email || !password || !nickname) {
+
+        message.innerText =
+            "Vyplň všechna pole.";
+
+        message.className =
+            "error";
+
+        return;
+    }
+
+
+    if (password.length < 6) {
+
+        message.innerText =
+            "Heslo musí mít alespoň 6 znaků.";
+
+        message.className =
+            "error";
+
+        return;
+    }
+
+
+    // Vytvoření účtu
+    const { data, error } =
+        await supabaseClient.auth.signUp({
+
+            email: email,
+
+            password: password,
+
+            options: {
+
+                data: {
+                    nickname: nickname
+                },
+
+                emailRedirectTo:
+                    "https://hanebnybambus.github.io/test/"
+
+            }
+
+        });
+
+
+    if (error) {
+
+        console.error(error);
+
+        message.innerText =
+            "❌ " + error.message;
+
+        message.className =
+            "error";
+
+        return;
+    }
+
+
+    // Pokud Supabase vytvořil rovnou session
+    if (data.session) {
+
+        message.innerText =
+            "✅ Účet vytvořen.";
+
+        message.className =
+            "success";
+
+        await checkProfile();
+
+        return;
+    }
+
+
+    // Pokud je nutné potvrzení e-mailu
+    message.innerText =
+        "✅ Účet vytvořen. Zkontroluj e-mail a potvrď registraci.";
+
+    message.className =
+        "success";
+
+}
+
+
+// ==========================================
 // PŘIHLÁŠENÍ
 // ==========================================
 
 async function login() {
 
     const email =
-        document.getElementById("loginEmail").value.trim();
+        document.getElementById("loginEmail")
+            .value
+            .trim();
 
     const password =
-        document.getElementById("loginPassword").value;
+        document.getElementById("loginPassword")
+            .value;
+
+    const message =
+        document.getElementById("loginMessage");
+
+
+    if (!email || !password) {
+
+        message.innerText =
+            "Vyplň e-mail a heslo.";
+
+        message.className =
+            "error";
+
+        return;
+    }
 
 
     const { error } =
@@ -246,11 +471,23 @@ async function login() {
 
     if (error) {
 
-        document.getElementById("loginMessage").innerText =
+        console.error(error);
+
+        message.innerText =
             "❌ " + error.message;
+
+        message.className =
+            "error";
 
         return;
     }
+
+
+    message.innerText =
+        "✅ Přihlášení úspěšné.";
+
+    message.className =
+        "success";
 
 
     await checkProfile();
@@ -290,7 +527,7 @@ async function checkProfile() {
         console.error(error);
 
         alert(
-            "Chyba profilu: " +
+            "Chyba při načítání profilu: " +
             error.message
         );
 
@@ -301,17 +538,60 @@ async function checkProfile() {
     document.getElementById("loginBox").style.display =
         "none";
 
+    document.getElementById("registerBox").style.display =
+        "none";
 
-    if (!profile) {
 
-        document.getElementById("nicknameBox").style.display =
-            "block";
+    // Profil existuje
+    if (profile) {
+
+        openChat(profile.nickname);
 
         return;
+
     }
 
 
-    openChat(profile.nickname);
+    // Profil neexistuje.
+    // Zkusíme použít přezdívku uloženou
+    // při registraci.
+
+    const savedNickname =
+        user.user_metadata?.nickname;
+
+
+    if (savedNickname) {
+
+        const { data: newProfile, error: insertError } =
+            await supabaseClient
+                .from("profiles")
+                .insert({
+
+                    id: user.id,
+
+                    nickname: savedNickname
+
+                })
+                .select("nickname")
+                .single();
+
+
+        if (!insertError && newProfile) {
+
+            openChat(newProfile.nickname);
+
+            return;
+
+        }
+
+    }
+
+
+    // Pokud přezdívku nemáme,
+    // požádáme uživatele o její zadání.
+
+    document.getElementById("nicknameBox").style.display =
+        "block";
 
 }
 
@@ -323,13 +603,21 @@ async function checkProfile() {
 async function saveNickname() {
 
     const nickname =
-        document.getElementById("nickname").value.trim();
+        document.getElementById("nickname")
+            .value
+            .trim();
+
+    const message =
+        document.getElementById("nicknameMessage");
 
 
     if (!nickname) {
 
-        document.getElementById("nicknameMessage").innerText =
+        message.innerText =
             "Zadej přezdívku.";
+
+        message.className =
+            "error";
 
         return;
     }
@@ -346,10 +634,11 @@ async function saveNickname() {
         alert("Nejsi přihlášen.");
 
         return;
+
     }
 
 
-    const { error } =
+    const { data, error } =
         await supabaseClient
             .from("profiles")
             .insert({
@@ -358,21 +647,26 @@ async function saveNickname() {
 
                 nickname: nickname
 
-            });
+            })
+            .select("nickname")
+            .single();
 
 
     if (error) {
 
         console.error(error);
 
-        document.getElementById("nicknameMessage").innerText =
+        message.innerText =
             "❌ " + error.message;
+
+        message.className =
+            "error";
 
         return;
     }
 
 
-    openChat(nickname);
+    openChat(data.nickname);
 
 }
 
@@ -384,6 +678,9 @@ async function saveNickname() {
 async function openChat(nickname) {
 
     document.getElementById("loginBox").style.display =
+        "none";
+
+    document.getElementById("registerBox").style.display =
         "none";
 
     document.getElementById("nicknameBox").style.display =
@@ -445,6 +742,10 @@ async function loadMessages() {
         addMessage(message);
 
     });
+
+
+    messages.scrollTop =
+        messages.scrollHeight;
 
 }
 
@@ -515,10 +816,6 @@ function addMessage(message) {
 
 
     messages.appendChild(div);
-
-
-    messages.scrollTop =
-        messages.scrollHeight;
 
 }
 
@@ -602,15 +899,16 @@ async function sendMessage() {
 
 
 // ==========================================
-// AUTOMATICKÉ NAČÍTÁNÍ
+// AUTOMATICKÉ NAČÍTÁNÍ ZPRÁV
 // ==========================================
 
 setInterval(() => {
 
-    if (
-        document.getElementById("chat").style.display
-        !== "none"
-    ) {
+    const chat =
+        document.getElementById("chat");
+
+
+    if (chat.style.display === "block") {
 
         loadMessages();
 
@@ -633,7 +931,7 @@ async function logout() {
 
 
 // ==========================================
-// KONTROLA EXISTUJÍCÍ SESSION
+// KONTROLA EXISTUJÍCÍHO PŘIHLÁŠENÍ
 // ==========================================
 
 async function checkSession() {
