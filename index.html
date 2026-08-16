@@ -1481,15 +1481,14 @@ function startMessagesSubscription() {
                 table: "messages"
             },
             payload => {
-
                 if (payload.eventType === "INSERT") {
-
                     if (!isSearching) {
                         addMessage(
                             payload.new,
                             currentUser ? currentUser.id : null
                         );
                     }
+                    // ...
 
                     if (
                         currentUser &&
