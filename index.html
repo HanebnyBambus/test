@@ -686,7 +686,40 @@
         <input type="color" id="favColor" value="#3b82f6" style="width: 100px; height: 50px; padding: 0; cursor: pointer; border-radius: 8px; border: 1px solid var(--border-color); background: var(--box-bg);">
     </div>
 
-    <button onclick="saveProfileSettings()">Uložit nastavení</button>
+    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
+
+    <h3>🔑 Změna hesla</h3>
+    <p style="font-size: 14px; color: var(--time-color);">Pokud si chceš změnit heslo, zadej nové níže.</p>
+
+    <div class="password-wrapper">
+        <input id="settingsNewPassword" type="password" placeholder="Nové heslo (min. 6 znaků)">
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('settingsNewPassword', this)">
+            <svg class="eye-open" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+        </button>
+    </div>
+
+    <div class="password-wrapper">
+        <input id="settingsConfirmPassword" type="password" placeholder="Potvrď nové heslo">
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('settingsConfirmPassword', this)">
+            <svg class="eye-open" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+        </button>
+    </div>
+
+    <button onclick="saveProfileSettings()">Uložit změny</button>
     <button class="secondary" onclick="showDashboard()" style="margin-top: 10px;">⬅️ Zpět do menu</button>
     
     <p id="profileMessage"></p>
@@ -1132,6 +1165,10 @@ async function showProfileSettings() {
     document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
     document.getElementById("profileBox").style.display = "block";
     document.getElementById("profileMessage").innerText = "";
+    
+    // Vyčistíme pole pro hesla při každém otevření nastavení
+    document.getElementById("settingsNewPassword").value = "";
+    document.getElementById("settingsConfirmPassword").value = "";
 
     if (!currentUser) return;
 
@@ -1146,37 +1183,69 @@ async function showProfileSettings() {
     }
 }
 
-// Uložení nastavení profilu (barvy)
+// Uložení nastavení profilu (barva + volitelná změna hesla)
 async function saveProfileSettings() {
     if (!currentUser) return;
 
     const color = document.getElementById("favColor").value;
+    const newPassword = document.getElementById("settingsNewPassword").value;
+    const confirmPassword = document.getElementById("settingsConfirmPassword").value;
     const msg = document.getElementById("profileMessage");
 
     msg.innerText = "Ukládám...";
     msg.className = "info";
 
-    const { error } = await supabaseClient
+    // 1. Uložení barvy do tabulky profiles
+    const { error: colorError } = await supabaseClient
         .from("profiles")
         .update({ color: color })
         .eq("id", currentUser.id);
 
-    if (error) {
-        msg.innerText = "❌ Chyba: " + error.message;
+    if (colorError) {
+        msg.innerText = "❌ Chyba při ukládání barvy: " + colorError.message;
         msg.className = "error";
-    } else {
-        msg.innerText = "✅ Nastavení uloženo!";
-        msg.className = "success";
-        
-        // Okamžitě překreslíme aktuální zprávy i seznam uživatelů, 
-        // aby se nová barva projevila hned po návratu do chatu
-        await loadMessages();
-        await loadUsers();
-
-        setTimeout(() => {
-            showDashboard();
-        }, 1500);
+        return;
     }
+
+    // 2. Pokud uživatel vyplnil nové heslo, zkontrolujeme ho a změníme
+    if (newPassword || confirmPassword) {
+        if (newPassword.length < 6) {
+            msg.innerText = "❌ Nové heslo musí mít alespoň 6 znaků.";
+            msg.className = "error";
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            msg.innerText = "❌ Zadaná hesla se neshodují.";
+            msg.className = "error";
+            return;
+        }
+
+        const { error: passwordError } = await supabaseClient.auth.updateUser({
+            password: newPassword
+        });
+
+        if (passwordError) {
+            msg.innerText = "❌ Chyba při změně hesla: " + passwordError.message;
+            msg.className = "error";
+            return;
+        }
+
+        // Vyčistíme pole s hesly po úspěšné změně
+        document.getElementById("settingsNewPassword").value = "";
+        document.getElementById("settingsConfirmPassword").value = "";
+    }
+
+    msg.innerText = "✅ Nastavení a heslo bylo úspěšně uloženo!";
+    msg.className = "success";
+    
+    // Okamžitě překreslíme aktuální zprávy i seznam uživatelů
+    await loadMessages();
+    await loadUsers();
+
+    setTimeout(() => {
+        showDashboard();
+    }, 1500);
 }
 
 function backToRoomPassword() {
@@ -1797,7 +1866,6 @@ async function loadMessages() {
 
     messagesData.forEach(msg => {
         msg.reactions = reactionsData.filter(rx => rx.message_id === msg.id);
-        // Přiřadíme uživatelskou barvu (pokud ji má uloženou, jinak fallback na generátor)
         msg.userColor = profilesMap[msg.user_id] || getAvatarColor(msg.nickname);
     });
 
@@ -1850,7 +1918,6 @@ function addMessage(message, currentUserId) {
     const nickWrapper = document.createElement("div");
     nickWrapper.className = "nickname-wrapper";
     
-    // Použijeme vlastní barvu zprávy
     const avatarColor = message.userColor || getAvatarColor(message.nickname);
     nickWrapper.style.backgroundColor = avatarColor;
 
