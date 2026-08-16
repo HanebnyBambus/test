@@ -162,6 +162,10 @@
         .secondary {
             background: #777;
         }
+        
+        .secondary:hover {
+            background: #555;
+        }
 
         .logout {
             background: #b00020;
@@ -185,7 +189,36 @@
             font-size: 14px;
         }
 
+        /* ================================= */
+        /* ROZCESTNÍK (DASHBOARD) STYLY */
+        /* ================================= */
+        .dashboard-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .dashboard-buttons button {
+            padding: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .poll-btn {
+            background: #0066cc;
+        }
+        .poll-btn:hover {
+            background: #005bb5;
+        }
+
         /* Výchozí stav: Všechno kromě hesla je skryté */
+        #dashboardBox,
+        #pollsBox,
         #loginBox,
         #registerBox,
         #nicknameBox,
@@ -587,7 +620,7 @@
     <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
     <h1>🔒 Krsmol 2027</h1>
 
-    <p>Pro vstup do chatu musíš zadat přístupové heslo.</p>
+    <p>Pro vstup do systému musíš zadat přístupové heslo.</p>
 
     <div class="password-wrapper">
         <input
@@ -614,14 +647,36 @@
         </button>
     </div>
 
-    <button onclick="verifyRoomPassword()">Vstoupit do chatu</button>
+    <button onclick="verifyRoomPassword()">Odemknout</button>
     <p id="roomPasswordMessage"></p>
 </div>
+
+<!-- ROZCESTNÍK (Nové menu po zadání hesla) -->
+<div class="box" id="dashboardBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
+    <h1>🏠 Rozcestník</h1>
+    <p style="text-align: center;">Vítej v systému Krsmol 2027. Co chceš dnes dělat?</p>
+    
+    <div class="dashboard-buttons">
+        <button onclick="enterChatFlow()">💬 Vstoupit do chatu</button>
+        <button class="poll-btn" onclick="openPolls()">📊 Ankety (Připravuje se)</button>
+        <button class="secondary" onclick="backToRoomPassword()">🚪 Zamknout a odejít</button>
+    </div>
+</div>
+
+<!-- ANKETY (Zatím prázdná stránka) -->
+<div class="box" id="pollsBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
+    <h1>📊 Ankety</h1>
+    <p style="text-align: center; padding: 40px 0;">Modul pro hlasování a ankety se momentálně vyvíjí...</p>
+    <button class="secondary" onclick="showDashboard()">⬅️ Zpět do menu</button>
+</div>
+
 
 <!-- PŘIHLÁŠENÍ -->
 <div class="box" id="loginBox">
     <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
-    <h1>🔐 Přihlášení</h1>
+    <h1>🔐 Přihlášení do chatu</h1>
     <input id="loginEmail" type="email" placeholder="E-mail">
 
     <div class="password-wrapper">
@@ -646,7 +701,7 @@
 
     <button onclick="login()">Přihlásit</button>
     <button class="secondary" onclick="showRegister()">Vytvořit nový účet</button>
-    <button class="logout logout-small" style="width:100%; margin-top:10px;" onclick="backToRoomPassword()">Zpět na zadání hesla</button>
+    <button class="logout logout-small" style="width:100%; margin-top:10px;" onclick="showDashboard()">⬅️ Zpět do menu</button>
     <p id="loginMessage"></p>
 </div>
 
@@ -721,9 +776,10 @@
             <strong id="currentNickname"></strong>
         </p>
 
-        <button class="logout logout-small" onclick="logout()">
-            Odhlásit
-        </button>
+        <div style="display: flex; gap: 10px;">
+            <button class="secondary logout-small" onclick="backToDashboardFromChat()">🏠 Menu</button>
+            <button class="logout logout-small" onclick="logout()">Odhlásit</button>
+        </div>
     </div>
 
     <div class="chatLayout">
@@ -762,8 +818,8 @@
                 <span class="emoji-item" onclick="insertEmoji('💩')">💩</span>
                 <span class="emoji-item" onclick="insertEmoji('🙌')">🙌</span>
                 <span class="emoji-item" onclick="insertEmoji('💬')">💬</span>
-		<span class="emoji-item" onclick="insertEmoji('卐')">卐</span>
-		<span class="emoji-item" onclick="insertEmoji('ᛋᛋ')">ᛋᛋ</span>
+		        <span class="emoji-item" onclick="insertEmoji('卐')">卐</span>
+		        <span class="emoji-item" onclick="insertEmoji('ᛋᛋ')">ᛋᛋ</span>
 
 
             </div>
@@ -952,7 +1008,7 @@ let roomAuthenticated = false;
 
 
 /* ================================= */
-/* HESLO MÍSTNOSTI */
+/* HESLO MÍSTNOSTI A MENU LOGIKA */
 /* ================================= */
 
 function verifyRoomPassword() {
@@ -968,14 +1024,29 @@ function verifyRoomPassword() {
         document.getElementById("roomPasswordMessage").innerText = "";
         document.getElementById("roomPasswordInput").value = "";
 
-        document.getElementById("chatPasswordBox").style.display = "none";
-
-        checkSession();
+        // Ukážeme rozcestník
+        showDashboard();
 
     } else {
         msg.innerText = "❌ Nesprávné heslo.";
         msg.className = "error";
     }
+}
+
+function showDashboard() {
+    // Skryjeme všechna okna
+    ["chatPasswordBox", "loginBox", "registerBox", "nicknameBox", "chat", "pollsBox"].forEach(id => {
+        document.getElementById(id).style.display = "none";
+    });
+    // Zobrazíme Dashboard
+    document.getElementById("dashboardBox").style.display = "block";
+}
+
+function openPolls() {
+    ["dashboardBox"].forEach(id => {
+        document.getElementById(id).style.display = "none";
+    });
+    document.getElementById("pollsBox").style.display = "block";
 }
 
 function backToRoomPassword() {
@@ -984,11 +1055,36 @@ function backToRoomPassword() {
         "loginBox",
         "registerBox",
         "nicknameBox",
-        "chat"
+        "chat",
+        "dashboardBox",
+        "pollsBox"
     ].forEach(id =>
         document.getElementById(id).style.display = "none"
     );
     document.getElementById("chatPasswordBox").style.display = "block";
+}
+
+// Funkce volaná z rozcestníku po kliknutí na "Vstoupit do chatu"
+function enterChatFlow() {
+    document.getElementById("dashboardBox").style.display = "none";
+    checkSession();
+}
+
+function backToDashboardFromChat() {
+    if (chatInterval) {
+        clearInterval(chatInterval);
+        chatInterval = null;
+    }
+    
+    // Odpojení od online stavu, aby ostatní viděli, že nejsme v chatu
+    if (presenceChannel) {
+        try {
+            presenceChannel.untrack();
+        } catch(e) {}
+    }
+
+    document.getElementById("chat").style.display = "none";
+    showDashboard();
 }
 
 
@@ -1005,7 +1101,9 @@ function showLogin() {
     [
         "registerBox",
         "nicknameBox",
-        "chat"
+        "chat",
+        "dashboardBox",
+        "pollsBox"
     ].forEach(id =>
         document.getElementById(id).style.display = "none"
     );
@@ -1244,7 +1342,9 @@ async function openChat(nickname) {
         "loginBox",
         "registerBox",
         "nicknameBox",
-        "chatPasswordBox"
+        "chatPasswordBox",
+        "dashboardBox",
+        "pollsBox"
     ].forEach(id =>
         document.getElementById(id).style.display = "none"
     );
