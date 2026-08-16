@@ -1581,10 +1581,22 @@ function startMessagesSubscription() {
             {
                 event: "INSERT",
                 schema: "public",
-                table: "reactions"
+                table: "messages"
             },
             payload => {
+                // Místo ručního přidávání rovnou načteme čerstvá data, 
+                // čímž se vyhneme případným chybám v parsování nebo cachování
                 loadMessages();
+
+                if (
+                    currentUser &&
+                    payload.new.user_id !== currentUser.id
+                ) {
+                    triggerNotification(
+                        payload.new.nickname,
+                        payload.new.message
+                    );
+                }
             }
         )
 
