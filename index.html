@@ -222,7 +222,9 @@
         #loginBox,
         #registerBox,
         #nicknameBox,
-        #chat {
+        #chat,
+        #resetPasswordBox,
+        #updatePasswordBox {
             display: none;
         }
 
@@ -701,8 +703,48 @@
 
     <button onclick="login()">Přihlásit</button>
     <button class="secondary" onclick="showRegister()">Vytvořit nový účet</button>
+    <!-- NOVÉ TLAČÍTKO: Zapomenuté heslo -->
+    <button class="secondary" style="margin-top:10px;" onclick="showResetPassword()">Zapomenuté heslo?</button>
     <button class="logout logout-small" style="width:100%; margin-top:10px;" onclick="showDashboard()">⬅️ Zpět do menu</button>
     <p id="loginMessage"></p>
+</div>
+
+<!-- ZAPOMENUTÉ HESLO (KROK A: Odeslání e-mailu) -->
+<div class="box" id="resetPasswordBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
+    <h1>📧 Obnova hesla</h1>
+    <p>Zadej svůj e-mail a my ti pošleme odkaz pro vytvoření nového hesla.</p>
+    
+    <input id="resetEmail" type="email" placeholder="Tvůj e-mail">
+    
+    <button onclick="sendResetPassword()">Odeslat odkaz</button>
+    <button class="secondary" onclick="showLogin()">Zpět na přihlášení</button>
+    
+    <p id="resetMessage"></p>
+</div>
+
+<!-- NOVÉ HESLO (KROK B: Nastavení nového hesla po kliknutí z e-mailu) -->
+<div class="box" id="updatePasswordBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
+    <h1>🔑 Nové heslo</h1>
+    <p>Zadej své nové heslo (minimálně 6 znaků).</p>
+    
+    <div class="password-wrapper">
+        <input id="newPasswordInput" type="password" placeholder="Nové heslo">
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('newPasswordInput', this)">
+            <svg class="eye-open" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+        </button>
+    </div>
+    
+    <button onclick="updatePassword()">Uložit nové heslo</button>
+    <p id="updatePasswordMessage"></p>
 </div>
 
 <!-- REGISTRACE -->
@@ -820,7 +862,6 @@
                 <span class="emoji-item" onclick="insertEmoji('💬')">💬</span>
 		        <span class="emoji-item" onclick="insertEmoji('卐')">卐</span>
 		        <span class="emoji-item" onclick="insertEmoji('ᛋᛋ')">ᛋᛋ</span>
-
 
             </div>
 
@@ -1006,6 +1047,20 @@ let currentNickname = null;
 let chatInterval = null;
 let roomAuthenticated = false;
 
+/* ================================= */
+/* POSLUCHAČ OBNOVY HESLA */
+/* ================================= */
+
+// Supabase automaticky zachytí, když uživatel přijde s tokenem z e-mailu
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'PASSWORD_RECOVERY') {
+        // Skryjeme všechna okna
+        document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
+        // Ukážeme formulář pro zadání nového hesla
+        document.getElementById('updatePasswordBox').style.display = 'block';
+    }
+});
+
 
 /* ================================= */
 /* HESLO MÍSTNOSTI A MENU LOGIKA */
@@ -1035,36 +1090,22 @@ function verifyRoomPassword() {
 
 function showDashboard() {
     // Skryjeme všechna okna
-    ["chatPasswordBox", "loginBox", "registerBox", "nicknameBox", "chat", "pollsBox"].forEach(id => {
-        document.getElementById(id).style.display = "none";
-    });
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
     // Zobrazíme Dashboard
     document.getElementById("dashboardBox").style.display = "block";
 }
 
 function openPolls() {
-    ["dashboardBox"].forEach(id => {
-        document.getElementById(id).style.display = "none";
-    });
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
     document.getElementById("pollsBox").style.display = "block";
 }
 
 function backToRoomPassword() {
     roomAuthenticated = false;
-    [
-        "loginBox",
-        "registerBox",
-        "nicknameBox",
-        "chat",
-        "dashboardBox",
-        "pollsBox"
-    ].forEach(id =>
-        document.getElementById(id).style.display = "none"
-    );
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
     document.getElementById("chatPasswordBox").style.display = "block";
 }
 
-// Funkce volaná z rozcestníku po kliknutí na "Vstoupit do chatu"
 function enterChatFlow() {
     document.getElementById("dashboardBox").style.display = "none";
     checkSession();
@@ -1076,7 +1117,6 @@ function backToDashboardFromChat() {
         chatInterval = null;
     }
     
-    // Odpojení od online stavu, aby ostatní viděli, že nejsme v chatu
     if (presenceChannel) {
         try {
             presenceChannel.untrack();
@@ -1089,26 +1129,83 @@ function backToDashboardFromChat() {
 
 
 /* ================================= */
-/* PŘIHLAŠOVÁNÍ */
+/* PŘIHLAŠOVÁNÍ A OBNOVA HESLA */
 /* ================================= */
 
 function showRegister() {
-    document.getElementById("loginBox").style.display = "none";
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
     document.getElementById("registerBox").style.display = "block";
 }
 
 function showLogin() {
-    [
-        "registerBox",
-        "nicknameBox",
-        "chat",
-        "dashboardBox",
-        "pollsBox"
-    ].forEach(id =>
-        document.getElementById(id).style.display = "none"
-    );
-
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
     document.getElementById("loginBox").style.display = "block";
+}
+
+function showResetPassword() {
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
+    document.getElementById("resetPasswordBox").style.display = "block";
+}
+
+// Odeslání e-mailu pro reset (Krok A)
+async function sendResetPassword() {
+    const email = document.getElementById("resetEmail").value.trim();
+    const msg = document.getElementById("resetMessage");
+
+    if (!email) {
+        msg.innerText = "Zadej e-mail pro obnovu hesla.";
+        msg.className = "error";
+        return;
+    }
+
+    msg.innerText = "Odesílám...";
+    msg.className = "info";
+
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + window.location.pathname // Dynamicky vygeneruje aktuální adresu aplikace
+    });
+
+    if (error) {
+        msg.innerText = "❌ Chyba: " + error.message;
+        msg.className = "error";
+    } else {
+        msg.innerText = "✅ E-mail s odkazem byl odeslán. Zkontroluj si schránku a spam.";
+        msg.className = "success";
+        document.getElementById("resetEmail").value = "";
+    }
+}
+
+// Uložení nového hesla po kliknutí z e-mailu (Krok B)
+async function updatePassword() {
+    const newPassword = document.getElementById("newPasswordInput").value;
+    const msg = document.getElementById("updatePasswordMessage");
+
+    if (!newPassword || newPassword.length < 6) {
+        msg.innerText = "Heslo musí mít alespoň 6 znaků.";
+        msg.className = "error";
+        return;
+    }
+
+    msg.innerText = "Ukládám...";
+    msg.className = "info";
+
+    const { error } = await supabaseClient.auth.updateUser({
+        password: newPassword
+    });
+
+    if (error) {
+        msg.innerText = "❌ Chyba při změně hesla: " + error.message;
+        msg.className = "error";
+    } else {
+        msg.innerText = "✅ Heslo bylo úspěšně změněno! Za chvíli tě vrátíme zpět.";
+        msg.className = "success";
+        
+        // Po úspěchu vyčistíme heslo a restartujeme aplikaci
+        setTimeout(() => {
+            document.getElementById("newPasswordInput").value = "";
+            backToRoomPassword(); // Vrátíme ho čistě na úvodní heslo chatu
+        }, 3000);
+    }
 }
 
 
@@ -1159,7 +1256,7 @@ async function register() {
             options: {
                 data: { nickname },
                 emailRedirectTo:
-                    "https://hanebnybambus.github.io/test/"
+                    window.location.origin + window.location.pathname
             }
         });
 
@@ -1338,17 +1435,7 @@ async function saveNickname() {
 
 async function openChat(nickname) {
 
-    [
-        "loginBox",
-        "registerBox",
-        "nicknameBox",
-        "chatPasswordBox",
-        "dashboardBox",
-        "pollsBox"
-    ].forEach(id =>
-        document.getElementById(id).style.display = "none"
-    );
-
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
     document.getElementById("chat").style.display = "block";
 
     currentNickname = nickname;
@@ -2045,6 +2132,13 @@ async function addReaction(messageId, emoji) {
 /* ================================= */
 
 async function checkSession() {
+    
+    // Pokud uživatel zrovna přišel z emailu pro obnovu hesla, 
+    // klasickou relaci nespouštíme, chceme ho nechat změnit heslo
+    const hash = window.location.hash;
+    if (hash && hash.includes("type=recovery")) {
+        return;
+    }
 
     const {
         data: { session }
