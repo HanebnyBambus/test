@@ -1494,12 +1494,7 @@ function startMessagesSubscription() {
                 table: "reactions"
             },
             payload => {
-
-                /*
-                 * Znovu načteme zprávy včetně reakcí.
-                 * Tím se reakce okamžitě zobrazí
-                 * všem připojeným uživatelům.
-                 */
+                // Pošle se notifikace všem, stačí znovu načíst
                 loadMessages();
             }
         )
@@ -1509,75 +1504,54 @@ function startMessagesSubscription() {
 
 
 /* ================================= */
-/* NAČTENÍ ZPRÁV + REAKCÍ */
+/* NAČTENÍ ZPRÁV + REAKCÍ (OPRAVENO) */
 /* ================================= */
 
 async function loadMessages() {
+    
+    // 1. Načteme POUZE zprávy (bez vnucené vazby na tabulku reakcí)
+    const { data: messagesData, error: messagesError } = await supabaseClient
+        .from("messages")
+        .select("id, user_id, nickname, message, created_at, is_edited")
+        .order("created_at", { ascending: false })
+        .limit(50);
 
-    /*
-     * Načteme posledních 50 zpráv
-     * a zároveň všechny reakce k nim.
-     */
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
-            .from("messages")
-            .select(`
-                id,
-                user_id,
-                nickname,
-                message,
-                created_at,
-                is_edited,
-                reactions (
-                    emoji,
-                    user_id
-                )
-            `)
-            .order("created_at", {
-                ascending: false
-            })
-            .limit(50);
-
-    if (error) {
-
-        console.error(
-            "Chyba při načítání zpráv:",
-            error
-        );
-
-        document.getElementById("messages").innerText =
-            "Chyba při načítání zpráv.";
-
+    if (messagesError) {
+        console.error("Chyba při načítání zpráv:", messagesError);
+        document.getElementById("messages").innerText = "Chyba při načítání zpráv.";
         return;
     }
 
-    const messages =
-        document.getElementById("messages");
+    // 2. Zjistíme ID načtených zpráv a stáhneme k nim reakce
+    let reactionsData = [];
+    if (messagesData && messagesData.length > 0) {
+        const messageIds = messagesData.map(msg => msg.id);
+        const { data: rxData, error: rxError } = await supabaseClient
+            .from("reactions")
+            .select("message_id, emoji, user_id")
+            .in("message_id", messageIds);
+            
+        if (!rxError && rxData) {
+            reactionsData = rxData;
+        }
+    }
 
+    // 3. Propojíme reakce se zprávami
+    messagesData.forEach(msg => {
+        msg.reactions = reactionsData.filter(rx => rx.message_id === msg.id);
+    });
+
+    // 4. Vykreslíme
+    const messages = document.getElementById("messages");
     messages.innerHTML = "";
 
-    /*
-     * Data jsou načtená od nejnovějších,
-     * proto je otočíme pro správné pořadí chatu.
-     */
-    if (data) {
-
-        data.reverse().forEach(message => {
-
-            addMessage(
-                message,
-                currentUser
-                    ? currentUser.id
-                    : null
-            );
+    if (messagesData) {
+        messagesData.reverse().forEach(message => {
+            addMessage(message, currentUser ? currentUser.id : null);
         });
     }
 
-    messages.scrollTop =
-        messages.scrollHeight;
+    messages.scrollTop = messages.scrollHeight;
 }
 
 
@@ -1678,21 +1652,6 @@ function addMessage(message, currentUserId) {
 
     reactionsDiv.className =
         "reaction-bar";
-
-
-    /*
-     * Spočítáme stejné reakce.
-     *
-     * Například:
-     * 👍
-     * 👍
-     * 👍
-     * 😂
-     *
-     * se zobrazí jako:
-     *
-     * 👍 3   😂 1
-     */
 
     if (
         message.reactions &&
@@ -1993,19 +1952,8 @@ async function addReaction(messageId, emoji) {
             });
 
     if (error) {
-
-        console.error(
-            "Chyba při reakci:",
-            error
-        );
-
-    } else {
-
-        /*
-         * Realtime subscription se postará
-         * o znovunačtení reakcí.
-         */
-    }
+        console.error("Chyba při reakci:", error);
+    } 
 }
 
 
