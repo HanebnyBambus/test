@@ -75,15 +75,20 @@
             position: absolute;
             top: 15px;
             right: 15px;
-            width: auto;
-            padding: 6px 12px;
+            width: 30px;
+            height: 30px;
+            padding: 0;
             margin-top: 0;
-            font-size: 14px;
+            font-size: 12px;
             background: #444;
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 50%;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
         }
 
         body.dark-mode .theme-btn {
@@ -653,7 +658,7 @@
 
 <!-- MÍSTNOST HESLO (ZOBRAZENO JAKO PRVNÍ) -->
 <div class="box" id="chatPasswordBox">
-    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
+    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
     <h1>🔒 Krsmol 2027</h1>
 
     <p>Pro vstup do systému musíš zadat přístupové heslo.</p>
@@ -689,7 +694,7 @@
 
 <!-- ROZCESTNÍK (Nové menu po zadání hesla) -->
 <div class="box" id="dashboardBox">
-    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
+    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
     <h1>🏠 Rozcestník</h1>
     <p style="text-align: center;">Vítej v systému Krsmol 2027. Co chceš dnes dělat?</p>
     
@@ -705,7 +710,7 @@
     
 <!-- INFORMACE O CHATĚ -->
 <div class="box" id="infoBox">
-    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
+    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
     <h1>🏡 Informace o chatě</h1>
     
     <div class="info-card">
@@ -741,7 +746,7 @@
 
 <!-- ANKETY (Zatím prázdná stránka) -->
 <div class="box" id="pollsBox">
-    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
+    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
     <h1>📊 Ankety</h1>
     <p style="text-align: center; padding: 40px 0;">Modul pro hlasování a ankety se momentálně vyvíjí...</p>
     <button class="secondary" onclick="showDashboard()">⬅️ Zpět do menu</button>
@@ -749,7 +754,7 @@
 
 <!-- NASTAVENÍ PROFILU -->
 <div class="box" id="profileBox">
-    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
+    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
     <h1>⚙️ Nastavení profilu</h1>
     
     <div style="margin: 20px 0; text-align: center;">
@@ -799,7 +804,7 @@
 
 <!-- PŘIHLÁŠENÍ -->
 <div class="box" id="loginBox">
-    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
+    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
     <h1>🔐 Přihlášení do chatu</h1>
     <input id="loginEmail" type="email" placeholder="E-mail">
 
@@ -833,7 +838,7 @@
 
 <!-- ZAPOMENUTÉ HESLO (KROK A: Odeslání e-mailu) -->
 <div class="box" id="resetPasswordBox">
-    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
+    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
     <h1>📧 Obnova hesla</h1>
     <p>Zadej svůj e-mail a my ti pošleme odkaz pro vytvoření nového hesla.</p>
     
@@ -847,7 +852,7 @@
 
 <!-- NOVÉ HESLO (KROK B: Nastavení nového hesla po kliknutí z e-mailu) -->
 <div class="box" id="updatePasswordBox">
-    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
+    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
     <h1>🔑 Nové heslo</h1>
     <p>Zadej své nové heslo (minimálně 6 znaků) a pro jistotu ho zopakuj.</p>
     
@@ -886,7 +891,7 @@
 
 <!-- REGISTRACE -->
 <div class="box" id="registerBox">
-    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
+    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
     <h1>👤 Registrace</h1>
 
     <input id="registerEmail" type="email" placeholder="E-mail">
@@ -931,7 +936,7 @@
 
 <!-- PŘEZDÍVKA -->
 <div class="box" id="nicknameBox">
-    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
+    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
     <h1>👤 Přezdívka</h1>
 
     <p>K tomuto účtu zatím nemáš nastavenou přezdívku.</p>
@@ -945,7 +950,7 @@
 
 <!-- CHAT -->
 <div class="box" id="chat">
-    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
+    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
 
     <h1>💬 Krsmol 2027</h1>
 
@@ -997,8 +1002,6 @@
                 <span class="emoji-item" onclick="insertEmoji('💩')">💩</span>
                 <span class="emoji-item" onclick="insertEmoji('🙌')">🙌</span>
                 <span class="emoji-item" onclick="insertEmoji('💬')">💬</span>
-                <span class="emoji-item" onclick="insertEmoji('卐')">卐</span>
-                <span class="emoji-item" onclick="insertEmoji('ᛋᛋ')">ᛋᛋ</span>
 
             </div>
 
@@ -1035,6 +1038,22 @@
 
 <script>
 
+// Odemčení zvuku při prvním dotyku/kliknutí na telefon
+function unlockAudioContext() {
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    } catch(e) {}
+    document.removeEventListener('click', unlockAudioContext);
+    document.removeEventListener('touchstart', unlockAudioContext);
+}
+
+document.addEventListener('click', unlockAudioContext);
+document.addEventListener('touchstart', unlockAudioContext);
+
+
 /* ================================= */
 /* GENERÁTOR BAREV PRO AVATARY */
 /* ================================= */
@@ -1060,18 +1079,26 @@ function linkify(text) {
     );
 }
 
-function toggleDarkMode() {
-    document.body.classList.toggle("dark-mode");
-
-    localStorage.setItem(
-        "chatDarkMode",
-        document.body.classList.contains("dark-mode")
-    );
+function updateThemeButtons() {
+    const isDark = document.body.classList.contains("dark-mode");
+    const icon = isDark ? "☀️" : "🌙";
+    document.querySelectorAll(".theme-btn").forEach(btn => {
+        btn.innerText = icon;
+    });
 }
 
+function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+    const isDark = document.body.classList.contains("dark-mode");
+    localStorage.setItem("chatDarkMode", isDark);
+    updateThemeButtons();
+}
+
+// Inicializace ikonek při načtení stránky
 if (localStorage.getItem("chatDarkMode") === "true") {
     document.body.classList.add("dark-mode");
 }
+updateThemeButtons();
 
 function togglePasswordVisibility(inputId, btn) {
     const input = document.getElementById(inputId);
@@ -1111,70 +1138,111 @@ if ("Notification" in window && Notification.permission === "default") {
     Notification.requestPermission();
 }
 
-function playNotificationSound() {
+/* ================================= */
+/* ZVUK ICQ A NOTIFIKACE */
+/* ================================= */
+
+function playIcqSound() {
     try {
-        const audioCtx = new (
-            window.AudioContext ||
-            window.webkitAudioContext
-        )();
-
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-
-        osc.type = "sine";
-
-        osc.frequency.setValueAtTime(
-            587.33,
-            audioCtx.currentTime
-        );
-
-        gain.gain.setValueAtTime(
-            0.1,
-            audioCtx.currentTime
-        );
-
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.15);
-
-    } catch(e) {}
-}
-
-function triggerNotification(nickname, text) {
-
-    playNotificationSound();
-
-    if (
-        document.hidden &&
-        "Notification" in window &&
-        Notification.permission === "granted"
-    ) {
-        new Notification(
-            `Zpráva od ${nickname}`,
-            { body: text }
-        );
+        const audio = new Audio('icq.mp3');
+        audio.play().catch(e => {
+            console.warn("Audio file play failed, falling back to oscillators:", e);
+            playIcqOscillators();
+        });
+    } catch(e) {
+        console.error("Audio error:", e);
     }
 }
 
+function playIcqOscillators() {
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+
+        // 1. Tón ("Uh")
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(320, audioCtx.currentTime); 
+        gain1.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+        osc1.connect(gain1);
+        gain1.connect(audioCtx.destination);
+        osc1.start(audioCtx.currentTime);
+        osc1.stop(audioCtx.currentTime + 0.12);
+
+        // 2. Tón ("oh!")
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(510, audioCtx.currentTime + 0.13); 
+        gain2.gain.setValueAtTime(0.25, audioCtx.currentTime + 0.13);
+        gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+        osc2.connect(gain2);
+        gain2.connect(audioCtx.destination);
+        osc2.start(audioCtx.currentTime + 0.13);
+        osc2.stop(audioCtx.currentTime + 0.35);
+    } catch(e) {
+        console.error("Oscillator error:", e);
+    }
+}
+
+async function triggerNotification(nickname, text) {
+    if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+        try {
+            const { LocalNotifications } = window.Capacitor.Plugins;
+            if (LocalNotifications) {
+                // Kontrola a vyžádání oprávnění pro Android 13+
+                let perm = await LocalNotifications.checkPermissions();
+                if (perm.display !== 'granted') {
+                    perm = await LocalNotifications.requestPermissions();
+                }
+
+                if (perm.display === 'granted') {
+                    // Vytvořujeme v2 kanál bez přípony .mp3 v parametru sound
+                    await LocalNotifications.createChannel({
+                        id: 'icq_sound_channel_v2',
+                        name: 'ICQ Notifikace V2',
+                        description: 'Kanál pro zprávy s ICQ zvukem',
+                        sound: 'icq',
+                        importance: 5,
+                        visibility: 1,
+                        vibration: true
+                    });
+
+                    // Naplánování notifikace
+                    await LocalNotifications.schedule({
+                        notifications: [
+                            {
+                                title: `Zpráva od ${nickname}`,
+                                body: text,
+                                id: Math.floor(Math.random() * 100000),
+                                schedule: { at: new Date(Date.now() + 100) },
+                                channelId: 'icq_sound_channel_v2',
+                                sound: 'icq'
+                            }
+                        ]
+                    });
+                }
+            }
+        } catch (e) {
+            console.error("Chyba při odesílání nativní notifikace:", e);
+        }
+    }
+
+    // Přehrání zvuku přímo v aplikaci (záloha pro otevřené okno / web)
+    playIcqSound();
+}
 
 /* ================================= */
-/* SUPABASE */
+/* SUPABASE A GLOBÁLNÍ PROMĚNNÉ */
 /* ================================= */
 
-const SUPABASE_URL =
-    "https://jdvyfigrazambxtnqpkq.supabase.co";
-
-const SUPABASE_KEY =
-    "sb_publishable_YKO_HGnM6so7hNtg_naIeQ_cYX40nxJ";
-
-const supabaseClient =
-    supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
-
+const SUPABASE_URL = "https://jdvyfigrazambxtnqpkq.supabase.co";
+const SUPABASE_KEY = "sb_publishable_YKO_HGnM6so7hNtg_naIeQ_cYX40nxJ";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const CHAT_PASSWORD = "Krsmol2027";
 
 let presenceChannel = null;
@@ -1183,6 +1251,11 @@ let currentUser = null;
 let currentNickname = null;
 let chatInterval = null;
 let roomAuthenticated = false;
+
+// Proměnné pro sledování nových zpráv a spouštění notifikací
+let knownMessageIds = new Set();
+let isFirstLoad = true;
+
 
 /* ================================= */
 /* POSLUCHAČ OBNOVY HESLA */
@@ -1201,20 +1274,14 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 /* ================================= */
 
 function verifyRoomPassword() {
-
-    const input =
-        document.getElementById("roomPasswordInput").value;
-
-    const msg =
-        document.getElementById("roomPasswordMessage");
+    const input = document.getElementById("roomPasswordInput").value;
+    const msg = document.getElementById("roomPasswordMessage");
 
     if (input === CHAT_PASSWORD) {
         roomAuthenticated = true;
         document.getElementById("roomPasswordMessage").innerText = "";
         document.getElementById("roomPasswordInput").value = "";
-
         showDashboard();
-
     } else {
         msg.innerText = "❌ Nesprávné heslo.";
         msg.className = "error";
@@ -1236,13 +1303,11 @@ function openInfo() {
     document.getElementById("infoBox").style.display = "block";
 }
 
-// Otevření nastavení profilu
 async function showProfileSettings() {
     document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
     document.getElementById("profileBox").style.display = "block";
     document.getElementById("profileMessage").innerText = "";
     
-    // Vyčistíme pole pro hesla při každém otevření nastavení
     document.getElementById("settingsNewPassword").value = "";
     document.getElementById("settingsConfirmPassword").value = "";
 
@@ -1259,7 +1324,6 @@ async function showProfileSettings() {
     }
 }
 
-// Uložení nastavení profilu (barva + volitelná změna hesla)
 async function saveProfileSettings() {
     if (!currentUser) return;
 
@@ -1271,7 +1335,6 @@ async function saveProfileSettings() {
     msg.innerText = "Ukládám...";
     msg.className = "info";
 
-    // 1. Uložení barvy do tabulky profiles
     const { error: colorError } = await supabaseClient
         .from("profiles")
         .update({ color: color })
@@ -1283,7 +1346,6 @@ async function saveProfileSettings() {
         return;
     }
 
-    // 2. Pokud uživatel vyplnil nové heslo, zkontrolujeme ho a změníme
     if (newPassword || confirmPassword) {
         if (newPassword.length < 6) {
             msg.innerText = "❌ Nové heslo musí mít alespoň 6 znaků.";
@@ -1307,7 +1369,6 @@ async function saveProfileSettings() {
             return;
         }
 
-        // Vyčistíme pole s hesly po úspěšné změně
         document.getElementById("settingsNewPassword").value = "";
         document.getElementById("settingsConfirmPassword").value = "";
     }
@@ -1315,7 +1376,6 @@ async function saveProfileSettings() {
     msg.innerText = "✅ Nastavení a heslo bylo úspěšně uloženo!";
     msg.className = "success";
     
-    // Okamžitě překreslíme aktuální zprávy i seznam uživatelů
     await loadMessages();
     await loadUsers();
 
@@ -1443,21 +1503,11 @@ async function updatePassword() {
 /* ================================= */
 
 async function register() {
-
-    const email =
-        document.getElementById("registerEmail").value.trim();
-
-    const password =
-        document.getElementById("registerPassword").value;
-
-    const passwordConfirm =
-        document.getElementById("registerPasswordConfirm").value;
-
-    const nickname =
-        document.getElementById("registerNickname").value.trim();
-
-    const message =
-        document.getElementById("registerMessage");
+    const email = document.getElementById("registerEmail").value.trim();
+    const password = document.getElementById("registerPassword").value;
+    const passwordConfirm = document.getElementById("registerPasswordConfirm").value;
+    const nickname = document.getElementById("registerNickname").value.trim();
+    const message = document.getElementById("registerMessage");
 
     if (!email || !password || !passwordConfirm || !nickname) {
         message.innerText = "Vyplň všechna pole.";
@@ -1472,48 +1522,34 @@ async function register() {
     }
 
     if (password.length < 6) {
-        message.innerText =
-            "Heslo musí mít alespoň 6 znaků.";
+        message.innerText = "Heslo musí mít alespoň 6 znaků.";
         message.className = "error";
         return;
     }
 
-    const { data, error } =
-        await supabaseClient.auth.signUp({
-            email,
-            password,
-            options: {
-                data: { nickname },
-                emailRedirectTo:
-                    window.location.origin + window.location.pathname
-            }
-        });
+    const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+            data: { nickname },
+            emailRedirectTo: window.location.origin + window.location.pathname
+        }
+    });
 
     if (error) {
-
-        message.innerText =
-            "❌ " + error.message;
-
+        message.innerText = "❌ " + error.message;
         message.className = "error";
-
         return;
     }
 
     if (data.session) {
-
-        message.innerText =
-            "✅ Účet vytvořen.";
-
+        message.innerText = "✅ Účet vytvořen.";
         message.className = "success";
-
         await checkProfile();
-
         return;
     }
 
-    message.innerText =
-        "✅ Účet vytvořen. Potvrď e-mail.";
-
+    message.innerText = "✅ Účet vytvořen. Potvrď e-mail.";
     message.className = "success";
 }
 
@@ -1523,39 +1559,24 @@ async function register() {
 /* ================================= */
 
 async function login() {
-
-    const email =
-        document.getElementById("loginEmail").value.trim();
-
-    const password =
-        document.getElementById("loginPassword").value;
-
-    const message =
-        document.getElementById("loginMessage");
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    const message = document.getElementById("loginMessage");
 
     if (!email || !password) {
-
-        message.innerText =
-            "Vyplň e-mail a heslo.";
-
+        message.innerText = "Vyplň e-mail a heslo.";
         message.className = "error";
-
         return;
     }
 
-    const { error } =
-        await supabaseClient.auth.signInWithPassword({
-            email,
-            password
-        });
+    const { error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+    });
 
     if (error) {
-
-        message.innerText =
-            "❌ " + error.message;
-
+        message.innerText = "❌ " + error.message;
         message.className = "error";
-
         return;
     }
 
@@ -1568,21 +1589,16 @@ async function login() {
 /* ================================= */
 
 async function checkProfile() {
-
-    const {
-        data: { user }
-    } = await supabaseClient.auth.getUser();
-
+    const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) return;
 
     currentUser = user;
 
-    const { data: profile } =
-        await supabaseClient
-            .from("profiles")
-            .select("nickname")
-            .eq("id", user.id)
-            .maybeSingle();
+    const { data: profile } = await supabaseClient
+        .from("profiles")
+        .select("nickname")
+        .eq("id", user.id)
+        .maybeSingle();
 
     document.getElementById("loginBox").style.display = "none";
     document.getElementById("registerBox").style.display = "none";
@@ -1591,27 +1607,20 @@ async function checkProfile() {
         return openChat(profile.nickname);
     }
 
-    const savedNickname =
-        user.user_metadata?.nickname;
+    const savedNickname = user.user_metadata?.nickname;
 
     if (savedNickname) {
-
-        const {
-            data: newProfile
-        } =
-            await supabaseClient
-                .from("profiles")
-                .insert({
-                    id: user.id,
-                    nickname: savedNickname
-                })
-                .select("nickname")
-                .single();
+        const { data: newProfile } = await supabaseClient
+            .from("profiles")
+            .insert({
+                id: user.id,
+                nickname: savedNickname
+            })
+            .select("nickname")
+            .single();
 
         if (newProfile) {
-            return openChat(
-                newProfile.nickname
-            );
+            return openChat(newProfile.nickname);
         }
     }
 
@@ -1660,14 +1669,15 @@ async function saveNickname() {
 /* ================================= */
 
 async function openChat(nickname) {
-
     document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
     document.getElementById("chat").style.display = "block";
 
     currentNickname = nickname;
+    document.getElementById("currentNickname").innerText = nickname;
 
-    document.getElementById("currentNickname").innerText =
-        nickname;
+    // Reset notifikačních trackerů při novém vstupu do chatu
+    knownMessageIds.clear();
+    isFirstLoad = true;
 
     await loadMessages();
     await loadUsers();
@@ -1688,17 +1698,10 @@ async function openChat(nickname) {
 /* ================================= */
 
 async function loadUsers() {
-
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
-            .from("profiles")
-            .select("id, nickname, color")
-            .order("nickname", {
-                ascending: true
-            });
+    const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("id, nickname, color")
+        .order("nickname", { ascending: true });
 
     if (!error) {
         renderUsers(data || []);
@@ -1706,31 +1709,21 @@ async function loadUsers() {
 }
 
 function renderUsers(users) {
-
-    const usersList =
-        document.getElementById("usersList");
-
+    const usersList = document.getElementById("usersList");
     usersList.innerHTML = "";
 
     if (!users.length) {
-        usersList.innerText =
-            "Zatím nejsou žádní uživatelé.";
+        usersList.innerText = "Zatím nejsou žádní uživatelé.";
         return;
     }
 
-    const onlineUsers =
-        getOnlineUserIds();
+    const onlineUsers = getOnlineUserIds();
 
     users.forEach(user => {
-
-        const div =
-            document.createElement("div");
-
+        const div = document.createElement("div");
         div.className = "userItem";
 
-        const status =
-            document.createElement("span");
-
+        const status = document.createElement("span");
         status.className = "userStatus";
 
         const avatar = document.createElement("div");
@@ -1738,21 +1731,13 @@ function renderUsers(users) {
         avatar.style.backgroundColor = user.color || getAvatarColor(user.nickname);
         avatar.textContent = user.nickname ? user.nickname.charAt(0) : "?";
 
-        const nickname =
-            document.createElement("span");
-
-        nickname.className =
-            "userNickname";
-
-        nickname.textContent =
-            user.nickname;
+        const nickname = document.createElement("span");
+        nickname.className = "userNickname";
+        nickname.textContent = user.nickname;
 
         if (onlineUsers.has(user.id)) {
-
             status.textContent = "🟢";
-
         } else {
-
             status.textContent = "🔴";
             nickname.classList.add("offline");
         }
@@ -1760,30 +1745,21 @@ function renderUsers(users) {
         div.appendChild(status);
         div.appendChild(avatar);
         div.appendChild(nickname);
-
         usersList.appendChild(div);
     });
 }
 
 function getOnlineUserIds() {
-
     const onlineUsers = new Set();
-
     if (presenceChannel) {
-
-        Object.values(
-            presenceChannel.presenceState()
-        ).forEach(entries =>
+        Object.values(presenceChannel.presenceState()).forEach(entries =>
             entries.forEach(entry => {
-
                 if (entry.user_id) {
                     onlineUsers.add(entry.user_id);
                 }
-
             })
         );
     }
-
     return onlineUsers;
 }
 
@@ -1793,98 +1769,43 @@ function getOnlineUserIds() {
 /* ================================= */
 
 async function startPresence() {
-
-    if (
-        !currentUser ||
-        !currentNickname ||
-        presenceChannel
-    ) {
+    if (!currentUser || !currentNickname || presenceChannel) {
         return;
     }
 
-    presenceChannel =
-        supabaseClient.channel(
-            "chat-online-users",
-            {
-                config: {
-                    presence: {
-                        key: currentUser.id
-                    }
-                }
-            }
-        );
+    presenceChannel = supabaseClient.channel("chat-online-users", {
+        config: { presence: { key: currentUser.id } }
+    });
 
     presenceChannel
-
-        .on(
-            "presence",
-            { event: "sync" },
-            () => loadUsers()
-        )
-
-        .on(
-            "presence",
-            { event: "join" },
-            () => loadUsers()
-        )
-
-        .on(
-            "presence",
-            { event: "leave" },
-            () => loadUsers()
-        )
-
-        .on(
-            "broadcast",
-            { event: "typing" },
-            payload => {
-
-                if (
-                    payload.payload.user_id !==
-                    currentUser.id
-                ) {
-
-                    const indicator =
-                        document.getElementById(
-                            "typingIndicator"
-                        );
-
-                    indicator.innerText =
-                        `${payload.payload.nickname} právě píše...`;
-
-                    clearTimeout(
-                        window.typingTimeoutTimer
-                    );
-
-                    window.typingTimeoutTimer =
-                        setTimeout(() => {
-                            indicator.innerText = "";
-                        }, 2000);
-                }
+        .on("presence", { event: "sync" }, () => loadUsers())
+        .on("presence", { event: "join" }, () => loadUsers())
+        .on("presence", { event: "leave" }, () => loadUsers())
+        .on("broadcast", { event: "typing" }, payload => {
+            if (payload.payload.user_id !== currentUser.id) {
+                const indicator = document.getElementById("typingIndicator");
+                indicator.innerText = `${payload.payload.nickname} právě píše...`;
+                clearTimeout(window.typingTimeoutTimer);
+                window.typingTimeoutTimer = setTimeout(() => {
+                    indicator.innerText = "";
+                }, 2000);
             }
-        );
+        });
 
-    presenceChannel.subscribe(
-        async status => {
-
-            if (status === "SUBSCRIBED") {
-
-                await presenceChannel.track({
-                    user_id: currentUser.id,
-                    nickname: currentNickname,
-                    online_at: new Date().toISOString()
-                });
-
-                loadUsers();
-            }
+    presenceChannel.subscribe(async status => {
+        if (status === "SUBSCRIBED") {
+            await presenceChannel.track({
+                user_id: currentUser.id,
+                nickname: currentNickname,
+                online_at: new Date().toISOString()
+            });
+            loadUsers();
         }
-    );
+    });
 }
 
 function handleTyping() {
-
     if (presenceChannel) {
-
         presenceChannel.send({
             type: "broadcast",
             event: "typing",
@@ -1898,11 +1819,10 @@ function handleTyping() {
 
 
 /* ================================= */
-/* NAČTENÍ ZPRÁV + REAKCÍ */
+/* NAČTENÍ ZPRÁV + REAKCÍ + NOTIFIKACE */
 /* ================================= */
 
 async function loadMessages() {
-    
     const { data: messagesData, error: messagesError } = await supabaseClient
         .from("messages")
         .select("id, user_id, nickname, message, created_at, is_edited")
@@ -1915,16 +1835,13 @@ async function loadMessages() {
         return;
     }
 
-    // Načteme profily, abychom znali vlastní barvy uživatelů
     let profilesMap = {};
     const { data: profilesData } = await supabaseClient
         .from("profiles")
         .select("id, color");
     
     if (profilesData) {
-        profilesData.forEach(p => {
-            profilesMap[p.id] = p.color;
-        });
+        profilesData.forEach(p => { profilesMap[p.id] = p.color; });
     }
 
     let reactionsData = [];
@@ -1951,9 +1868,21 @@ async function loadMessages() {
     messages.innerHTML = "";
 
     if (messagesData) {
-        messagesData.reverse().forEach(message => {
+        // Obrátíme pole, abychom vykreslovali (a přehrávali zvuky) od nejstarší po nejnovější zprávu z těch 50
+        const reversedData = [...messagesData].reverse();
+
+        reversedData.forEach(message => {
+            
+            // DETEKCE NOVÉ ZPRÁVY - spustíme notifikaci pouze, pokud už to není první načtení a pokud ji neposlal aktuální uživatel
+            if (!isFirstLoad && !knownMessageIds.has(message.id) && message.user_id !== (currentUser ? currentUser.id : null)) {
+                triggerNotification(message.nickname, message.message);
+            }
+            
+            knownMessageIds.add(message.id);
             addMessage(message, currentUser ? currentUser.id : null);
         });
+        
+        isFirstLoad = false;
     }
 
     if (isAtBottom) {
@@ -1967,30 +1896,16 @@ async function loadMessages() {
 /* ================================= */
 
 function addMessage(message, currentUserId) {
-
-    if (
-        document.getElementById(
-            `msg-${message.id}`
-        )
-    ) {
+    if (document.getElementById(`msg-${message.id}`)) {
         return;
     }
 
-    const isMine =
-        message.user_id === currentUserId;
-
-    const div =
-        document.createElement("div");
-
+    const isMine = message.user_id === currentUserId;
+    const div = document.createElement("div");
     div.id = `msg-${message.id}`;
-
-    div.className =
-        "message " +
-        (isMine ? "mine" : "other");
-
+    div.className = "message " + (isMine ? "mine" : "other");
 
     /* PŘEZDÍVKA A AVATAR */
-
     const nickWrapper = document.createElement("div");
     nickWrapper.className = "nickname-wrapper";
     
@@ -2012,60 +1927,29 @@ function addMessage(message, currentUserId) {
     nickWrapper.appendChild(avatar);
     nickWrapper.appendChild(nickname);
 
-
     /* TEXT */
-
-    const text =
-        document.createElement("span");
-
+    const text = document.createElement("span");
     text.className = "text";
-
-    text.innerHTML =
-        linkify(message.message);
-
+    text.innerHTML = linkify(message.message);
 
     /* ČAS */
-
-    const time =
-        document.createElement("span");
-
+    const time = document.createElement("span");
     time.className = "time";
-
-    const date =
-        new Date(message.created_at);
-
-    time.textContent =
-        !isNaN(date.getTime())
-            ? date.toLocaleString(
-                "cs-CZ",
-                {
-                    timeZone: "Europe/Prague",
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit"
-                }
-            )
-            : "čas neznámý";
-
-
-    /* UPRAVENO */
+    const date = new Date(message.created_at);
+    time.textContent = !isNaN(date.getTime())
+        ? date.toLocaleString("cs-CZ", {
+            timeZone: "Europe/Prague",
+            day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit"
+        }) : "čas neznámý";
 
     if (message.is_edited) {
-
-        time.innerHTML +=
-            ' <span class="edited-label">(upraveno)</span>';
+        time.innerHTML += ' <span class="edited-label">(upraveno)</span>';
     }
 
     div.appendChild(nickWrapper);
     div.appendChild(text);
 
-
-    /* ================================= */
     /* ROZBALOVACÍ REAKCE */
-    /* ================================= */
-
     const reactionContainer = document.createElement("div");
     reactionContainer.className = "reaction-container";
 
@@ -2116,64 +2000,30 @@ function addMessage(message, currentUserId) {
         popup.style.display = 'none';
     });
 
-
     /* ČAS */
-
     div.appendChild(time);
 
-
-    /* ================================= */
     /* UPRAVIT + SMAZAT */
-    /* ================================= */
-
     if (isMine) {
+        const actionsDiv = document.createElement("div");
+        actionsDiv.className = "message-actions";
 
-        const actionsDiv =
-            document.createElement("div");
-
-        actionsDiv.className =
-            "message-actions";
-
-
-        const editBtn =
-            document.createElement("button");
-
-        editBtn.className =
-            "action-btn edit-btn";
-
+        const editBtn = document.createElement("button");
+        editBtn.className = "action-btn edit-btn";
         editBtn.innerHTML = "✏️";
+        editBtn.title = "Upravit zprávu";
+        editBtn.onclick = () => editMessage(message.id, message.message);
 
-        editBtn.title =
-            "Upravit zprávu";
-
-        editBtn.onclick = () =>
-            editMessage(
-                message.id,
-                message.message
-            );
-
-
-        const delBtn =
-            document.createElement("button");
-
-        delBtn.className =
-            "action-btn delete-btn";
-
+        const delBtn = document.createElement("button");
+        delBtn.className = "action-btn delete-btn";
         delBtn.innerHTML = "🗑️";
-
-        delBtn.title =
-            "Smazat zprávu";
-
-        delBtn.onclick = () =>
-            deleteMessage(message.id);
-
+        delBtn.title = "Smazat zprávu";
+        delBtn.onclick = () => deleteMessage(message.id);
 
         actionsDiv.appendChild(editBtn);
         actionsDiv.appendChild(delBtn);
-
         div.appendChild(actionsDiv);
     }
-
 
     const messagesContainer = document.getElementById("messages");
     messagesContainer.appendChild(div);
@@ -2185,34 +2035,18 @@ function addMessage(message, currentUserId) {
 /* ================================= */
 
 async function editMessage(messageId, oldText) {
-
-    const newText =
-        prompt(
-            "Uprav svou zprávu:",
-            oldText
-        );
-
-    if (
-        newText !== null &&
-        newText.trim() !== "" &&
-        newText !== oldText
-    ) {
-
-        const { error } =
-            await supabaseClient
-                .from("messages")
-                .update({
-                    message: newText.trim(),
-                    is_edited: true
-                })
-                .eq("id", messageId);
+    const newText = prompt("Uprav svou zprávu:", oldText);
+    if (newText !== null && newText.trim() !== "" && newText !== oldText) {
+        const { error } = await supabaseClient
+            .from("messages")
+            .update({
+                message: newText.trim(),
+                is_edited: true
+            })
+            .eq("id", messageId);
 
         if (error) {
-
-            alert(
-                "Chyba při úpravě zprávy: " +
-                error.message
-            );
+            alert("Chyba při úpravě zprávy: " + error.message);
         }
     }
 }
@@ -2223,27 +2057,16 @@ async function editMessage(messageId, oldText) {
 /* ================================= */
 
 async function deleteMessage(messageId) {
-
-    if (
-        !confirm(
-            "Opravdu chceš tuto zprávu smazat?"
-        )
-    ) {
+    if (!confirm("Opravdu chceš tuto zprávu smazat?")) {
         return;
     }
-
-    const { error } =
-        await supabaseClient
-            .from("messages")
-            .delete()
-            .eq("id", messageId);
+    const { error } = await supabaseClient
+        .from("messages")
+        .delete()
+        .eq("id", messageId);
 
     if (error) {
-
-        alert(
-            "Chyba při mazání zprávy: " +
-            error.message
-        );
+        alert("Chyba při mazání zprávy: " + error.message);
     }
 }
 
@@ -2253,47 +2076,27 @@ async function deleteMessage(messageId) {
 /* ================================= */
 
 async function sendMessage() {
-
-    const input =
-        document.getElementById(
-            "messageInput"
-        );
-
-    const text =
-        input.value.trim();
+    const input = document.getElementById("messageInput");
+    const text = input.value.trim();
 
     if (!text) return;
+    if (!currentUser) return alert("Nejsi přihlášen.");
 
-    if (!currentUser) {
-        return alert(
-            "Nejsi přihlášen."
-        );
-    }
+    const nickname = document.getElementById("currentNickname").innerText;
 
-    const nickname =
-        document.getElementById(
-            "currentNickname"
-        ).innerText;
-
-    const { error } =
-        await supabaseClient
-            .from("messages")
-            .insert({
-                user_id: currentUser.id,
-                nickname,
-                message: text
-            });
+    const { error } = await supabaseClient
+        .from("messages")
+        .insert({
+            user_id: currentUser.id,
+            nickname,
+            message: text
+        });
 
     if (error) {
-
-        return alert(
-            "Zprávu se nepodařilo odeslat: " +
-            error.message
-        );
+        return alert("Zprávu se nepodařilo odeslat: " + error.message);
     }
 
     input.value = "";
-    
     const messages = document.getElementById("messages");
     messages.scrollTop = messages.scrollHeight;
 }
@@ -2304,38 +2107,22 @@ async function sendMessage() {
 /* ================================= */
 
 async function logout() {
-
     if (chatInterval) {
         clearInterval(chatInterval);
         chatInterval = null;
     }
-
     if (presenceChannel) {
-
         try {
-
             await presenceChannel.untrack();
-
-            await supabaseClient.removeChannel(
-                presenceChannel
-            );
-
+            await supabaseClient.removeChannel(presenceChannel);
         } catch(e) {}
     }
-
     if (messagesChannel) {
-
         try {
-
-            await supabaseClient.removeChannel(
-                messagesChannel
-            );
-
+            await supabaseClient.removeChannel(messagesChannel);
         } catch(e) {}
     }
-
     await supabaseClient.auth.signOut();
-
     location.reload();
 }
 
@@ -2345,17 +2132,14 @@ async function logout() {
 /* ================================= */
 
 async function addReaction(messageId, emoji) {
-
     if (!currentUser) return;
-
-    const { error } =
-        await supabaseClient
-            .from("reactions")
-            .insert({
-                message_id: messageId,
-                user_id: currentUser.id,
-                emoji: emoji
-            });
+    const { error } = await supabaseClient
+        .from("reactions")
+        .insert({
+            message_id: messageId,
+            user_id: currentUser.id,
+            emoji: emoji
+        });
 
     if (error) {
         console.error("Chyba při reakci:", error);
@@ -2368,16 +2152,12 @@ async function addReaction(messageId, emoji) {
 /* ================================= */
 
 async function checkSession() {
-    
     const hash = window.location.hash;
     if (hash && hash.includes("type=recovery")) {
         return;
     }
 
-    const {
-        data: { session }
-    } =
-        await supabaseClient.auth.getSession();
+    const { data: { session } } = await supabaseClient.auth.getSession();
 
     if (session) {
         currentUser = session.user;
@@ -2425,9 +2205,7 @@ async function executeSearch() {
         .select("id, color");
     
     if (profilesData) {
-        profilesData.forEach(p => {
-            profilesMap[p.id] = p.color;
-        });
+        profilesData.forEach(p => { profilesMap[p.id] = p.color; });
     }
 
     let reactionsData = [];
