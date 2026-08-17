@@ -216,9 +216,42 @@
             background: #005bb5;
         }
 
+        /* ================================= */
+        /* INFORMACE O CHATĚ STYLY */
+        /* ================================= */
+        .info-card {
+            background: var(--sub-bg);
+            border: 1px solid var(--box-border);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-card h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 16px;
+            color: #0066cc;
+        }
+
+        body.dark-mode .info-card h3 {
+            color: #60a5fa;
+        }
+
+        .info-card p, .info-card ul {
+            margin: 5px 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .info-card ul {
+            padding-left: 20px;
+        }
+
         /* Výchozí stav: Všechno kromě hesla je skryté */
         #dashboardBox,
         #pollsBox,
+        #infoBox,
         #profileBox,
         #loginBox,
         #registerBox,
@@ -662,10 +695,47 @@
     
     <div class="dashboard-buttons">
         <button onclick="enterChatFlow()">💬 Vstoupit do chatu</button>
+        <button class="secondary" onclick="openInfo()">ℹ️ Informace o chatě</button>
         <button class="poll-btn" onclick="openPolls()">📊 Ankety (Připravuje se)</button>
         <button class="secondary" onclick="showProfileSettings()">⚙️ Nastavení profilu</button>
         <button class="secondary" onclick="backToRoomPassword()">🚪 Zamknout a odejít</button>
     </div>
+</div>
+
+<!-- INFORMACE O CHATĚ -->
+<div class="box" id="infoBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙 / ☀️</button>
+    <h1>🏡 Informace o chatě</h1>
+    
+    <div class="info-card">
+        <h3>📶 Wi-Fi & Připojení</h3>
+        <p><strong>Název sítě:</strong> Krsmol_Guest</p>
+        <p><strong>Heslo:</strong> <code>chata2027</code></p>
+    </div>
+
+    <div class="info-card">
+        <h3>🔑 Příjezd a Odjezd</h3>
+        <p><strong>Check-in:</strong> od 14:00</p>
+        <p><strong>Check-out:</strong> do 11:00</p>
+        <p><strong>Klíče:</strong> Schránka na kód vedle hlavních dveří.</p>
+    </div>
+
+    <div class="info-card">
+        <h3>📜 Pravidla pobytu</h3>
+        <ul>
+            <li>Noční klid od 22:00 do 06:00.</li>
+            <li>Třídění odpadu (plasty, sklo, papír) v zádveří.</li>
+            <li>Udržujte čistotu v kuchyňce a společných prostorách.</li>
+        </ul>
+    </div>
+
+    <div class="info-card">
+        <h3>📞 Důležité kontakty</h3>
+        <p><strong>Správce:</strong> +420 123 456 789</p>
+        <p><strong>Záchranka / Hasiči / Policie:</strong> 112</p>
+    </div>
+
+    <button class="secondary" onclick="showDashboard()" style="margin-top: 10px;">⬅️ Zpět do menu</button>
 </div>
 
 <!-- ANKETY (Zatím prázdná stránka) -->
@@ -926,8 +996,8 @@
                 <span class="emoji-item" onclick="insertEmoji('💩')">💩</span>
                 <span class="emoji-item" onclick="insertEmoji('🙌')">🙌</span>
                 <span class="emoji-item" onclick="insertEmoji('💬')">💬</span>
-		        <span class="emoji-item" onclick="insertEmoji('卐')">卐</span>
-		        <span class="emoji-item" onclick="insertEmoji('ᛋᛋ')">ᛋᛋ</span>
+                <span class="emoji-item" onclick="insertEmoji('卐')">卐</span>
+                <span class="emoji-item" onclick="insertEmoji('ᛋᛋ')">ᛋᛋ</span>
 
             </div>
 
@@ -1158,6 +1228,11 @@ function showDashboard() {
 function openPolls() {
     document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
     document.getElementById("pollsBox").style.display = "block";
+}
+
+function openInfo() {
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
+    document.getElementById("infoBox").style.display = "block";
 }
 
 // Otevření nastavení profilu
