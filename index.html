@@ -91,6 +91,14 @@
             line-height: 1;
         }
 
+        .theme-btn-inline {
+            position: static;
+            width: 34px;
+            height: 34px;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
         body.dark-mode .theme-btn {
             background: #e0e0e0;
             color: #121212;
@@ -274,30 +282,34 @@
 
         .chatLayout {
             display: grid;
-            grid-template-columns: 240px 1fr;
+            grid-template-columns: 260px 1fr;
             gap: 20px;
             align-items: start;
         }
         
         #usersBox {
-            padding: 15px;
+            padding: 10px 15px;
             border: 1px solid var(--box-border);
             border-radius: 10px;
             background: var(--sub-bg);
-            height: 520px;
-            overflow-y: auto;
         }
 
         #usersTitle {
             font-weight: bold;
-            font-size: 18px;
-            margin-bottom: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            user-select: none;
+            padding: 5px 0;
+            outline: none;
         }
 
         #usersList {
             display: flex;
             flex-direction: column;
             gap: 7px;
+            margin-top: 10px;
+            max-height: 380px;
+            overflow-y: auto;
         }
         
         .userItem {
@@ -632,11 +644,11 @@
 
             #usersBox {
                 height: auto;
-                max-height: 220px;
+                margin-bottom: 10px;
             }
 
             #messages {
-                height: 380px;
+                height: 420px;
             }
 
             .message {
@@ -658,7 +670,7 @@
 
 <!-- MÍSTNOST HESLO (ZOBRAZENO JAKO PRVNÍ) -->
 <div class="box" id="chatPasswordBox">
-    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
     <h1>🔒 Krsmol 2027</h1>
 
     <p>Pro vstup do systému musíš zadat přístupové heslo.</p>
@@ -694,7 +706,7 @@
 
 <!-- ROZCESTNÍK (Nové menu po zadání hesla) -->
 <div class="box" id="dashboardBox">
-    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
     <h1>🏠 Rozcestník</h1>
     <p style="text-align: center;">Vítej v systému Krsmol 2027. Co chceš dnes dělat?</p>
     
@@ -710,7 +722,7 @@
     
 <!-- INFORMACE O CHATĚ -->
 <div class="box" id="infoBox">
-    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
     <h1>🏡 Informace o chatě</h1>
     
     <div class="info-card">
@@ -746,7 +758,7 @@
 
 <!-- ANKETY (Zatím prázdná stránka) -->
 <div class="box" id="pollsBox">
-    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
     <h1>📊 Ankety</h1>
     <p style="text-align: center; padding: 40px 0;">Modul pro hlasování a ankety se momentálně vyvíjí...</p>
     <button class="secondary" onclick="showDashboard()">⬅️ Zpět do menu</button>
@@ -754,7 +766,7 @@
 
 <!-- NASTAVENÍ PROFILU -->
 <div class="box" id="profileBox">
-    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
     <h1>⚙️ Nastavení profilu</h1>
     
     <div style="margin: 20px 0; text-align: center;">
@@ -804,7 +816,7 @@
 
 <!-- PŘIHLÁŠENÍ -->
 <div class="box" id="loginBox">
-    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
     <h1>🔐 Přihlášení do chatu</h1>
     <input id="loginEmail" type="email" placeholder="E-mail">
 
@@ -838,7 +850,7 @@
 
 <!-- ZAPOMENUTÉ HESLO (KROK A: Odeslání e-mailu) -->
 <div class="box" id="resetPasswordBox">
-    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
     <h1>📧 Obnova hesla</h1>
     <p>Zadej svůj e-mail a my ti pošleme odkaz pro vytvoření nového hesla.</p>
     
@@ -852,7 +864,7 @@
 
 <!-- NOVÉ HESLO (KROK B: Nastavení nového hesla po kliknutí z e-mailu) -->
 <div class="box" id="updatePasswordBox">
-    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
     <h1>🔑 Nové heslo</h1>
     <p>Zadej své nové heslo (minimálně 6 znaků) a pro jistotu ho zopakuj.</p>
     
@@ -891,7 +903,7 @@
 
 <!-- REGISTRACE -->
 <div class="box" id="registerBox">
-    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
     <h1>👤 Registrace</h1>
 
     <input id="registerEmail" type="email" placeholder="E-mail">
@@ -936,7 +948,7 @@
 
 <!-- PŘEZDÍVKA -->
 <div class="box" id="nicknameBox">
-    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
     <h1>👤 Přezdívka</h1>
 
     <p>K tomuto účtu zatím nemáš nastavenou přezdívku.</p>
@@ -950,7 +962,6 @@
 
 <!-- CHAT -->
 <div class="box" id="chat">
-    <button class="theme-btn" id="themeBtn" onclick="toggleDarkMode()">🌙</button>
 
     <h1>💬 Krsmol 2027</h1>
 
@@ -960,7 +971,8 @@
             <strong id="currentNickname"></strong>
         </p>
 
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="theme-btn theme-btn-inline" onclick="toggleDarkMode()" title="Přepnout tmavý/světlý režim">🌙</button>
             <button class="secondary logout-small" onclick="backToDashboardFromChat()">🏠 Menu</button>
             <button class="logout logout-small" onclick="logout()">Odhlásit</button>
         </div>
@@ -968,10 +980,10 @@
 
     <div class="chatLayout">
 
-        <div id="usersBox">
-            <div id="usersTitle">👥 Uživatelé</div>
+        <details id="usersBox">
+            <summary id="usersTitle">👥 Uživatelé (Online: <span id="onlineCount">0</span>)</summary>
             <div id="usersList">Načítám uživatele...</div>
-        </div>
+        </details>
 
         <div class="chatMain">
             
@@ -1194,14 +1206,12 @@ async function triggerNotification(nickname, text) {
         try {
             const { LocalNotifications } = window.Capacitor.Plugins;
             if (LocalNotifications) {
-                // Kontrola a vyžádání oprávnění pro Android 13+
                 let perm = await LocalNotifications.checkPermissions();
                 if (perm.display !== 'granted') {
                     perm = await LocalNotifications.requestPermissions();
                 }
 
                 if (perm.display === 'granted') {
-                    // Vytvořujeme v2 kanál bez přípony .mp3 v parametru sound
                     await LocalNotifications.createChannel({
                         id: 'icq_sound_channel_v2',
                         name: 'ICQ Notifikace V2',
@@ -1212,7 +1222,6 @@ async function triggerNotification(nickname, text) {
                         vibration: true
                     });
 
-                    // Naplánování notifikace
                     await LocalNotifications.schedule({
                         notifications: [
                             {
@@ -1232,7 +1241,6 @@ async function triggerNotification(nickname, text) {
         }
     }
 
-    // Přehrání zvuku přímo v aplikaci (záloha pro otevřené okno / web)
     playIcqSound();
 }
 
@@ -1675,7 +1683,6 @@ async function openChat(nickname) {
     currentNickname = nickname;
     document.getElementById("currentNickname").innerText = nickname;
 
-    // Reset notifikačních trackerů při novém vstupu do chatu
     knownMessageIds.clear();
     isFirstLoad = true;
 
@@ -1710,14 +1717,19 @@ async function loadUsers() {
 
 function renderUsers(users) {
     const usersList = document.getElementById("usersList");
+    const onlineCountSpan = document.getElementById("onlineCount");
     usersList.innerHTML = "";
 
     if (!users.length) {
         usersList.innerText = "Zatím nejsou žádní uživatelé.";
+        if (onlineCountSpan) onlineCountSpan.innerText = "0";
         return;
     }
 
     const onlineUsers = getOnlineUserIds();
+    if (onlineCountSpan) {
+        onlineCountSpan.innerText = onlineUsers.size;
+    }
 
     users.forEach(user => {
         const div = document.createElement("div");
@@ -1868,12 +1880,9 @@ async function loadMessages() {
     messages.innerHTML = "";
 
     if (messagesData) {
-        // Obrátíme pole, abychom vykreslovali (a přehrávali zvuky) od nejstarší po nejnovější zprávu z těch 50
         const reversedData = [...messagesData].reverse();
 
         reversedData.forEach(message => {
-            
-            // DETEKCE NOVÉ ZPRÁVY - spustíme notifikaci pouze, pokud už to není první načtení a pokud ji neposlal aktuální uživatel
             if (!isFirstLoad && !knownMessageIds.has(message.id) && message.user_id !== (currentUser ? currentUser.id : null)) {
                 triggerNotification(message.nickname, message.message);
             }
