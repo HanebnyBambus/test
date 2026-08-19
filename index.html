@@ -333,6 +333,18 @@
             white-space: nowrap;
         }
 
+        .userCustomStatus {
+            font-size: 12px;
+            color: var(--time-color);
+            margin-left: auto;
+            padding-left: 5px;
+            font-style: italic;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 90px;
+        }
+
         .offline {
             color: #888;
         }
@@ -349,6 +361,34 @@
             padding: 12px;
             border-radius: 10px;
             background: var(--sub-bg);
+            scroll-behavior: smooth;
+        }
+
+        /* Tlačítko sjetí dolů */
+        .scroll-down-btn {
+            display: none;
+            position: absolute;
+            bottom: 70px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #0066cc;
+            color: white;
+            border: none;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 10;
+            align-items: center;
+            justify-content: center;
+            margin-top: 0;
+            padding: 0;
+        }
+
+        .scroll-down-btn:hover {
+            background: #005bb5;
+            transform: scale(1.05);
         }
         
         #typingIndicator {
@@ -712,7 +752,7 @@
     
     <div class="dashboard-buttons">
         <button onclick="enterChatFlow()">💬 Vstoupit do chatu</button>
-        <button class="secondary" onclick="openInfo()">ℹ️ Informace o chatě (Připravuje se)</button>
+        <button class="secondary" onclick="openInfo()">ℹ️ Informace o chatě</button>
         <button class="poll-btn" onclick="openPolls()">📊 Ankety (Připravuje se)</button>
         <button class="secondary" onclick="showProfileSettings()">⚙️ Nastavení profilu</button>
         <button class="secondary" onclick="backToRoomPassword()">🚪 Zamknout a odejít</button>
@@ -756,6 +796,11 @@
         <input type="color" id="favColor" value="#3b82f6" style="width: 100px; height: 50px; padding: 0; cursor: pointer; border-radius: 8px; border: 1px solid var(--border-color); background: var(--box-bg);">
     </div>
 
+    <div style="margin: 20px 0; text-align: center;">
+        <label for="userStatusInput" style="display: block; margin-bottom: 10px; font-weight: bold;">Osobní status / Emoji:</label>
+        <input type="text" id="userStatusInput" placeholder="např. 🚗 Na cestě, 🍺 V hospodě..." maxlength="20" style="max-width: 300px; margin: 0 auto;">
+    </div>
+
     <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
 
     <h3>🔑 Změna hesla</h3>
@@ -796,7 +841,7 @@
 </div>
 
 
-<!-- PŘIHLÁŠENÍ -->
+<!-- PŘIHLAŠENÍ -->
 <div class="box" id="loginBox">
     <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
     <h1>🔐 Přihlášení do chatu</h1>
@@ -976,9 +1021,11 @@
                 <button onclick="clearSearch()" id="clearSearchBtn" style="width: auto; margin-top: 0; padding: 0 15px; display: none; background: #b00020;" title="Zrušit hledání">❌</button>
             </div>
 
-            <div id="messages">
+            <div id="messages" onscroll="handleScroll()">
                 Načítám zprávy...
             </div>
+
+            <button id="scrollDownBtn" class="scroll-down-btn" onclick="scrollToBottom()" title="Sjet dolů">⬇️</button>
 
             <div id="typingIndicator"></div>
 
@@ -996,10 +1043,10 @@
                 <span class="emoji-item" onclick="insertEmoji('💩')">💩</span>
                 <span class="emoji-item" onclick="insertEmoji('🙌')">🙌</span>
                 <span class="emoji-item" onclick="insertEmoji('💬')">💬</span>
-		<span class="emoji-item" onclick="insertEmoji('卐')">卐</span>
-		<span class="emoji-item" onclick="insertEmoji('卍')">卍</span>
-		<span class="emoji-item" onclick="insertEmoji('ᛋᛋ')">ᛋᛋ</span>
-		<span class="emoji-item" onclick="insertEmoji('✙')">✙</span>
+                <span class="emoji-item" onclick="insertEmoji('卐')">卐</span>
+                <span class="emoji-item" onclick="insertEmoji('卍')">卍</span>
+                <span class="emoji-item" onclick="insertEmoji('ᛋᛋ')">ᛋᛋ</span>
+                <span class="emoji-item" onclick="insertEmoji('✙')">✙</span>
 
             </div>
 
@@ -1309,12 +1356,13 @@ async function showProfileSettings() {
 
     const { data: profile } = await supabaseClient
         .from("profiles")
-        .select("color")
+        .select("color, status")
         .eq("id", currentUser.id)
         .maybeSingle();
 
-    if (profile && profile.color) {
-        document.getElementById("favColor").value = profile.color;
+    if (profile) {
+        if (profile.color) document.getElementById("favColor").value = profile.color;
+        if (profile.status) document.getElementById("userStatusInput").value = profile.status;
     }
 }
 
@@ -1322,6 +1370,7 @@ async function saveProfileSettings() {
     if (!currentUser) return;
 
     const color = document.getElementById("favColor").value;
+    const statusText = document.getElementById("userStatusInput").value.trim();
     const newPassword = document.getElementById("settingsNewPassword").value;
     const confirmPassword = document.getElementById("settingsConfirmPassword").value;
     const msg = document.getElementById("profileMessage");
@@ -1329,13 +1378,16 @@ async function saveProfileSettings() {
     msg.innerText = "Ukládám...";
     msg.className = "info";
 
-    const { error: colorError } = await supabaseClient
+    const { error: profileError } = await supabaseClient
         .from("profiles")
-        .update({ color: color })
+        .update({ 
+            color: color,
+            status: statusText
+        })
         .eq("id", currentUser.id);
 
-    if (colorError) {
-        msg.innerText = "❌ Chyba při ukládání barvy: " + colorError.message;
+    if (profileError) {
+        msg.innerText = "❌ Chyba při ukládání profilu: " + profileError.message;
         msg.className = "error";
         return;
     }
@@ -1367,7 +1419,7 @@ async function saveProfileSettings() {
         document.getElementById("settingsConfirmPassword").value = "";
     }
 
-    msg.innerText = "✅ Nastavení a heslo bylo úspěšně uloženo!";
+    msg.innerText = "✅ Nastavení bylo úspěšně uloženo!";
     msg.className = "success";
     
     await loadMessages();
@@ -1693,7 +1745,7 @@ async function openChat(nickname) {
 async function loadUsers() {
     const { data, error } = await supabaseClient
         .from("profiles")
-        .select("id, nickname, color")
+        .select("id, nickname, color, status")
         .order("nickname", { ascending: true });
 
     if (!error) {
@@ -1743,6 +1795,15 @@ function renderUsers(users) {
         div.appendChild(status);
         div.appendChild(avatar);
         div.appendChild(nickname);
+
+        if (user.status) {
+            const customStatus = document.createElement("span");
+            customStatus.className = "userCustomStatus";
+            customStatus.textContent = user.status;
+            customStatus.title = user.status;
+            div.appendChild(customStatus);
+        }
+
         usersList.appendChild(div);
     });
 }
@@ -2026,6 +2087,28 @@ function addMessage(message, currentUserId) {
 
 
 /* ================================= */
+/* SCROLL LOGIKA */
+/* ================================= */
+
+function handleScroll() {
+    const messages = document.getElementById("messages");
+    const scrollBtn = document.getElementById("scrollDownBtn");
+    const isAtBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 100;
+
+    if (!isAtBottom) {
+        scrollBtn.style.display = "flex";
+    } else {
+        scrollBtn.style.display = "none";
+    }
+}
+
+function scrollToBottom() {
+    const messages = document.getElementById("messages");
+    messages.scrollTop = messages.scrollHeight;
+}
+
+
+/* ================================= */
 /* ÚPRAVA ZPRÁVY */
 /* ================================= */
 
@@ -2092,8 +2175,7 @@ async function sendMessage() {
     }
 
     input.value = "";
-    const messages = document.getElementById("messages");
-    messages.scrollTop = messages.scrollHeight;
+    scrollToBottom();
 }
 
 
