@@ -106,7 +106,7 @@
 
         h1 { text-align: center; }
 
-        input, button {
+        input, select, button {
             width: 100%;
             padding: 12px;
             margin-top: 10px;
@@ -801,6 +801,19 @@
         <input type="text" id="userStatusInput" placeholder="např. 🚗 Na cestě, 🍺 V hospodě..." maxlength="20" style="max-width: 300px; margin: 0 auto;">
     </div>
 
+    <div style="margin: 20px 0; text-align: center;">
+        <label for="soundSelect" style="display: block; margin-bottom: 10px; font-weight: bold;">Zvuk notifikace:</label>
+        <div style="display: flex; gap: 8px; max-width: 300px; margin: 0 auto;">
+            <select id="soundSelect" style="margin-top:0;">
+                <option value="icq">ICQ (Uh-oh)</option>
+                <option value="beep">Klasický píp</option>
+                <option value="pop">Vlna / Pop</option>
+                <option value="chime">Chime / Zvonek</option>
+            </select>
+            <button type="button" onclick="testNotificationSound()" style="width: 50px; margin-top:0; flex-shrink:0;" title="Přehrát ukázku">🔊</button>
+        </div>
+    </div>
+
     <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
 
     <h3>🔑 Změna hesla</h3>
@@ -1184,18 +1197,74 @@ if ("Notification" in window && Notification.permission === "default") {
 }
 
 /* ================================= */
-/* ZVUK ICQ A NOTIFIKACE */
+/* ZVUKY A NOTIFIKACE */
 /* ================================= */
 
-function playIcqSound() {
-    try {
-        const audio = new Audio('icq.mp3');
-        audio.play().catch(e => {
-            console.warn("Audio file play failed, falling back to oscillators:", e);
+function playSelectedNotificationSound(soundType) {
+    const selected = soundType || localStorage.getItem("chatNotificationSound") || "icq";
+
+    if (selected === "icq") {
+        try {
+            const audio = new Audio('icq.mp3');
+            audio.play().catch(e => {
+                playIcqOscillators();
+            });
+        } catch(e) {
             playIcqOscillators();
-        });
+        }
+    } else {
+        playSynthesizedSound(selected);
+    }
+}
+
+function playSynthesizedSound(type) {
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+
+        const now = audioCtx.currentTime;
+
+        if (type === "beep") {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, now);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.15);
+        } else if (type === "pop") {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.08);
+        } else if (type === "chime") {
+            [523.25, 659.25, 783.99].forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                gain.gain.setValueAtTime(0.15, now + idx * 0.08);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.25);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now + idx * 0.08);
+                osc.stop(now + idx * 0.08 + 0.25);
+            });
+        }
     } catch(e) {
-        console.error("Audio error:", e);
+        console.error("Synthesized sound error:", e);
     }
 }
 
@@ -1206,7 +1275,6 @@ function playIcqOscillators() {
             audioCtx.resume();
         }
 
-        // 1. Tón ("Uh")
         const osc1 = audioCtx.createOscillator();
         const gain1 = audioCtx.createGain();
         osc1.type = 'sine';
@@ -1218,7 +1286,6 @@ function playIcqOscillators() {
         osc1.start(audioCtx.currentTime);
         osc1.stop(audioCtx.currentTime + 0.12);
 
-        // 2. Tón ("oh!")
         const osc2 = audioCtx.createOscillator();
         const gain2 = audioCtx.createGain();
         osc2.type = 'sine';
@@ -1232,6 +1299,11 @@ function playIcqOscillators() {
     } catch(e) {
         console.error("Oscillator error:", e);
     }
+}
+
+function testNotificationSound() {
+    const selected = document.getElementById("soundSelect").value;
+    playSelectedNotificationSound(selected);
 }
 
 async function triggerNotification(nickname, text) {
@@ -1274,7 +1346,7 @@ async function triggerNotification(nickname, text) {
         }
     }
 
-    playIcqSound();
+    playSelectedNotificationSound();
 }
 
 /* ================================= */
@@ -1352,6 +1424,9 @@ async function showProfileSettings() {
     document.getElementById("settingsNewPassword").value = "";
     document.getElementById("settingsConfirmPassword").value = "";
 
+    const savedSound = localStorage.getItem("chatNotificationSound") || "icq";
+    document.getElementById("soundSelect").value = savedSound;
+
     if (!currentUser) return;
 
     const { data: profile } = await supabaseClient
@@ -1371,12 +1446,15 @@ async function saveProfileSettings() {
 
     const color = document.getElementById("favColor").value;
     const statusText = document.getElementById("userStatusInput").value.trim();
+    const soundChoice = document.getElementById("soundSelect").value;
     const newPassword = document.getElementById("settingsNewPassword").value;
     const confirmPassword = document.getElementById("settingsConfirmPassword").value;
     const msg = document.getElementById("profileMessage");
 
     msg.innerText = "Ukládám...";
     msg.className = "info";
+
+    localStorage.setItem("chatNotificationSound", soundChoice);
 
     const { error: profileError } = await supabaseClient
         .from("profiles")
