@@ -1,506 +1,2406 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="cs">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>KRÁLOVSTVÍ — Verze 5.0 Rebuilt Engine</title>
-<style>
-:root{--bg:#0b0e13;--panel:#151a22;--panel2:#1c232e;--line:#303a49;--gold:#d9ad58;--gold2:#f0cf82;--green:#6bc58a;--red:#e06c73;--blue:#6ba8e6;--purple:#a78be0;--text:#edf1f5;--muted:#8f9bab;--mana:#3b82f6}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% -10%,#30394b,#0b0e13 48%);color:var(--text);font:14px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-button,input,select{font:inherit}button{border:1px solid var(--line);background:#242c38;color:var(--text);border-radius:9px;padding:8px 12px;cursor:pointer;transition:.15s}button:hover{filter:brightness(1.18);transform:translateY(-1px)}button.primary{background:linear-gradient(#9b742f,#65491f);border-color:#c39749}.danger{background:#682d35}.small{padding:4px 8px;font-size:12px}
-.app{max-width:1450px;margin:auto;padding:10px}.top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;position:sticky;top:7px;z-index:10;padding:9px;background:#121720ee;border:1px solid var(--line);border-radius:15px;backdrop-filter:blur(12px);box-shadow:0 15px 40px #0007}.brand{font-size:20px;font-weight:900;letter-spacing:1px;margin-right:auto}.brand span{color:var(--gold2)}.res{background:#0c1118;border:1px solid #252e3b;border-radius:9px;padding:7px 10px;white-space:nowrap}.res b{color:var(--gold2)}
-.tabs{display:flex;gap:6px;overflow:auto;padding:10px 0}.tab.active{background:#8a662b;border-color:#bd9347}.page{animation:fade .18s}@keyframes fade{from{opacity:.5;transform:translateY(3px)}to{opacity:1;transform:none}}
-.grid{display:grid;grid-template-columns:1.45fr 1fr;gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.panel{background:linear-gradient(180deg,#171d26,#131820);border:1px solid var(--line);border-radius:15px;padding:14px;box-shadow:0 12px 35px #0003}.panel h2,.panel h3{margin:0 0 9px}.muted{color:var(--muted)}.gold{color:var(--gold2)}.ok{color:var(--green)}.bad{color:var(--red)}.mana-text{color:var(--mana)}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:9px}.card{background:linear-gradient(180deg,#202834,#1a202a);border:1px solid #303a49;border-radius:11px;padding:11px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.bar{height:8px;background:#0a0e13;border-radius:10px;overflow:hidden;margin-top:4px;display:flex}.bar i{display:block;height:100%;background:var(--gold);box-shadow:0 0 8px #d9ad5844}.bar.mana i{background:var(--mana);box-shadow:0 0 8px #3b82f644}.build{min-height:180px;display:flex;flex-direction:column;gap:7px}.build .cost{font-size:12px;color:var(--muted)}
-.city{position:relative;min-height:470px;overflow:hidden;border-radius:14px;background:linear-gradient(160deg,#23342f,#17242a 48%,#1a2026);border:1px solid #3b4a4e}.city:before{content:"";position:absolute;inset:0;background:linear-gradient(transparent 48%,#0003 49%,transparent 50%),linear-gradient(90deg,transparent 48%,#0003 49%,transparent 50%);background-size:90px 90px;opacity:.35}.buildingSpot{position:absolute;z-index:1;width:130px;text-align:center;transition:all .3s}.buildingSpot.unbuilt{opacity:.3;filter:grayscale(1)}.buildingSpot .ico{font-size:42px;filter:drop-shadow(0 5px 5px #0008)}.buildingSpot b{display:block;background:#111a;color:#eee;padding:3px;border-radius:6px}.spot1{left:8%;top:10%}.spot2{right:8%;top:15%}.spot3{left:39%;top:7%}.spot4{left:12%;bottom:14%}.spot5{right:12%;bottom:13%}.spot6{left:40%;bottom:8%}
-.map{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;max-width:760px}.tile{aspect-ratio:1;min-height:36px;border:1px solid #36404c;border-radius:5px;background:#182329;display:flex;align-items:center;justify-content:center;font-size:19px;cursor:pointer;position:relative}.tile:hover{outline:2px solid var(--gold);z-index:2}.tile.enemy{background:#352329}.tile.oasis{background:#18382b}.tile.artifact{background:#302843}.tile.world{background:#4a3920}.tile.village{background:#23374b}.tile.ai{background:#3c3030}.tile.boss{background:#4a1c1c;border-color:var(--red);box-shadow:inset 0 0 10px #000}.tile .coord{position:absolute;bottom:1px;right:3px;font-size:7px;color:#87929f}
-.tile .march-badge{position:absolute;top:1px;left:1px;font-size:9px;background:var(--red);color:#fff;padding:1px 3px;border-radius:3px;animation:pulse 1s infinite}@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
-.units-train-box{background:#121720;padding:10px;border-radius:8px;border:1px solid var(--line);margin-bottom:8px}
-.bulk-btns{display:flex;gap:4px;margin-top:5px}.bulk-btns button{flex:1;padding:3px;font-size:11px}
-.modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:12px;z-index:50}.modal.show{display:flex}.modalbox{width:min(800px,100%);max-height:92vh;overflow:auto;background:linear-gradient(#1a202a,#11161d);border:1px solid #465265;border-radius:17px;padding:18px;box-shadow:0 30px 100px #000}.toast{position:fixed;right:15px;bottom:15px;background:#222b37;border:1px solid #455163;padding:12px 15px;border-radius:11px;display:none;z-index:60}.toast.show{display:block}.tag{display:inline-block;border:1px solid #536176;background:#202936;border-radius:6px;padding:3px 6px;font-size:11px}.heroAvatar{font-size:80px;text-align:center;text-shadow:0 8px 15px #000}.rare{border-color:#9d78d1}.legendary{border-color:#d9ad58;box-shadow:0 0 20px #d9ad5820}
-.battle-screen{display:grid;grid-template-columns:1fr 1fr;gap:15px;background:#10151d;padding:15px;border-radius:12px;border:1px solid var(--line);margin-top:10px}
-.battle-side{text-align:center;background:#18202c;padding:10px;border-radius:10px}
-.battle-vs{grid-column:1 / -1;text-align:center;font-size:22px;font-weight:900;color:var(--gold2);margin:-5px 0}
-#login-overlay{position:fixed;inset:0;background:#05070a;z-index:100;display:flex;align-items:center;justify-content:center;padding:15px}
-.login-box{background:var(--panel);border:1px solid var(--line);padding:25px;border-radius:15px;text-align:center;max-width:380px;width:100%}
-.login-box input{width:100%;padding:10px;margin:12px 0;background:#0c1118;border:1px solid var(--line);color:#fff;border-radius:8px;text-align:center}
-@media(max-width:900px){.grid{grid-template-columns:1fr}.grid3{grid-template-columns:1fr}.brand{width:100%}.top{position:relative}.city{min-height:410px}.buildingSpot{width:100px}.buildingSpot .ico{font-size:32px}.map{gap:2px}.tile{min-height:29px;font-size:15px}.battle-screen{grid-template-columns:1fr}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Krsmol chata 2027</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💬</text></svg>">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+
+        /* ================================= */
+        /* CSS PROMĚNNÉ PRO TMAVÝ REŽIM */
+        /* ================================= */
+
+        :root {
+            --bg-color: #f2f2f2;
+            --box-bg: #ffffff;
+            --text-color: #222222;
+            --border-color: #cccccc;
+            --box-border: #ddd;
+            --sub-bg: #fafafa;
+            --msg-other-bg: #e8e8e8;
+            --msg-other-text: #222222;
+            --msg-mine-bg: #222222;
+            --msg-mine-text: #ffffff;
+            --time-color: #777777;
+            --mine-time-color: #ccc;
+            --icon-color: #64748b;
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --box-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --border-color: #444444;
+            --box-border: #333333;
+            --sub-bg: #262626;
+            --msg-other-bg: #333333;
+            --msg-other-text: #ffffff;
+            --msg-mine-bg: #0066cc;
+            --msg-mine-text: #ffffff;
+            --time-color: #aaaaaa;
+            --mine-time-color: #dddddd;
+            --icon-color: #94a3b8;
+        }
+
+        * { box-sizing: border-box; }
+
+        input::-ms-reveal, input::-ms-clear { display: none; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .box {
+            position: relative;
+            width: 90%;
+            max-width: 1100px;
+            margin: 40px auto;
+            background: var(--box-bg);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .theme-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            margin-top: 0;
+            font-size: 12px;
+            background: #444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .theme-btn-inline {
+            position: static;
+            width: 34px;
+            height: 34px;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        body.dark-mode .theme-btn {
+            background: #e0e0e0;
+            color: #121212;
+        }
+
+        h1 { text-align: center; }
+
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--box-bg);
+            color: var(--text-color);
+        }
+
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .password-wrapper input {
+            margin-top: 0;
+            padding-right: 45px;
+        }
+
+        .toggle-password-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin-top: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--icon-color);
+        }
+
+        .toggle-password-btn:hover {
+            background: transparent;
+            opacity: 0.8;
+        }
+
+        .toggle-password-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        button {
+            background: #222;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        button:hover {
+            background: #444;
+        }
+
+        .secondary {
+            background: #777;
+        }
+        
+        .secondary:hover {
+            background: #555;
+        }
+
+        .logout {
+            background: #b00020;
+        }
+
+        .chatHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .chatHeader p {
+            margin: 0;
+        }
+
+        .logout-small {
+            width: auto;
+            padding: 8px 16px;
+            margin-top: 0;
+            font-size: 14px;
+        }
+
+        /* ================================= */
+        /* ROZCESTNÍK (DASHBOARD) STYLY */
+        /* ================================= */
+        .dashboard-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .dashboard-buttons button {
+            padding: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .poll-btn {
+            background: #0066cc;
+        }
+        .poll-btn:hover {
+            background: #005bb5;
+        }
+
+        /* ================================= */
+        /* INFORMACE O CHATĚ STYLY */
+        /* ================================= */
+        .info-card {
+            background: var(--sub-bg);
+            border: 1px solid var(--box-border);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-card h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 16px;
+            color: #0066cc;
+        }
+
+        body.dark-mode .info-card h3 {
+            color: #60a5fa;
+        }
+
+        .info-card p, .info-card ul {
+            margin: 5px 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .info-card ul {
+            padding-left: 20px;
+        }
+
+        /* Výchozí stav: Všechno kromě hesla je skryté */
+        #dashboardBox,
+        #pollsBox,
+        #infoBox,
+        #profileBox,
+        #loginBox,
+        #registerBox,
+        #nicknameBox,
+        #chat,
+        #resetPasswordBox,
+        #updatePasswordBox {
+            display: none;
+        }
+
+        /* Heslo je viditelné jako první */
+        #chatPasswordBox {
+            display: block;
+        }
+
+        .chatLayout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        #usersBox {
+            padding: 10px 15px;
+            border: 1px solid var(--box-border);
+            border-radius: 10px;
+            background: var(--sub-bg);
+        }
+
+        #usersTitle {
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            user-select: none;
+            padding: 5px 0;
+            outline: none;
+        }
+
+        #usersList {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            margin-top: 10px;
+            max-height: 380px;
+            overflow-y: auto;
+        }
+        
+        .userItem {
+            display: flex;
+            align-items: center;
+            padding: 9px 10px;
+            background: var(--box-bg);
+            border-radius: 8px;
+            border: 1px solid var(--box-border);
+        }
+
+        .userStatus {
+            margin-right: 8px;
+            font-size: 13px;
+        }
+
+        .userNickname {
+            font-weight: bold;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .userCustomStatus {
+            font-size: 12px;
+            color: var(--time-color);
+            margin-left: auto;
+            padding-left: 5px;
+            font-style: italic;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 90px;
+        }
+
+        .offline {
+            color: #888;
+        }
+
+        .chatMain {
+            min-width: 0;
+            position: relative;
+        }
+        
+        #messages {
+            height: 420px;
+            overflow-y: auto;
+            border: 1px solid var(--box-border);
+            padding: 12px;
+            border-radius: 10px;
+            background: var(--sub-bg);
+            scroll-behavior: smooth;
+        }
+
+        /* Tlačítko sjetí dolů */
+        .scroll-down-btn {
+            display: none;
+            position: absolute;
+            bottom: 70px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #0066cc;
+            color: white;
+            border: none;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 10;
+            align-items: center;
+            justify-content: center;
+            margin-top: 0;
+            padding: 0;
+        }
+
+        .scroll-down-btn:hover {
+            background: #005bb5;
+            transform: scale(1.05);
+        }
+        
+        #typingIndicator {
+            height: 20px;
+            font-size: 13px;
+            font-style: italic;
+            color: var(--time-color);
+            margin-top: 5px;
+            padding-left: 5px;
+        }
+
+        .inputGroup {
+            display: flex;
+            gap: 8px;
+            margin-top: 5px;
+            position: relative;
+        }
+
+        .inputGroup input {
+            margin-top: 0;
+        }
+
+        .emoji-btn {
+            width: 45px;
+            margin-top: 0;
+            font-size: 20px;
+            padding: 0;
+            background: var(--sub-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .emoji-btn:hover {
+            background: var(--box-border);
+        }
+
+        .inputGroup button.send-btn {
+            width: 120px;
+            margin-top: 0;
+            flex-shrink: 0;
+        }
+
+        #emojiPicker {
+            display: none;
+            position: absolute;
+            bottom: 55px;
+            right: 130px;
+            background: var(--box-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .emoji-item {
+            font-size: 22px;
+            cursor: pointer;
+            text-align: center;
+            user-select: none;
+            padding: 4px;
+            border-radius: 5px;
+        }
+
+        .emoji-item:hover {
+            background: var(--sub-bg);
+        }
+
+        .message {
+            position: relative;
+            width: fit-content;
+            max-width: 75%;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            border-radius: 14px;
+            clear: both;
+            word-wrap: break-word;
+        }
+
+        .message.other {
+            margin-right: auto;
+            background: var(--msg-other-bg);
+            color: var(--msg-other-text);
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message.mine {
+            margin-left: auto;
+            background: var(--msg-mine-bg);
+            color: var(--msg-mine-text);
+            border-bottom-right-radius: 4px;
+            padding-right: 50px;
+        }
+
+        .nickname {
+            display: block;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .text {
+            display: block;
+            margin-top: 6px;
+            margin-bottom: 4px;
+            font-size: 15px;
+        }
+
+        .message.mine .nickname {
+            color: #ffffff;
+        }
+
+        .message.other .nickname {
+            color: #ffffff;
+        }
+        
+        .time {
+            display: block;
+            font-size: 11px;
+            color: var(--time-color);
+            margin-top: 4px;
+        }
+
+        .message.mine .time {
+            color: var(--mine-time-color);
+        }
+        
+        .edited-label {
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        .message-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            padding: 0;
+            margin: 0;
+            width: auto;
+            opacity: 0.6;
+        }
+
+        .action-btn:hover {
+            opacity: 1;
+            background: transparent;
+            transform: scale(1.1);
+        }
+
+        .edit-btn {
+            color: #ffca28;
+        }
+
+        .delete-btn {
+            color: #ff6b6b;
+        }
+
+        /* ================================= */
+        /* AVATARY */
+        /* ================================= */
+
+        .avatar {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 11px;
+            flex-shrink: 0;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .avatar-small {
+            width: 24px;
+            height: 24px;
+            font-size: 12px;
+            margin-right: 8px;
+            background: transparent;
+        }
+
+        .nickname-wrapper {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px 3px 5px;
+            border-radius: 12px;
+            margin-bottom: 4px;
+        }
+
+        /* ================================= */
+        /* ROZBALOVACÍ REAKCE */
+        /* ================================= */
+
+        .reaction-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 5px;
+            margin-top: 6px;
+            position: relative;
+        }
+
+        .reaction-pill {
+            display: inline-block;
+            background: var(--sub-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 2px 7px;
+            font-size: 11px;
+            cursor: default;
+            color: var(--text-color);
+        }
+
+        .reaction-trigger-btn {
+            background: var(--sub-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 11px;
+            padding: 0;
+            margin-top: 0;
+            opacity: 0.7;
+        }
+
+        .reaction-trigger-btn:hover {
+            opacity: 1;
+            background: var(--box-border);
+        }
+
+        .reaction-popup {
+            display: none;
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            background: var(--box-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            gap: 4px;
+            z-index: 50;
+        }
+
+        .reaction-popup button {
+            background: transparent;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px;
+            width: auto;
+            margin-top: 0;
+            border-radius: 6px;
+        }
+
+        .reaction-popup button:hover {
+            background: var(--sub-bg);
+            transform: scale(1.2);
+        }
+
+        .error { color: #b00020; }
+        .success { color: green; }
+        .info { color: #555; }
+
+        @media (max-width: 700px) {
+            .box {
+                width: 95%;
+                margin: 15px auto;
+                padding: 15px;
+            }
+
+            .chatLayout {
+                grid-template-columns: 1fr;
+            }
+
+            #usersBox {
+                height: auto;
+                margin-bottom: 10px;
+            }
+
+            #messages {
+                height: 420px;
+            }
+
+            .message {
+                max-width: 85%;
+            }
+
+            #emojiPicker {
+                right: 0;
+                left: 0;
+                margin: auto;
+                width: fit-content;
+            }
+        }
+
+    </style>
 </head>
+
 <body>
 
-<div id="login-overlay">
-  <div class="login-box">
-    <h2 style="color:var(--gold2);margin-top:0">🔒 Vstup do Království</h2>
-    <input type="password" id="pass-input" placeholder="Zadej heslo..." onkeypress="if(event.key==='Enter') checkPassword()">
-    <button class="primary" style="width:100%" onclick="checkPassword()">Vstoupit</button>
-    <button class="danger" style="width:100%;margin-top:8px;font-size:12px" onclick="hardReset()">⚠️ Smazat uložení</button>
-  </div>
+<!-- MÍSTNOST HESLO (ZOBRAZENO JAKO PRVNÍ) -->
+<div class="box" id="chatPasswordBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
+    <h1>🔒 Krsmol 2027</h1>
+
+    <p>Pro vstup do systému musíš zadat přístupové heslo.</p>
+
+    <div class="password-wrapper">
+        <input
+            id="roomPasswordInput"
+            type="password"
+            placeholder="Heslo místnosti"
+            onkeydown="if(event.key === 'Enter') verifyRoomPassword()"
+        >
+
+        <button
+            type="button"
+            class="toggle-password-btn"
+            onclick="togglePasswordVisibility('roomPasswordInput', this)"
+        >
+            <svg class="eye-open" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+
+            <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+        </button>
+    </div>
+
+    <button onclick="verifyRoomPassword()">Odemknout</button>
+    <p id="roomPasswordMessage"></p>
 </div>
 
-<div class="app">
-<header class="top">
- <div class="brand">🏰 <span>KRÁLOVSTVÍ v5.0</span></div>
- <div class="res">🌲 <b id="wood">0</b></div><div class="res">🧱 <b id="clay">0</b></div><div class="res">⛏️ <b id="iron">0</b></div><div class="res">💰 <b id="gold">0</b></div><div class="res">👥 <b id="pop">0/0</b></div>
- <button onclick="save()">💾</button><button onclick="openGuide()">📖 Deník</button><button onclick="settings()">⚙️</button>
-</header>
-<nav class="tabs">
-<button class="tab active" data-tab="village">🏰 Vesnice</button>
-<button class="tab" data-tab="map">🗺️ Svět</button>
-<button class="tab" data-tab="army">⚔️ Armáda</button>
-<button class="tab" data-tab="hero">🧙 Hrdina</button>
-<button class="tab" data-tab="magic">✨ Magie</button>
-<button class="tab" data-tab="trade">🏪 Obchod</button>
-<button class="tab" data-tab="tech">🔬 Výzkum</button>
-<button class="tab" data-tab="diplomacy">🚩 Diplomacie</button>
-<button class="tab" data-tab="reports">📜 Reporty</button>
-<button class="tab" data-tab="stats">🏆 Impérium</button>
-</nav>
-
-<!-- VESNICE -->
-<section id="village" class="page"><div class="grid">
-<div>
- <section class="panel"><div class="row"><div><h2 id="vname">Nová osada [4|4]</h2><span class="tag" id="era">Éra I</span></div><select id="vselect" onchange="switchVillage(this.value)"></select></div><div class="city" style="margin-top:12px">
-  <div class="buildingSpot spot1" id="spot-woodcutter"><div class="ico">🌲</div><b>Dřevorubec Lv.<span data-b="woodcutter">0</span></b></div>
-  <div class="buildingSpot spot2" id="spot-ironmine"><div class="ico">⛏️</div><b>Důl železa Lv.<span data-b="ironmine">0</span></b></div>
-  <div class="buildingSpot spot3" id="spot-claypit"><div class="ico">🧱</div><b>Hlína Lv.<span data-b="claypit">0</span></b></div>
-  <div class="buildingSpot spot4" id="spot-farm"><div class="ico">👨‍🌾</div><b>Statek Lv.<span data-b="farm">0</span></b></div>
-  <div class="buildingSpot spot5" id="spot-stable"><div class="ico">🐎</div><b>Stáj Lv.<span data-b="stable">0</span></b></div>
-  <div class="buildingSpot spot6" id="spot-world"><div class="ico">🏛️</div><b>Div světa Lv.<span data-b="world">0</span></b></div>
- </div></section>
- <section class="panel"><h2>🏗️ Budovy Vesnice</h2><div id="buildings" class="cards"></div></section>
-</div>
-<aside>
- <section class="panel"><h2>📈 Hospodářství</h2><div id="economy"></div></section>
- <section class="panel"><h2>🎲 Světová událost</h2><div id="event"></div></section>
- <section class="panel"><h2>🥾 Pochody & Výpravy</h2><div id="activities"></div></section>
-</aside>
-</div></section>
-
-<!-- MAPA -->
-<section id="map" class="page" style="display:none"><div class="grid">
-<section class="panel"><h2>🗺️ Královská mapa</h2><p class="muted">10×10. Bossové, Oázy a AI Království.</p><div id="mapgrid" class="map"></div></section>
-<aside class="panel"><h2>🔎 Detail Území</h2><div id="tileInfo">Klikni na políčko na mapě.</div></aside></div></section>
-
-<!-- ARMÁDA -->
-<section id="army" class="page" style="display:none"><div class="grid">
-<section class="panel"><h2>⚔️ Posádka Vesnice</h2><div id="armyList"></div></section>
-<section class="panel"><h2>🏋️ Hromadný Výcvik Vojska</h2><p class="muted">Kasárna a Stáje zkracují čas výcviku.</p><div id="training"></div><hr><h3>⏳ Výcviková Fronta</h3><div id="trainQueue">Žádný výcvik neprobíhá.</div></section>
-</div></section>
-
-<!-- HRDINA -->
-<section id="hero" class="page" style="display:none">
-<div id="hero-main-container" class="grid">
-<section class="panel"><div class="heroAvatar" id="hero-avatar">🧙</div><h2 style="text-align:center"><span id="hero-title-name">Hrdina</span> Lv. <span id="hlvl">1</span></h2><div id="heroStats"></div><hr><h3>🌳 Talenty (5 bodů / level)</h3><div id="talents" class="cards"></div></section>
-<section class="panel"><h2>🎒 Inventář & Prodej (Tržiště)</h2><div id="inventory" class="cards"></div><hr><h2>🧭 Expedice</h2><div id="expedition"></div></section>
-</div>
-</section>
-
-<!-- MAGIE -->
-<section id="magic" class="page" style="display:none"><div class="grid">
-<section class="panel"><h2>✨ Kniha Kouzel</h2><div id="spellBook" class="cards"></div></section>
-<section class="panel"><h2>🔵 Tvoje Mana</h2><div class="card"><div class="row"><b>Mána</b><b id="mana-val" class="mana-text">0 / 0</b></div><div class="bar mana"><i id="mana-bar-fill" style="width:0%"></i></div></div></section>
-</div></section>
-
-<!-- OBCHOD -->
-<section id="trade" class="page" style="display:none"><div class="grid">
-<section class="panel"><h2>🏪 Obchodní Karavany</h2><div id="tradePanel"></div></section>
-<section class="panel"><h2>📜 Aktivní Karavany</h2><div id="caravanList"><i>Žádné karavany na cestě.</i></div></section>
-</div></section>
-
-<!-- VÝZKUM -->
-<section id="tech" class="page" style="display:none"><section class="panel"><h2>🔬 Technologický strom</h2><div id="techTree" class="cards"></div></section></section>
-
-<!-- DIPLOMACIE -->
-<section id="diplomacy" class="page" style="display:none"><div class="grid"><section class="panel"><h2>🚩 Kmen & Aliance</h2><div id="tribe"></div></section><section class="panel"><h2>👑 AI Království</h2><div id="aiList"></div></section></div></section>
-
-<!-- REPORTY -->
-<section id="reports" class="page" style="display:none"><section class="panel"><h2>📜 Kronika Bitev (Klikni pro detail)</h2><div id="reportsList"></div></section></section>
-
-<!-- STATY -->
-<section id="stats" class="page" style="display:none"><section class="panel"><h2>🏆 Impérium</h2><div id="statsPanel"></div></section></section>
+<!-- ROZCESTNÍK (Nové menu po zadání hesla) -->
+<div class="box" id="dashboardBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
+    <h1>🏠 Rozcestník</h1>
+    <p style="text-align: center;">Vítej v systému Krsmol 2027. Co chceš dnes dělat?</p>
+    
+    <div class="dashboard-buttons">
+        <button onclick="enterChatFlow()">💬 Vstoupit do chatu</button>
+        <button class="secondary" onclick="openInfo()">ℹ️ Informace o chatě(Připravuje se)</button>
+        <button class="poll-btn" onclick="openPolls()">📊 Ankety (Připravuje se)</button>
+        <button class="secondary" onclick="showProfileSettings()">⚙️ Nastavení profilu</button>
+        <button class="secondary" onclick="backToRoomPassword()">🚪 Zamknout a odejít</button>
+    </div>
 </div>
 
-<div id="modal" class="modal"><div class="modalbox"><div id="modalContent"></div><div style="text-align:right;margin-top:15px"><button onclick="closeModal()">Zavřít</button></div></div></div>
-<div id="toast" class="toast"></div>
+    
+<!-- INFORMACE O CHATĚ -->
+<div class="box" id="infoBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
+    <h1>🏡 Informace o chatě</h1>
+
+    <div class="info-card">
+        <h3>🔑 Příjezd a Odjezd</h3>
+        <p><strong>Check-in / Check-out:</strong> Dle předchozí domluvy.</p>
+    </div>
+
+    <div class="info-card">
+        <h3>📜 Pravidla pobytu</h3>
+        <p><strong>Režim:</strong> OPEN</p>
+    </div>
+
+    <button class="secondary" onclick="showDashboard()" style="margin-top: 10px;">⬅️ Zpět do menu</button>
+</div>
+
+<!-- ANKETY (Zatím prázdná stránka) -->
+<div class="box" id="pollsBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
+    <h1>📊 Ankety</h1>
+    <p style="text-align: center; padding: 40px 0;">Modul pro hlasování a ankety se momentálně vyvíjí...</p>
+    <button class="secondary" onclick="showDashboard()">⬅️ Zpět do menu</button>
+</div>
+
+<!-- NASTAVENÍ PROFILU -->
+<div class="box" id="profileBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
+    <h1>⚙️ Nastavení profilu</h1>
+    
+    <div style="margin: 20px 0; text-align: center;">
+        <label for="favColor" style="display: block; margin-bottom: 10px; font-weight: bold;">Barva přezdívky:</label>
+        <input type="color" id="favColor" value="#3b82f6" style="width: 100px; height: 50px; padding: 0; cursor: pointer; border-radius: 8px; border: 1px solid var(--border-color); background: var(--box-bg);">
+    </div>
+
+    <div style="margin: 20px 0; text-align: center;">
+        <label for="userStatusInput" style="display: block; margin-bottom: 10px; font-weight: bold;">Osobní status / Emoji:</label>
+        <input type="text" id="userStatusInput" placeholder="např. 🚗 Na cestě, 🍺 V hospodě..." maxlength="20" style="max-width: 300px; margin: 0 auto;">
+    </div>
+
+    <div style="margin: 20px 0; text-align: center;">
+        <label for="soundSelect" style="display: block; margin-bottom: 10px; font-weight: bold;">Zvuk notifikace:</label>
+        <div style="display: flex; gap: 8px; max-width: 300px; margin: 0 auto;">
+            <select id="soundSelect" style="margin-top:0;">
+                <option value="icq">ICQ (Uh-oh)</option>
+                <option value="beep">Klasický píp</option>
+                <option value="pop">Vlna / Pop</option>
+                <option value="chime">Chime / Zvonek</option>
+            </select>
+            <button type="button" onclick="testNotificationSound()" style="width: 50px; margin-top:0; flex-shrink:0;" title="Přehrát ukázku">🔊</button>
+        </div>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
+
+    <h3>🔑 Změna hesla</h3>
+    <p style="font-size: 14px; color: var(--time-color);">Pokud si chceš změnit heslo, zadej nové níže.</p>
+
+    <div class="password-wrapper">
+        <input id="settingsNewPassword" type="password" placeholder="Nové heslo (min. 6 znaků)">
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('settingsNewPassword', this)">
+            <svg class="eye-open" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+        </button>
+    </div>
+
+    <div class="password-wrapper">
+        <input id="settingsConfirmPassword" type="password" placeholder="Potvrď nové heslo">
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('settingsConfirmPassword', this)">
+            <svg class="eye-open" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+        </button>
+    </div>
+
+    <button onclick="saveProfileSettings()">Uložit změny</button>
+    <button class="secondary" onclick="showDashboard()" style="margin-top: 10px;">⬅️ Zpět do menu</button>
+    
+    <p id="profileMessage"></p>
+</div>
+
+
+<!-- PŘIHLAŠENÍ -->
+<div class="box" id="loginBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
+    <h1>🔐 Přihlášení do chatu</h1>
+    <input id="loginEmail" type="email" placeholder="E-mail">
+
+    <div class="password-wrapper">
+        <input 
+            id="loginPassword" 
+            type="password" 
+            placeholder="Heslo"
+            onkeydown="if(event.key === 'Enter') login()"
+        >
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('loginPassword', this)">
+            <svg class="eye-open" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+
+            <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+        </button>
+    </div>
+
+    <button onclick="login()">Přihlásit</button>
+    <button class="secondary" onclick="showRegister()">Vytvořit nový účet</button>
+    <!-- NOVÉ TLAČÍTKO: Zapomenuté heslo -->
+    <button class="secondary" style="margin-top:10px;" onclick="showResetPassword()">Zapomenuté heslo?</button>
+    <button class="logout logout-small" style="width:100%; margin-top:10px;" onclick="showDashboard()">⬅️ Zpět do menu</button>
+    <p id="loginMessage"></p>
+</div>
+
+<!-- ZAPOMENUTÉ HESLO (KROK A: Odeslání e-mailu) -->
+<div class="box" id="resetPasswordBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
+    <h1>📧 Obnova hesla</h1>
+    <p>Zadej svůj e-mail a my ti pošleme odkaz pro vytvoření nového hesla.</p>
+    
+    <input id="resetEmail" type="email" placeholder="Tvůj e-mail">
+    
+    <button onclick="sendResetPassword()">Odeslat odkaz</button>
+    <button class="secondary" onclick="showLogin()">Zpět na přihlášení</button>
+    
+    <p id="resetMessage"></p>
+</div>
+
+<!-- NOVÉ HESLO (KROK B: Nastavení nového hesla po kliknutí z e-mailu) -->
+<div class="box" id="updatePasswordBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
+    <h1>🔑 Nové heslo</h1>
+    <p>Zadej své nové heslo (minimálně 6 znaků) a pro jistotu ho zopakuj.</p>
+    
+    <div class="password-wrapper">
+        <input id="newPasswordInput" type="password" placeholder="Nové heslo">
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('newPasswordInput', this)">
+            <svg class="eye-open" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- POTVRZENÍ HESLA -->
+    <div class="password-wrapper">
+        <input id="newPasswordConfirmInput" type="password" placeholder="Potvrď nové heslo">
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('newPasswordConfirmInput', this)">
+            <svg class="eye-open" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+        </button>
+    </div>
+    
+    <button onclick="updatePassword()">Uložit nové heslo</button>
+    <p id="updatePasswordMessage"></p>
+</div>
+
+<!-- REGISTRACE -->
+<div class="box" id="registerBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
+    <h1>👤 Registrace</h1>
+
+    <input id="registerEmail" type="email" placeholder="E-mail">
+
+    <div class="password-wrapper">
+        <input id="registerPassword" type="password" placeholder="Heslo (min. 6 znaků)">
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('registerPassword', this)">
+            <svg class="eye-open" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+
+            <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+        </button>
+    </div>
+
+    <div class="password-wrapper">
+        <input id="registerPasswordConfirm" type="password" placeholder="Potvrď heslo znovu">
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('registerPasswordConfirm', this)">
+            <svg class="eye-open" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+
+            <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+        </button>
+    </div>
+
+    <input id="registerNickname" type="text" maxlength="30" placeholder="Přezdívka">
+
+    <button onclick="register()">Vytvořit účet</button>
+    <button class="secondary" onclick="showLogin()">Zpět na přihlášení</button>
+
+    <p id="registerMessage"></p>
+</div>
+
+<!-- PŘEZDÍVKA -->
+<div class="box" id="nicknameBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
+    <h1>👤 Přezdívka</h1>
+
+    <p>K tomuto účtu zatím nemáš nastavenou přezdívku.</p>
+
+    <input id="nickname" type="text" maxlength="30" placeholder="Zadej přezdívku">
+
+    <button onclick="saveNickname()">Uložit přezdívku</button>
+
+    <p id="nicknameMessage"></p>
+</div>
+
+<!-- CHAT -->
+<div class="box" id="chat">
+
+    <h1>💬 Krsmol 2027</h1>
+
+    <div class="chatHeader">
+        <p>
+            Přihlášen jako:
+            <strong id="currentNickname"></strong>
+        </p>
+
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="theme-btn theme-btn-inline" onclick="toggleDarkMode()" title="Přepnout tmavý/světlý režim">🌙</button>
+            <button class="secondary logout-small" onclick="backToDashboardFromChat()">🏠 Menu</button>
+            <button class="logout logout-small" onclick="logout()">Odhlásit</button>
+        </div>
+    </div>
+
+    <div class="chatLayout">
+
+        <details id="usersBox">
+            <summary id="usersTitle">👥 Uživatelé (Online: <span id="onlineCount">0</span>)</summary>
+            <div id="usersList">Načítám uživatele...</div>
+        </details>
+
+        <div class="chatMain">
+            
+            <!-- VYHLEDÁVÁNÍ -->
+            <div id="searchBar" style="display: flex; gap: 5px; margin-bottom: 10px;">
+                <input id="searchInput" type="text" placeholder="Hledat ve zprávách..." onkeydown="if(event.key === 'Enter') executeSearch()" style="margin-top: 0;">
+                <button onclick="executeSearch()" style="width: auto; margin-top: 0; padding: 0 15px;" title="Hledat">🔍</button>
+                <button onclick="clearSearch()" id="clearSearchBtn" style="width: auto; margin-top: 0; padding: 0 15px; display: none; background: #b00020;" title="Zrušit hledání">❌</button>
+            </div>
+
+            <div id="messages" onscroll="handleScroll()">
+                Načítám zprávy...
+            </div>
+
+            <button id="scrollDownBtn" class="scroll-down-btn" onclick="scrollToBottom()" title="Sjet dolů">⬇️</button>
+
+            <div id="typingIndicator"></div>
+
+            <div id="emojiPicker">
+
+                <span class="emoji-item" onclick="insertEmoji('😀')">😀</span>
+                <span class="emoji-item" onclick="insertEmoji('😂')">😂</span>
+                <span class="emoji-item" onclick="insertEmoji('😍')">😍</span>
+                <span class="emoji-item" onclick="insertEmoji('👍')">👍</span>
+                <span class="emoji-item" onclick="insertEmoji('🔥')">🔥</span>
+                <span class="emoji-item" onclick="insertEmoji('❤️')">❤️</span>
+                <span class="emoji-item" onclick="insertEmoji('🎉')">🎉</span>
+                <span class="emoji-item" onclick="insertEmoji('😎')">😎</span>
+                <span class="emoji-item" onclick="insertEmoji('🤔')">🤔</span>
+                <span class="emoji-item" onclick="insertEmoji('💩')">💩</span>
+                <span class="emoji-item" onclick="insertEmoji('🙌')">🙌</span>
+                <span class="emoji-item" onclick="insertEmoji('💬')">💬</span>
+                <span class="emoji-item" onclick="insertEmoji('卐')">卐</span>
+                <span class="emoji-item" onclick="insertEmoji('卍')">卍</span>
+                <span class="emoji-item" onclick="insertEmoji('ᛋᛋ')">ᛋᛋ</span>
+                <span class="emoji-item" onclick="insertEmoji('✙')">✙</span>
+
+            </div>
+
+            <div class="inputGroup">
+
+                <button
+                    type="button"
+                    class="emoji-btn"
+                    onclick="toggleEmojiPicker()"
+                >
+                    😊
+                </button>
+
+                <input
+                    id="messageInput"
+                    type="text"
+                    maxlength="500"
+                    placeholder="Napiš zprávu..."
+                    onkeydown="if(event.key === 'Enter') sendMessage()"
+                    oninput="handleTyping()"
+                >
+
+                <button
+                    class="send-btn"
+                    onclick="sendMessage()"
+                >
+                    Odeslat
+                </button>
+
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
-const KEY="kralovstvi_v5_save";
-const SECRET_PASS="Krsmol2027";
 
-let soundSettings={sfx:true,music:true};
-let audioCtx=null;
-function playSound(freq,type='sine',duration=0.15){
- if(!soundSettings.sfx) return;
- try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();let osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.type=type;osc.frequency.value=freq;osc.connect(gain);gain.connect(audioCtx.destination);osc.start();gain.gain.exponentialRampToValueAtTime(0.00001,audioCtx.currentTime+duration);osc.stop(audioCtx.currentTime+duration);}catch(e){}
+// Odemčení zvuku při prvním dotyku/kliknutí na telefon
+function unlockAudioContext() {
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    } catch(e) {}
+    document.removeEventListener('click', unlockAudioContext);
+    document.removeEventListener('touchstart', unlockAudioContext);
 }
 
-function checkPassword(){
- if(document.getElementById('pass-input').value===SECRET_PASS){sessionStorage.setItem('auth','true');document.getElementById('login-overlay').style.display='none';playSound(523.25,'triangle',0.3);}
- else{alert('Špatné heslo!');}
+document.addEventListener('click', unlockAudioContext);
+document.addEventListener('touchstart', unlockAudioContext);
+
+
+/* ================================= */
+/* GENERÁTOR BAREV PRO AVATARY */
+/* ================================= */
+const AVATAR_COLORS = [
+    '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e', 
+    '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef', '#ec4899'
+];
+
+function getAvatarColor(name) {
+    if (!name) return AVATAR_COLORS[0];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
-const unitDefs={
- spearman:{name:"🛡️ Kopiník",power:11,cost:[18,8,5],pop:1,baseTrain:4,type:"barracks",reqLvl:1},
- swordsman:{name:"⚔️ Šermíř",power:16,cost:[25,15,8],pop:1,baseTrain:6,type:"barracks",reqLvl:2},
- light:{name:"🐎 Lehká jízda",power:25,cost:[55,35,20],pop:2,baseTrain:10,type:"stable",reqLvl:1},
- heavy:{name:"🐴 Těžká jízda",power:48,cost:[90,70,65],pop:3,baseTrain:16,type:"stable",reqLvl:3},
- ram:{name:"🚪 Beranidlo",power:20,cost:[100,50,90],pop:3,baseTrain:20,type:"barracks",reqLvl:4},
- catapult:{name:"☄️ Katapult",power:28,cost:[140,120,160],pop:5,baseTrain:30,type:"barracks",reqLvl:5},
- noble:{name:"👑 Šlechtic",power:15,cost:[350,300,350],pop:5,baseTrain:45,type:"barracks",reqLvl:5}
-};
-const bdefs={
- woodcutter:["🌲","Dřevorubec",55,25,15],claypit:["🧱","Hliníkárna",45,35,18],ironmine:["⛏️","Důl železa",35,30,28],
- farm:["👨‍🌾","Selský dvůr",70,55,35],stable:["🐎","Stáj",140,100,100],barracks:["⚔️","Kasárna",100,80,70],
- wall:["🧱","Hradby",90,90,110],market:["🏪","Tržiště",130,120,80],world:["🏛️","Div světa",800,800,800]
-};
-const techDefs={mining:{name:"⛏️ Pokročilá těžba",cost:2,desc:"+15 % produkce"},metallurgy:{name:"⚙️ Metalurgie",cost:3,desc:"+10 % síla pěchoty"},cavalry:{name:"🐎 Jezdecké umění",cost:3,desc:"Odemyká Stáje"},siege:{name:"☄️ Obléhací stroje",cost:4,desc:"Katapulty a beranidla"},monarchy:{name:"👑 Monarchie",cost:6,desc:"Šlechtici a anektování"}};
-const spells={harvest:{name:"🌾 Cereální Požehnání",mana:30,desc:"Přidá 300 od každé suroviny."},wind:{name:"⚡ Rychlý Vítr",mana:40,desc:"Zkrátí čas pochodů na polovinu."}};
+function linkify(text) {
+    const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 
-function fresh(){
- let map={};for(let y=0;y<10;y++)for(let x=0;x<10;x++){
-  let r=Math.random();
-  let t=r<.05?"boss":r<.15?"oasis":r<.22?"enemy":r<.25?"artifact":r<.28?"ai":"wild";
-  map[x+"|"+y]={type:t,loyalty:100,wall:r<.22?Math.floor(Math.random()*4):0};
- }
- map["4|4"]={type:"village",loyalty:100,wall:1,owner:"player"};map["5|5"]={type:"world",loyalty:100,wall:0};
- return {last:Date.now(),resources:{wood:2000,clay:2000,iron:1500,gold:500},villages:[{name:"Hlavní osada",x:4,y:4,build:{woodcutter:2,claypit:2,ironmine:2,farm:2,stable:0,barracks:1,wall:1,market:1,world:0},units:{spearman:25,swordsman:15,light:0,heavy:0,ram:0,catapult:0,noble:0}}],active:0,map,marches:[],trainQueue:[],caravans:[],hero:{heroClass:'warrior',level:1,xp:0,hp:100,maxHp:100,mana:50,maxMana:50,attack:15,defense:10,armor:5,aura:5,points:5,talents:{warrior:0,commander:0,guardian:0},inventory:[{name:"Rezavý meč",slot:"weapon",attack:3,rarity:"common"}],equipped:{weapon:0,armor:-1}},tech:{},research:2,tribe:null,target:null,reports:[],expedition:null,stats:{battles:0,wins:0,kills:0,loot:0,play:0,started:Date.now()},ai:{vargan:{name:"Vargan",power:140,attitude:"neutrální"},morra:{name:"Morra",power:175,attitude:"nepřátelský"}}};
-}
-let G=JSON.parse(localStorage.getItem(KEY)||"null")||fresh();
-function save(){G.last=Date.now();localStorage.setItem(KEY,JSON.stringify(G));toast("💾 Hra uložena");playSound(600);}
-function v(){return G.villages[G.active]||G.villages[0]}
-function fmt(n){return Math.floor(n).toLocaleString("cs-CZ")}
-function tech(k){return !!G.tech[k]}
-
-function bonuses(){
- return {
-  prod: 1 + (Object.values(G.map).filter(x=>x.type==="oasis"&&x.owner==="player").length)*.05 + (tech("mining")?.15:0),
-  combat: 1 + (tech("metallurgy")?.10:0),
-  wallBonus: 1 + ((v().build.wall||0) * 0.15) // Hradby dají až +150% do obrany!
- };
+    return text.replace(urlRegex, (url) =>
+        `<a href="${url}" target="_blank" style="color: #0066cc; text-decoration: underline;">${url}</a>`
+    );
 }
 
-function production(){let b=v().build,m=bonuses().prod;return {wood:b.woodcutter*25*m,clay:b.claypit*20*m,iron:b.ironmine*15*m}}
-
-// KAPACITA ARMÁDY - TISÍCE JEDNOTEK DÍKY SELSKÉMU DVORU
-function population(){
- let used=0;for(let [k,c] of Object.entries(v().units))used+=c*(unitDefs[k]?.pop||1);
- let cap=500 + (v().build.farm * 750); // Lvl 10 = 8000 vojáků!
- return [used,cap];
+function updateThemeButtons() {
+    const isDark = document.body.classList.contains("dark-mode");
+    const icon = isDark ? "☀️" : "🌙";
+    document.querySelectorAll(".theme-btn").forEach(btn => {
+        btn.innerText = icon;
+    });
 }
 
-function tick(){
- let now=Date.now(),dt=Math.max(0,Math.min((now-G.last)/1000,7200));let p=production();
- G.resources.wood+=p.wood*dt/60;G.resources.clay+=p.clay*dt/60;G.resources.iron+=p.iron*dt/60;
- G.hero.hp=Math.min(G.hero.maxHp,G.hero.hp+dt*1.4);G.hero.mana=Math.min(G.hero.maxMana,G.hero.mana+dt*0.5);
- G.stats.play+=dt;
- 
- // Výcviková fronta jednotek
- if(G.trainQueue && G.trainQueue.length>0){
-  let item = G.trainQueue[0];
-  if(now >= item.end){
-   v().units[item.unit] = (v().units[item.unit]||0) + item.count;
-   toast(`⚔️ Dokončen výcvik: ${item.count}x ${unitDefs[item.unit].name}`);
-   playSound(700,'triangle',0.3);
-   G.trainQueue.shift();
-  }
- }
-
- // Pohyb armád na cestě
- if(G.marches){
-  for(let i=G.marches.length-1;i>=0;i--){
-   let m=G.marches[i];
-   if(now>=m.eta){
-    executeBattleScreen(m);
-    G.marches.splice(i,1);
-   }
-  }
- }
-
- levelHero();G.last=now;localStorage.setItem(KEY,JSON.stringify(G));render();
+function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+    const isDark = document.body.classList.contains("dark-mode");
+    localStorage.setItem("chatDarkMode", isDark);
+    updateThemeButtons();
 }
 
-function levelHero(){
- while(G.hero.xp>=G.hero.level*250){
-  G.hero.xp-=G.hero.level*250;G.hero.level++;
-  G.hero.points += 5; // 5 BODŮ ZA LEVEL!
-  G.hero.maxHp+=25;G.hero.hp=G.hero.maxHp;
-  toast("⭐ Hrdina postoupil na Level "+G.hero.level+"! (+5 Bodů)");
-  playSound(900,'triangle',0.5);
- }
+// Inicializace ikonek při načtení stránky
+if (localStorage.getItem("chatDarkMode") === "true") {
+    document.body.classList.add("dark-mode");
+}
+updateThemeButtons();
+
+function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const eyeOpen = btn.querySelector(".eye-open");
+    const eyeClosed = btn.querySelector(".eye-closed");
+
+    if (input.type === "password") {
+        input.type = "text";
+        eyeOpen.style.display = "none";
+        eyeClosed.style.display = "block";
+    } else {
+        input.type = "password";
+        eyeOpen.style.display = "block";
+        eyeClosed.style.display = "none";
+    }
 }
 
-function upgrade(k){
- let level=v().build[k]||0,def=bdefs[k],c={wood:def[2]*(level+1),clay:def[3]*(level+1),iron:def[4]*(level+1)};
- if(k==="stable"&&!tech("cavalry"))return toast("Vyžaduje výzkum Jezdecké umění");
- if(G.resources.wood<c.wood||G.resources.clay<c.clay||G.resources.iron<c.iron)return toast("Nedostatek surovin");
- G.resources.wood-=c.wood;G.resources.clay-=c.clay;G.resources.iron-=c.iron;v().build[k]=level+1;
- playSound(440,'square',0.2);render();
+function toggleEmojiPicker() {
+    const picker = document.getElementById("emojiPicker");
+
+    picker.style.display =
+        picker.style.display === "grid"
+            ? "none"
+            : "grid";
 }
 
-// HROMADNÝ VÝCVIK VOJSKA (BULK TRAINING)
-function trainBulk(unitKey,amount){
- if(amount<=0) return;
- let d=unitDefs[unitKey], V=v(), p=population();
- if(p[0] + (d.pop*amount) > p[1]) return toast("Kapacita Selského dvora je plná!");
- 
- let totalCost=[d.cost[0]*amount, d.cost[1]*amount, d.cost[2]*amount];
- if(G.resources.wood<totalCost[0]||G.resources.clay<totalCost[1]||G.resources.iron<totalCost[2]) return toast("Nedostatek surovin na celou dávku!");
- 
- G.resources.wood-=totalCost[0];G.resources.clay-=totalCost[1];G.resources.iron-=totalCost[2];
- 
- // Výpočet času (Kasárna/Stáje zkracují čas!)
- let buildLvl = d.type==="barracks"?V.build.barracks:V.build.stable;
- let speedMult = Math.max(0.3, 1 - (buildLvl * 0.08)); // Každý lvl zkrátí čas o 8%
- let totalTime = Math.ceil(d.baseTrain * amount * speedMult);
- 
- let startTime = G.trainQueue.length>0 ? G.trainQueue[G.trainQueue.length-1].end : Date.now();
- G.trainQueue.push({unit:unitKey, count:amount, end: startTime + (totalTime*1000)});
- 
- toast(`🛠️ Zadáno do výcviku: ${amount}x ${d.name} (${totalTime}s)`);
- playSound(350,'triangle',0.1);
- render();
+function insertEmoji(emoji) {
+    const input = document.getElementById("messageInput");
+
+    input.value += emoji;
+    input.focus();
+
+    document.getElementById("emojiPicker").style.display = "none";
 }
 
-function startMarch(){
- if(!G.target) return toast("Vyber cíl na mapě!");
- let V=v(), sent={}, totalPower=0, totalCount=0;
- for(let k in unitDefs){
-  let val=parseInt(document.getElementById("send_"+k)?.value)||0;
-  if(val>0){sent[k]=val; V.units[k]-=val; totalPower+=val*unitDefs[k].power; totalCount+=val;}
- }
- if(totalCount===0) return toast("Nevyslal jsi žádné vojsko!");
- 
- let marchTime=10; // 10s pochod
- G.marches.push({targetKey:G.target, sent:sent, power:totalPower, eta:Date.now()+(marchTime*1000)});
- toast(`🥾 Armáda (${totalCount} vojáků) vyrazila na cíl ${G.target}!`);
- closeModal();render();
+if ("Notification" in window && Notification.permission === "default") {
+    Notification.requestPermission();
 }
 
-// BOJOVÁ LOGIKA A NAVRÁCENÍ ARMÁDY DOMŮ!
-function executeBattleScreen(m){
- let tile=G.map[m.targetKey];
- let wallLvl=tile.wall||0;
- let wallBonus=1+(wallLvl*0.15);
- 
- let defPower=(tile.type==="ai"?180:tile.type==="boss"?600:100)*wallBonus;
- let attPower=m.power*bonuses().combat*(1 + G.hero.aura/100);
- 
- // Beranidla ničí hradby
- if(m.sent.ram>0 && wallLvl>0){
-  tile.wall=Math.max(0, wallLvl - Math.ceil(m.sent.ram/5));
- }
+/* ================================= */
+/* ZVUKY A NOTIFIKACE */
+/* ================================= */
 
- let win = attPower > defPower;
- let loot = win ? Math.floor(300 + Math.random()*500) : 0;
- 
- // Výpočet přeživších (ARMÁDA SE NEVYPARÍ!)
- let survivors={};
- let lossRate = win ? (defPower / (attPower * 2)) : 1; // Při jasné výhře minimální ztráty!
- for(let k in m.sent){
-  let lost = Math.floor(m.sent[k] * lossRate);
-  survivors[k] = Math.max(0, m.sent[k] - lost);
-  v().units[k] = (v().units[k]||0) + survivors[k]; // NAVRÁCENÍ DOMŮ!
- }
+function playSelectedNotificationSound(soundType) {
+    const selected = soundType || localStorage.getItem("chatNotificationSound") || "icq";
 
- if(win){
-  G.resources.wood+=loot;G.resources.gold+=Math.floor(loot*0.2);
-  if(tile.type==="oasis"){tile.owner="player";toast("🌿 Oáza byla dobyta!");}
-  if(tile.type==="boss"){tile.type="wild";G.hero.xp+=300;toast("🐉 Boss poražen!");}
-  G.stats.wins++;
- }
-
- // Vytvoření detailního reportu pro rozkliknutí
- let reportObj={
-  id: Date.now(),
-  date: new Date().toLocaleString("cs-CZ"),
-  target: m.targetKey,
-  win: win,
-  attPower: Math.floor(attPower),
-  defPower: Math.floor(defPower),
-  sent: m.sent,
-  survivors: survivors,
-  loot: loot
- };
- G.reports.unshift(reportObj);
- G.stats.battles++;
-
- // Otevření bojového oknka
- openReportModal(reportObj);
+    if (selected === "icq") {
+        try {
+            const audio = new Audio('icq.mp3');
+            audio.play().catch(e => {
+                playIcqOscillators();
+            });
+        } catch(e) {
+            playIcqOscillators();
+        }
+    } else {
+        playSynthesizedSound(selected);
+    }
 }
 
-function openReportModal(r){
- let sentStr = Object.entries(r.sent).map(([k,v])=>`${unitDefs[k].name}: ${v} (Přežilo: ${r.survivors[k]||0})`).join("<br>");
- openModal(`
-  <h2 style="text-align:center;color:${r.win?'var(--green)':'var(--red)'}">${r.win?'🏆 VÍTĚZSTVÍ!':'💀 PORÁŽKA!'}</h2>
-  <div class="battle-screen">
-   <div class="battle-side"><h3>⚔️ Útok</h3><p>Síla: <b>${r.attPower}</b></p></div>
-   <div class="battle-side"><h3>🛡️ Obrana</h3><p>Síla: <b>${r.defPower}</b></p></div>
-  </div>
-  <div style="margin-top:12px;background:#0c1118;padding:10px;border-radius:8px">
-   <h4>📊 Detail Vojska:</h4>
-   <p style="font-size:12px;color:var(--muted)">${sentStr}</p>
-   <hr>
-   <p class="gold">Kořist: 🌲 ${r.loot} surovin | Přeživší vojsko se vrátilo do osady!</p>
-  </div>
- `);
+function playSynthesizedSound(type) {
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+
+        const now = audioCtx.currentTime;
+
+        if (type === "beep") {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, now);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.15);
+        } else if (type === "pop") {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.08);
+        } else if (type === "chime") {
+            [523.25, 659.25, 783.99].forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                gain.gain.setValueAtTime(0.15, now + idx * 0.08);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.25);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now + idx * 0.08);
+                osc.stop(now + idx * 0.08 + 0.25);
+            });
+        }
+    } catch(e) {
+        console.error("Synthesized sound error:", e);
+    }
 }
 
-function render(){
- let p=population();document.getElementById("wood").textContent=fmt(G.resources.wood);document.getElementById("clay").textContent=fmt(G.resources.clay);document.getElementById("iron").textContent=fmt(G.resources.iron);document.getElementById("gold").textContent=fmt(G.resources.gold);document.getElementById("pop").textContent=p[0]+"/"+p[1];
- let V=v();document.getElementById("vname").textContent=V.name+" ["+V.x+"|"+V.y+"]";document.getElementById("era").textContent=G.hero.level>=5?"Éra II":"Éra I";
- 
- Object.keys(bdefs).forEach(k=>{
-  let el=document.getElementById("spot-"+k);
-  if(el){el.classList.toggle("unbuilt",(V.build[k]||0)===0);el.querySelector("[data-b]").textContent=V.build[k]||0;}
- });
+function playIcqOscillators() {
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
 
- document.getElementById("buildings").innerHTML=Object.entries(bdefs).map(([k,d])=>{
-  let l=V.build[k]||0, c={wood:d[2]*(l+1),clay:d[3]*(l+1),iron:d[4]*(l+1)};
-  return `<div class="card build"><h3>${d[0]} ${d[1]}</h3><div>Úroveň <b>${l}</b></div><div class="cost">Další: 🌲${c.wood} 🧱${c.clay} ⛓️${c.iron}</div><button onclick="upgrade('${k}')">Vylepšit</button></div>`
- }).join("");
- 
- document.getElementById("economy").innerHTML=`<div class="cards"><div class="card">🌲/min <b>${fmt(production().wood)}</b></div><div class="card">🧱/min <b>${fmt(production().clay)}</b></div><div class="card">⛓️/min <b>${fmt(production().iron)}</b></div></div>`;
- document.getElementById("event").innerHTML=`Obranný bonus Hradeb: <b class="ok">+${Math.round((bonuses().wallBonus-1)*100)} %</b>`;
- 
- renderMap();renderArmy();renderHero();renderMagic();renderReports();renderStats();
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(320, audioCtx.currentTime); 
+        gain1.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+        osc1.connect(gain1);
+        gain1.connect(audioCtx.destination);
+        osc1.start(audioCtx.currentTime);
+        osc1.stop(audioCtx.currentTime + 0.12);
+
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(510, audioCtx.currentTime + 0.13); 
+        gain2.gain.setValueAtTime(0.25, audioCtx.currentTime + 0.13);
+        gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+        osc2.connect(gain2);
+        gain2.connect(audioCtx.destination);
+        osc2.start(audioCtx.currentTime + 0.13);
+        osc2.stop(audioCtx.currentTime + 0.35);
+    } catch(e) {
+        console.error("Oscillator error:", e);
+    }
 }
 
-function renderMap(){
- let icon={wild:"",village:"🏰",enemy:"🏚️",oasis:"🌿",artifact:"✨",world:"🏛️",ai:"⚑",boss:"🐉"};
- document.getElementById("mapgrid").innerHTML=Object.entries(G.map).map(([k,t])=>{
-  let [x,y]=k.split("|");
-  return `<div class="tile ${t.type}" onclick="selectTile('${k}')">${icon[t.type]||""}<span class="coord">${x}|${y}</span></div>`
- }).join("");
+function testNotificationSound() {
+    const selected = document.getElementById("soundSelect").value;
+    playSelectedNotificationSound(selected);
 }
 
-function selectTile(k){
- G.target=k;
- let t=G.map[k];let [x,y]=k.split("|");
- document.getElementById("tileInfo").innerHTML=`
-  <h3>[${x}|${y}] — ${t.type.toUpperCase()}</h3>
-  <p>Hradby: Level ${t.wall||0}</p>
-  <button class="primary" onclick="openAttackModal()">⚔️ Vyslat Útok</button>
- `;
+async function triggerNotification(nickname, text) {
+    if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+        try {
+            const { LocalNotifications } = window.Capacitor.Plugins;
+            if (LocalNotifications) {
+                let perm = await LocalNotifications.checkPermissions();
+                if (perm.display !== 'granted') {
+                    perm = await LocalNotifications.requestPermissions();
+                }
+
+                if (perm.display === 'granted') {
+                    await LocalNotifications.createChannel({
+                        id: 'icq_sound_channel_v2',
+                        name: 'ICQ Notifikace V2',
+                        description: 'Kanál pro zprávy s ICQ zvukem',
+                        sound: 'icq',
+                        importance: 5,
+                        visibility: 1,
+                        vibration: true
+                    });
+
+                    await LocalNotifications.schedule({
+                        notifications: [
+                            {
+                                title: `Zpráva od ${nickname}`,
+                                body: text,
+                                id: Math.floor(Math.random() * 100000),
+                                schedule: { at: new Date(Date.now() + 100) },
+                                channelId: 'icq_sound_channel_v2',
+                                sound: 'icq'
+                            }
+                        ]
+                    });
+                }
+            }
+        } catch (e) {
+            console.error("Chyba při odesílání nativní notifikace:", e);
+        }
+    }
+
+    playSelectedNotificationSound();
 }
 
-function openAttackModal(){
- if(!G.target) return toast("Vyber cíl na mapě!");
- let V=v();
- let rows=Object.entries(unitDefs).map(([k,d])=>`
-  <div class="units-train-box row">
-   <span>${d.name} (máš ${V.units[k]||0})</span>
-   <input type="number" id="send_${k}" min="0" max="${V.units[k]||0}" value="0" style="width:70px">
-  </div>
- `).join("");
- openModal(`<h2>⚔️ Příprava Vojska na Útok</h2><p>Cíl: [${G.target}]</p>${rows}<button class="primary" style="width:100%;margin-top:10px" onclick="startMarch()">VYSLAT ARMÁDU</button>`);
+/* ================================= */
+/* SUPABASE A GLOBÁLNÍ PROMĚNNÉ */
+/* ================================= */
+
+const SUPABASE_URL = "https://jdvyfigrazambxtnqpkq.supabase.co";
+const SUPABASE_KEY = "sb_publishable_YKO_HGnM6so7hNtg_naIeQ_cYX40nxJ";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const CHAT_PASSWORD = "Krsmol2027";
+
+let presenceChannel = null;
+let messagesChannel = null;
+let currentUser = null;
+let currentNickname = null;
+let chatInterval = null;
+let roomAuthenticated = false;
+
+// Proměnné pro sledování nových zpráv a spouštění notifikací
+let knownMessageIds = new Set();
+let isFirstLoad = true;
+
+
+/* ================================= */
+/* POSLUCHAČ OBNOVY HESLA */
+/* ================================= */
+
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'PASSWORD_RECOVERY') {
+        document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
+        document.getElementById('updatePasswordBox').style.display = 'block';
+    }
+});
+
+
+/* ================================= */
+/* HESLO MÍSTNOSTI A MENU LOGIKA */
+/* ================================= */
+
+function verifyRoomPassword() {
+    const input = document.getElementById("roomPasswordInput").value;
+    const msg = document.getElementById("roomPasswordMessage");
+
+    if (input === CHAT_PASSWORD) {
+        roomAuthenticated = true;
+        document.getElementById("roomPasswordMessage").innerText = "";
+        document.getElementById("roomPasswordInput").value = "";
+        showDashboard();
+    } else {
+        msg.innerText = "❌ Nesprávné heslo.";
+        msg.className = "error";
+    }
 }
 
-function renderArmy(){
- let V=v();
- document.getElementById("armyList").innerHTML=Object.entries(unitDefs).map(([k,d])=>`
-  <div class="card row"><span>${d.name}</span><b>${V.units[k]||0} vojáků</b></div>
- `).join("");
-
- document.getElementById("training").innerHTML=Object.entries(unitDefs).map(([k,d])=>`
-  <div class="units-train-box">
-   <div class="row"><b>${d.name}</b><small class="muted">🌲${d.cost[0]} 🧱${d.cost[1]} ⛓️${d.cost[2]}</small></div>
-   <div class="bulk-btns">
-    <button onclick="trainBulk('${k}', 1)">+1</button>
-    <button onclick="trainBulk('${k}', 10)">+10</button>
-    <button onclick="trainBulk('${k}', 100)">+100</button>
-   </div>
-  </div>
- `).join("");
-
- let qStr = G.trainQueue.map(q=>`
-  <div class="card row"><span>${q.count}x ${unitDefs[q.unit].name}</span><b>${Math.ceil(Math.max(0, q.end-Date.now())/1000)}s</b></div>
- `).join("");
- document.getElementById("trainQueue").innerHTML = qStr || "Žádný výcvik neprobíhá.";
+function showDashboard() {
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
+    document.getElementById("dashboardBox").style.display = "block";
 }
 
-function renderHero(){
- let h=G.hero;
- document.getElementById("hlvl").textContent=h.level;
- document.getElementById("heroStats").innerHTML=`
-  <div class="card">
-   <div class="row"><b>❤️ HP: ${fmt(h.hp)}/${h.maxHp}</b><b>⭐ XP: ${fmt(h.xp)}</b></div>
-   <p>Volné body k rozdělení: <b class="gold">${h.points}</b></p>
-  </div>
-  <div class="cards" style="margin-top:8px">
-   <div class="card">⚔️ Útok: <b>${h.attack}</b> ${h.points?`<button class="small" onclick="heroPoint('attack')">+1</button>`:''}</div>
-   <div class="card">✨ Aura Armády: <b>+${h.aura}%</b> ${h.points?`<button class="small" onclick="heroPoint('aura')">+1</button>`:''}</div>
-  </div>
- `;
-
- document.getElementById("inventory").innerHTML=h.inventory.map((it,i)=>`
-  <div class="card">
-   <b>${it.name}</b> [+${it.attack||0} útok]
-   <button class="small danger" style="margin-top:5px" onclick="sellItem(${i})">💰 Prodat za 50 Zlata</button>
-  </div>
- `).join("");
+function openPolls() {
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
+    document.getElementById("pollsBox").style.display = "block";
 }
 
-function heroPoint(k){if(G.hero.points>0){G.hero[k]++;G.hero.points--;render();}}
-function sellItem(i){G.resources.gold+=50;G.hero.inventory.splice(i,1);toast("💰 Prodáno za 50 zlata");render();}
-
-function renderMagic(){
- document.getElementById("mana-val").innerText=`${Math.floor(G.hero.mana)} / ${G.hero.maxMana}`;
- document.getElementById("mana-bar-fill").style.width=`${(G.hero.mana/G.hero.maxMana)*100}%`;
- document.getElementById("spellBook").innerHTML=Object.entries(spells).map(([k,s])=>`
-  <div class="card"><h3>${s.name}</h3><p class="muted">${s.desc}</p><button class="primary" onclick="castSpell('${k}')">Seslat (${s.mana} M)</button></div>
- `).join("");
+function openInfo() {
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
+    document.getElementById("infoBox").style.display = "block";
 }
 
-function castSpell(k){
- if(G.hero.mana<spells[k].mana) return toast("Nedostatek many!");
- G.hero.mana-=spells[k].mana;
- if(k==="harvest"){G.resources.wood+=300;G.resources.clay+=300;G.resources.iron+=300;}
- toast("✨ Kouzlo sesláno!");render();
+async function showProfileSettings() {
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
+    document.getElementById("profileBox").style.display = "block";
+    document.getElementById("profileMessage").innerText = "";
+    
+    document.getElementById("settingsNewPassword").value = "";
+    document.getElementById("settingsConfirmPassword").value = "";
+
+    const savedSound = localStorage.getItem("chatNotificationSound") || "icq";
+    document.getElementById("soundSelect").value = savedSound;
+
+    if (!currentUser) return;
+
+    const { data: profile } = await supabaseClient
+        .from("profiles")
+        .select("color, status")
+        .eq("id", currentUser.id)
+        .maybeSingle();
+
+    if (profile) {
+        if (profile.color) document.getElementById("favColor").value = profile.color;
+        if (profile.status) document.getElementById("userStatusInput").value = profile.status;
+    }
 }
 
-function renderReports(){
- document.getElementById("reportsList").innerHTML=G.reports.map((r,i)=>`
-  <div class="card row" style="cursor:pointer" onclick="openReportModal(G.reports[${i}])">
-   <span><b>${r.win?'🏆 Vítězství':'💀 Porážka'}</b> na [${r.target}]</span>
-   <small class="muted">${r.date}</small>
-  </div>
- `).join("") || "<p class='muted'>Zatím žádné reporty.</p>";
+async function saveProfileSettings() {
+    if (!currentUser) return;
+
+    const color = document.getElementById("favColor").value;
+    const statusText = document.getElementById("userStatusInput").value.trim();
+    const soundChoice = document.getElementById("soundSelect").value;
+    const newPassword = document.getElementById("settingsNewPassword").value;
+    const confirmPassword = document.getElementById("settingsConfirmPassword").value;
+    const msg = document.getElementById("profileMessage");
+
+    msg.innerText = "Ukládám...";
+    msg.className = "info";
+
+    localStorage.setItem("chatNotificationSound", soundChoice);
+
+    const { error: profileError } = await supabaseClient
+        .from("profiles")
+        .update({ 
+            color: color,
+            status: statusText
+        })
+        .eq("id", currentUser.id);
+
+    if (profileError) {
+        msg.innerText = "❌ Chyba při ukládání profilu: " + profileError.message;
+        msg.className = "error";
+        return;
+    }
+
+    if (newPassword || confirmPassword) {
+        if (newPassword.length < 6) {
+            msg.innerText = "❌ Nové heslo musí mít alespoň 6 znaků.";
+            msg.className = "error";
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            msg.innerText = "❌ Zadaná hesla se neshodují.";
+            msg.className = "error";
+            return;
+        }
+
+        const { error: passwordError } = await supabaseClient.auth.updateUser({
+            password: newPassword
+        });
+
+        if (passwordError) {
+            msg.innerText = "❌ Chyba při změně hesla: " + passwordError.message;
+            msg.className = "error";
+            return;
+        }
+
+        document.getElementById("settingsNewPassword").value = "";
+        document.getElementById("settingsConfirmPassword").value = "";
+    }
+
+    msg.innerText = "✅ Nastavení bylo úspěšně uloženo!";
+    msg.className = "success";
+    
+    await loadMessages();
+    await loadUsers();
+
+    setTimeout(() => {
+        showDashboard();
+    }, 1500);
 }
 
-function openGuide(){
- openModal(`
-  <h2>📖 Královský Deník & Nápověda</h2>
-  <div class="card" style="margin-bottom:8px">
-   <h3>🌲 Jak získat suroviny?</h3>
-   <p class="muted">Vylepšuj Dřevorubce, Hliníkárnu a Důl na železo ve Vesnici, nebo sesílej Cereální Požehnání v záložce Magie.</p>
-  </div>
-  <div class="card">
-   <h3>⚔️ Jak verbovat tisíce vojáků?</h3>
-   <p class="muted">Vylepšuj Selský dvůr pro navýšení kapacity. V záložce Armáda používej tlačítka +10 a +100.</p>
-  </div>
- `);
+function backToRoomPassword() {
+    roomAuthenticated = false;
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
+    document.getElementById("chatPasswordBox").style.display = "block";
 }
 
-function settings(){
- openModal(`
-  <h2>⚙️ Nastavení</h2>
-  <label><input type="checkbox" ${soundSettings.sfx?'checked':''} onchange="soundSettings.sfx=this.checked"> 🔊 Zvukové efekty</label><br><br>
-  <button onclick="save();closeModal()">💾 Uložit hra</button> 
-  <button class="danger" onclick="hardReset()">☠️ Hard Reset</button>
- `);
+function enterChatFlow() {
+    document.getElementById("dashboardBox").style.display = "none";
+    checkSession();
 }
 
-function renderStats(){document.getElementById("statsPanel").innerHTML=`<div class="card">Bitvy: <b>${G.stats.battles}</b> | Vítězství: <b>${G.stats.wins}</b></div>`;}
-function openModal(s){document.getElementById("modalContent").innerHTML=s;document.getElementById("modal").classList.add("show")}
-function closeModal(){document.getElementById("modal").classList.remove("show")}
-function hardReset(){if(confirm('Opravdu smazat celé impérium?')){localStorage.removeItem(KEY);sessionStorage.removeItem('auth');location.reload();}}
-function toast(s){let e=document.getElementById("toast");e.textContent=s;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1900)}
-function showTab(id){document.querySelectorAll(".page").forEach(e=>e.style.display=e.id===id?"block":"none");document.querySelectorAll(".tab").forEach(e=>e.classList.toggle("active",e.dataset.tab===id))}
-document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+function backToDashboardFromChat() {
+    if (chatInterval) {
+        clearInterval(chatInterval);
+        chatInterval = null;
+    }
+    
+    if (presenceChannel) {
+        try {
+            presenceChannel.untrack();
+        } catch(e) {}
+    }
 
-if(sessionStorage.getItem('auth')==='true'){document.getElementById('login-overlay').style.display='none';}
-render();setInterval(tick,1000);
+    document.getElementById("chat").style.display = "none";
+    showDashboard();
+}
+
+
+/* ================================= */
+/* PŘIHLAŠOVÁNÍ A OBNOVA HESLA */
+/* ================================= */
+
+function showRegister() {
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
+    document.getElementById("registerBox").style.display = "block";
+}
+
+function showLogin() {
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
+    document.getElementById("loginBox").style.display = "block";
+}
+
+function showResetPassword() {
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
+    document.getElementById("resetPasswordBox").style.display = "block";
+}
+
+async function sendResetPassword() {
+    const email = document.getElementById("resetEmail").value.trim();
+    const msg = document.getElementById("resetMessage");
+
+    if (!email) {
+        msg.innerText = "Zadej e-mail pro obnovu hesla.";
+        msg.className = "error";
+        return;
+    }
+
+    msg.innerText = "Odesílám...";
+    msg.className = "info";
+
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + window.location.pathname
+    });
+
+    if (error) {
+        msg.innerText = "❌ Chyba: " + error.message;
+        msg.className = "error";
+    } else {
+        msg.innerText = "✅ E-mail s odkazem byl odeslán. Zkontroluj si schránku a spam.";
+        msg.className = "success";
+        document.getElementById("resetEmail").value = "";
+    }
+}
+
+async function updatePassword() {
+    const newPassword = document.getElementById("newPasswordInput").value;
+    const confirmPassword = document.getElementById("newPasswordConfirmInput").value;
+    const msg = document.getElementById("updatePasswordMessage");
+
+    if (!newPassword || newPassword.length < 6) {
+        msg.innerText = "Heslo musí mít alespoň 6 znaků.";
+        msg.className = "error";
+        return;
+    }
+
+    if (newPassword !== confirmPassword) {
+        msg.innerText = "Hesla se neshodují.";
+        msg.className = "error";
+        return;
+    }
+
+    msg.innerText = "Ukládám...";
+    msg.className = "info";
+
+    const { error } = await supabaseClient.auth.updateUser({
+        password: newPassword
+    });
+
+    if (error) {
+        msg.innerText = "❌ Chyba při změně hesla: " + error.message;
+        msg.className = "error";
+    } else {
+        msg.innerText = "✅ Heslo bylo úspěšně změněno! Za chvíli tě vrátíme zpět.";
+        msg.className = "success";
+        
+        setTimeout(() => {
+            document.getElementById("newPasswordInput").value = "";
+            document.getElementById("newPasswordConfirmInput").value = "";
+            backToRoomPassword(); 
+        }, 3000);
+    }
+}
+
+
+/* ================================= */
+/* REGISTRACE */
+/* ================================= */
+
+async function register() {
+    const email = document.getElementById("registerEmail").value.trim();
+    const password = document.getElementById("registerPassword").value;
+    const passwordConfirm = document.getElementById("registerPasswordConfirm").value;
+    const nickname = document.getElementById("registerNickname").value.trim();
+    const message = document.getElementById("registerMessage");
+
+    if (!email || !password || !passwordConfirm || !nickname) {
+        message.innerText = "Vyplň všechna pole.";
+        message.className = "error";
+        return;
+    }
+
+    if (password !== passwordConfirm) {
+        message.innerText = "Hesla se neshodují.";
+        message.className = "error";
+        return;
+    }
+
+    if (password.length < 6) {
+        message.innerText = "Heslo musí mít alespoň 6 znaků.";
+        message.className = "error";
+        return;
+    }
+
+    const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+            data: { nickname },
+            emailRedirectTo: window.location.origin + window.location.pathname
+        }
+    });
+
+    if (error) {
+        message.innerText = "❌ " + error.message;
+        message.className = "error";
+        return;
+    }
+
+    if (data.session) {
+        message.innerText = "✅ Účet vytvořen.";
+        message.className = "success";
+        await checkProfile();
+        return;
+    }
+
+    message.innerText = "✅ Účet vytvořen. Potvrď e-mail.";
+    message.className = "success";
+}
+
+
+/* ================================= */
+/* LOGIN */
+/* ================================= */
+
+async function login() {
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    const message = document.getElementById("loginMessage");
+
+    if (!email || !password) {
+        message.innerText = "Vyplň e-mail a heslo.";
+        message.className = "error";
+        return;
+    }
+
+    const { error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+    });
+
+    if (error) {
+        message.innerText = "❌ " + error.message;
+        message.className = "error";
+        return;
+    }
+
+    await checkProfile();
+}
+
+
+/* ================================= */
+/* PROFIL */
+/* ================================= */
+
+async function checkProfile() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) return;
+
+    currentUser = user;
+
+    const { data: profile } = await supabaseClient
+        .from("profiles")
+        .select("nickname")
+        .eq("id", user.id)
+        .maybeSingle();
+
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("registerBox").style.display = "none";
+
+    if (profile) {
+        return openChat(profile.nickname);
+    }
+
+    const savedNickname = user.user_metadata?.nickname;
+
+    if (savedNickname) {
+        const { data: newProfile } = await supabaseClient
+            .from("profiles")
+            .insert({
+                id: user.id,
+                nickname: savedNickname
+            })
+            .select("nickname")
+            .single();
+
+        if (newProfile) {
+            return openChat(newProfile.nickname);
+        }
+    }
+
+    document.getElementById("nicknameBox").style.display = "block";
+}
+
+
+/* ================================= */
+/* ULOŽENÍ PŘEZDÍVKY */
+/* ================================= */
+
+async function saveNickname() {
+    const nickname = document.getElementById("nickname").value.trim();
+    if (!nickname) {
+        alert("Přezdívka nesmí být prázdná!");
+        return;
+    }
+
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) {
+        alert("Nejsi přihlášen!");
+        return;
+    }
+
+    const { data, error } = await supabaseClient
+        .from("profiles")
+        .insert({
+            id: user.id,
+            nickname: nickname
+        })
+        .select("nickname")
+        .single();
+
+    if (error) {
+        console.error("Chyba Supabase:", error);
+        alert("Chyba při ukládání: " + error.message);
+        return;
+    }
+
+    openChat(data.nickname);
+}
+
+
+/* ================================= */
+/* OTEVŘENÍ CHATU */
+/* ================================= */
+
+async function openChat(nickname) {
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
+    document.getElementById("chat").style.display = "block";
+
+    currentNickname = nickname;
+    document.getElementById("currentNickname").innerText = nickname;
+
+    knownMessageIds.clear();
+    isFirstLoad = true;
+
+    await loadMessages();
+    await loadUsers();
+    await startPresence();
+
+    if (chatInterval) clearInterval(chatInterval);
+
+    chatInterval = setInterval(() => {
+        if (!isSearching) {
+            loadMessages();
+        }
+    }, 3000);
+}
+
+
+/* ================================= */
+/* UŽIVATELÉ */
+/* ================================= */
+
+async function loadUsers() {
+    const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("id, nickname, color, status")
+        .order("nickname", { ascending: true });
+
+    if (!error) {
+        renderUsers(data || []);
+    }
+}
+
+function renderUsers(users) {
+    const usersList = document.getElementById("usersList");
+    const onlineCountSpan = document.getElementById("onlineCount");
+    usersList.innerHTML = "";
+
+    if (!users.length) {
+        usersList.innerText = "Zatím nejsou žádní uživatelé.";
+        if (onlineCountSpan) onlineCountSpan.innerText = "0";
+        return;
+    }
+
+    const onlineUsers = getOnlineUserIds();
+    if (onlineCountSpan) {
+        onlineCountSpan.innerText = onlineUsers.size;
+    }
+
+    users.forEach(user => {
+        const div = document.createElement("div");
+        div.className = "userItem";
+
+        const status = document.createElement("span");
+        status.className = "userStatus";
+
+        const avatar = document.createElement("div");
+        avatar.className = "avatar avatar-small";
+        avatar.style.backgroundColor = user.color || getAvatarColor(user.nickname);
+        avatar.textContent = user.nickname ? user.nickname.charAt(0) : "?";
+
+        const nickname = document.createElement("span");
+        nickname.className = "userNickname";
+        nickname.textContent = user.nickname;
+
+        if (onlineUsers.has(user.id)) {
+            status.textContent = "🟢";
+        } else {
+            status.textContent = "🔴";
+            nickname.classList.add("offline");
+        }
+
+        div.appendChild(status);
+        div.appendChild(avatar);
+        div.appendChild(nickname);
+
+        if (user.status) {
+            const customStatus = document.createElement("span");
+            customStatus.className = "userCustomStatus";
+            customStatus.textContent = user.status;
+            customStatus.title = user.status;
+            div.appendChild(customStatus);
+        }
+
+        usersList.appendChild(div);
+    });
+}
+
+function getOnlineUserIds() {
+    const onlineUsers = new Set();
+    if (presenceChannel) {
+        Object.values(presenceChannel.presenceState()).forEach(entries =>
+            entries.forEach(entry => {
+                if (entry.user_id) {
+                    onlineUsers.add(entry.user_id);
+                }
+            })
+        );
+    }
+    return onlineUsers;
+}
+
+
+/* ================================= */
+/* PRESENCE + TYPING */
+/* ================================= */
+
+async function startPresence() {
+    if (!currentUser || !currentNickname || presenceChannel) {
+        return;
+    }
+
+    presenceChannel = supabaseClient.channel("chat-online-users", {
+        config: { presence: { key: currentUser.id } }
+    });
+
+    presenceChannel
+        .on("presence", { event: "sync" }, () => loadUsers())
+        .on("presence", { event: "join" }, () => loadUsers())
+        .on("presence", { event: "leave" }, () => loadUsers())
+        .on("broadcast", { event: "typing" }, payload => {
+            if (payload.payload.user_id !== currentUser.id) {
+                const indicator = document.getElementById("typingIndicator");
+                indicator.innerText = `${payload.payload.nickname} právě píše...`;
+                clearTimeout(window.typingTimeoutTimer);
+                window.typingTimeoutTimer = setTimeout(() => {
+                    indicator.innerText = "";
+                }, 2000);
+            }
+        });
+
+    presenceChannel.subscribe(async status => {
+        if (status === "SUBSCRIBED") {
+            await presenceChannel.track({
+                user_id: currentUser.id,
+                nickname: currentNickname,
+                online_at: new Date().toISOString()
+            });
+            loadUsers();
+        }
+    });
+}
+
+function handleTyping() {
+    if (presenceChannel) {
+        presenceChannel.send({
+            type: "broadcast",
+            event: "typing",
+            payload: {
+                user_id: currentUser.id,
+                nickname: currentNickname
+            }
+        });
+    }
+}
+
+
+/* ================================= */
+/* NAČTENÍ ZPRÁV + REAKCÍ + NOTIFIKACE */
+/* ================================= */
+
+async function loadMessages() {
+    const { data: messagesData, error: messagesError } = await supabaseClient
+        .from("messages")
+        .select("id, user_id, nickname, message, created_at, is_edited")
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+    if (messagesError) {
+        console.error("Chyba při načítání zpráv:", messagesError);
+        document.getElementById("messages").innerText = "Chyba při načítání zpráv.";
+        return;
+    }
+
+    let profilesMap = {};
+    const { data: profilesData } = await supabaseClient
+        .from("profiles")
+        .select("id, color");
+    
+    if (profilesData) {
+        profilesData.forEach(p => { profilesMap[p.id] = p.color; });
+    }
+
+    let reactionsData = [];
+    if (messagesData && messagesData.length > 0) {
+        const messageIds = messagesData.map(msg => msg.id);
+        const { data: rxData, error: rxError } = await supabaseClient
+            .from("reactions")
+            .select("message_id, emoji, user_id")
+            .in("message_id", messageIds);
+            
+        if (!rxError && rxData) {
+            reactionsData = rxData;
+        }
+    }
+
+    messagesData.forEach(msg => {
+        msg.reactions = reactionsData.filter(rx => rx.message_id === msg.id);
+        msg.userColor = profilesMap[msg.user_id] || getAvatarColor(msg.nickname);
+    });
+
+    const messages = document.getElementById("messages");
+    const isAtBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 50;
+
+    messages.innerHTML = "";
+
+    if (messagesData) {
+        const reversedData = [...messagesData].reverse();
+
+        reversedData.forEach(message => {
+            if (!isFirstLoad && !knownMessageIds.has(message.id) && message.user_id !== (currentUser ? currentUser.id : null)) {
+                triggerNotification(message.nickname, message.message);
+            }
+            
+            knownMessageIds.add(message.id);
+            addMessage(message, currentUser ? currentUser.id : null);
+        });
+        
+        isFirstLoad = false;
+    }
+
+    if (isAtBottom) {
+        messages.scrollTop = messages.scrollHeight;
+    }
+}
+
+
+/* ================================= */
+/* VYKRESLENÍ ZPRÁVY */
+/* ================================= */
+
+function addMessage(message, currentUserId) {
+    if (document.getElementById(`msg-${message.id}`)) {
+        return;
+    }
+
+    const isMine = message.user_id === currentUserId;
+    const div = document.createElement("div");
+    div.id = `msg-${message.id}`;
+    div.className = "message " + (isMine ? "mine" : "other");
+
+    /* PŘEZDÍVKA A AVATAR */
+    const nickWrapper = document.createElement("div");
+    nickWrapper.className = "nickname-wrapper";
+    
+    const avatarColor = message.userColor || getAvatarColor(message.nickname);
+    nickWrapper.style.backgroundColor = avatarColor;
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = message.nickname ? message.nickname.charAt(0) : "?";
+
+    const nickname = document.createElement("span");
+    nickname.className = "nickname";
+    nickname.textContent = message.nickname;
+
+    if (isMine) {
+        nickWrapper.style.flexDirection = "row-reverse";
+    }
+
+    nickWrapper.appendChild(avatar);
+    nickWrapper.appendChild(nickname);
+
+    /* TEXT */
+    const text = document.createElement("span");
+    text.className = "text";
+    text.innerHTML = linkify(message.message);
+
+    /* ČAS */
+    const time = document.createElement("span");
+    time.className = "time";
+    const date = new Date(message.created_at);
+    time.textContent = !isNaN(date.getTime())
+        ? date.toLocaleString("cs-CZ", {
+            timeZone: "Europe/Prague",
+            day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit"
+        }) : "čas neznámý";
+
+    if (message.is_edited) {
+        time.innerHTML += ' <span class="edited-label">(upraveno)</span>';
+    }
+
+    div.appendChild(nickWrapper);
+    div.appendChild(text);
+
+    /* ROZBALOVACÍ REAKCE */
+    const reactionContainer = document.createElement("div");
+    reactionContainer.className = "reaction-container";
+
+    if (message.reactions && message.reactions.length > 0) {
+        const counts = {};
+        message.reactions.forEach(reaction => {
+            counts[reaction.emoji] = (counts[reaction.emoji] || 0) + 1;
+        });
+
+        Object.entries(counts).forEach(([emoji, count]) => {
+            const span = document.createElement("span");
+            span.className = "reaction-pill";
+            span.textContent = `${emoji} ${count}`;
+            reactionContainer.appendChild(span);
+        });
+    }
+
+    const triggerBtn = document.createElement("button");
+    triggerBtn.className = "reaction-trigger-btn";
+    triggerBtn.textContent = "➕";
+    triggerBtn.title = "Přidat reakci";
+
+    const popup = document.createElement("div");
+    popup.className = "reaction-popup";
+    popup.innerHTML = `
+        <button onclick="addReaction(${message.id}, '👍')">👍</button>
+        <button onclick="addReaction(${message.id}, '👎')">👎</button>
+        <button onclick="addReaction(${message.id}, '😂')">😂</button>
+        <button onclick="addReaction(${message.id}, '❤️')">❤️</button>
+        <button onclick="addReaction(${message.id}, '🔥')">🔥</button>
+        <button onclick="addReaction(${message.id}, '💩')">💩</button>
+        <button onclick="addReaction(${message.id}, '🎉')">🎉</button>
+    `;
+
+    triggerBtn.onclick = (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.reaction-popup').forEach(p => {
+            if (p !== popup) p.style.display = 'none';
+        });
+        popup.style.display = popup.style.display === 'flex' ? 'none' : 'flex';
+    };
+
+    reactionContainer.appendChild(triggerBtn);
+    reactionContainer.appendChild(popup);
+    div.appendChild(reactionContainer);
+
+    document.addEventListener('click', () => {
+        popup.style.display = 'none';
+    });
+
+    /* ČAS */
+    div.appendChild(time);
+
+    /* UPRAVIT + SMAZAT */
+    if (isMine) {
+        const actionsDiv = document.createElement("div");
+        actionsDiv.className = "message-actions";
+
+        const editBtn = document.createElement("button");
+        editBtn.className = "action-btn edit-btn";
+        editBtn.innerHTML = "✏️";
+        editBtn.title = "Upravit zprávu";
+        editBtn.onclick = () => editMessage(message.id, message.message);
+
+        const delBtn = document.createElement("button");
+        delBtn.className = "action-btn delete-btn";
+        delBtn.innerHTML = "🗑️";
+        delBtn.title = "Smazat zprávu";
+        delBtn.onclick = () => deleteMessage(message.id);
+
+        actionsDiv.appendChild(editBtn);
+        actionsDiv.appendChild(delBtn);
+        div.appendChild(actionsDiv);
+    }
+
+    const messagesContainer = document.getElementById("messages");
+    messagesContainer.appendChild(div);
+}
+
+
+/* ================================= */
+/* SCROLL LOGIKA */
+/* ================================= */
+
+function handleScroll() {
+    const messages = document.getElementById("messages");
+    const scrollBtn = document.getElementById("scrollDownBtn");
+    const isAtBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 100;
+
+    if (!isAtBottom) {
+        scrollBtn.style.display = "flex";
+    } else {
+        scrollBtn.style.display = "none";
+    }
+}
+
+function scrollToBottom() {
+    const messages = document.getElementById("messages");
+    messages.scrollTop = messages.scrollHeight;
+}
+
+
+/* ================================= */
+/* ÚPRAVA ZPRÁVY */
+/* ================================= */
+
+async function editMessage(messageId, oldText) {
+    const newText = prompt("Uprav svou zprávu:", oldText);
+    if (newText !== null && newText.trim() !== "" && newText !== oldText) {
+        const { error } = await supabaseClient
+            .from("messages")
+            .update({
+                message: newText.trim(),
+                is_edited: true
+            })
+            .eq("id", messageId);
+
+        if (error) {
+            alert("Chyba při úpravě zprávy: " + error.message);
+        }
+    }
+}
+
+
+/* ================================= */
+/* SMAZÁNÍ ZPRÁVY */
+/* ================================= */
+
+async function deleteMessage(messageId) {
+    if (!confirm("Opravdu chceš tuto zprávu smazat?")) {
+        return;
+    }
+    const { error } = await supabaseClient
+        .from("messages")
+        .delete()
+        .eq("id", messageId);
+
+    if (error) {
+        alert("Chyba při mazání zprávy: " + error.message);
+    }
+}
+
+
+/* ================================= */
+/* ODESLÁNÍ ZPRÁVY */
+/* ================================= */
+
+async function sendMessage() {
+    const input = document.getElementById("messageInput");
+    const text = input.value.trim();
+
+    if (!text) return;
+    if (!currentUser) return alert("Nejsi přihlášen.");
+
+    const nickname = document.getElementById("currentNickname").innerText;
+
+    const { error } = await supabaseClient
+        .from("messages")
+        .insert({
+            user_id: currentUser.id,
+            nickname,
+            message: text
+        });
+
+    if (error) {
+        return alert("Zprávu se nepodařilo odeslat: " + error.message);
+    }
+
+    input.value = "";
+    scrollToBottom();
+}
+
+
+/* ================================= */
+/* ODHLÁŠENÍ */
+/* ================================= */
+
+async function logout() {
+    if (chatInterval) {
+        clearInterval(chatInterval);
+        chatInterval = null;
+    }
+    if (presenceChannel) {
+        try {
+            await presenceChannel.untrack();
+            await supabaseClient.removeChannel(presenceChannel);
+        } catch(e) {}
+    }
+    if (messagesChannel) {
+        try {
+            await supabaseClient.removeChannel(messagesChannel);
+        } catch(e) {}
+    }
+    await supabaseClient.auth.signOut();
+    location.reload();
+}
+
+
+/* ================================= */
+/* PŘIDÁNÍ REAKCE */
+/* ================================= */
+
+async function addReaction(messageId, emoji) {
+    if (!currentUser) return;
+    const { error } = await supabaseClient
+        .from("reactions")
+        .insert({
+            message_id: messageId,
+            user_id: currentUser.id,
+            emoji: emoji
+        });
+
+    if (error) {
+        console.error("Chyba při reakci:", error);
+    } 
+}
+
+
+/* ================================= */
+/* KONTROLA SESSION */
+/* ================================= */
+
+async function checkSession() {
+    const hash = window.location.hash;
+    if (hash && hash.includes("type=recovery")) {
+        return;
+    }
+
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    if (session) {
+        currentUser = session.user;
+        await checkProfile();
+    } else {
+        if (roomAuthenticated) {
+            document.getElementById("loginBox").style.display = "block";
+        }
+    }
+}
+
+
+/* ================================= */
+/* VYHLEDÁVÁNÍ ZPRÁV */
+/* ================================= */
+
+let isSearching = false;
+
+async function executeSearch() {
+    const query = document.getElementById("searchInput").value.trim();
+    if (!query) {
+        clearSearch();
+        return;
+    }
+
+    isSearching = true;
+    document.getElementById("clearSearchBtn").style.display = "block";
+    document.getElementById("messages").innerHTML = "Hledám...";
+
+    const { data: messagesData, error: messagesError } = await supabaseClient
+        .from("messages")
+        .select("id, user_id, nickname, message, created_at, is_edited")
+        .ilike("message", `%${query}%`) 
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+    if (messagesError) {
+        document.getElementById("messages").innerText = "Chyba při hledání.";
+        return;
+    }
+
+    let profilesMap = {};
+    const { data: profilesData } = await supabaseClient
+        .from("profiles")
+        .select("id, color");
+    
+    if (profilesData) {
+        profilesData.forEach(p => { profilesMap[p.id] = p.color; });
+    }
+
+    let reactionsData = [];
+    if (messagesData && messagesData.length > 0) {
+        const messageIds = messagesData.map(msg => msg.id);
+        const { data: rxData } = await supabaseClient
+            .from("reactions")
+            .select("message_id, emoji, user_id")
+            .in("message_id", messageIds);
+        if (rxData) reactionsData = rxData;
+    }
+
+    messagesData.forEach(msg => {
+        msg.reactions = reactionsData.filter(rx => rx.message_id === msg.id);
+        msg.userColor = profilesMap[msg.user_id] || getAvatarColor(msg.nickname);
+    });
+
+    const messages = document.getElementById("messages");
+    messages.innerHTML = "";
+
+    if (messagesData && messagesData.length > 0) {
+        messagesData.reverse().forEach(message => {
+            addMessage(message, currentUser ? currentUser.id : null);
+        });
+    } else {
+        messages.innerHTML = "<div style='text-align:center; padding:20px; color: var(--time-color);'>Žádné zprávy nebyly nalezeny.</div>";
+    }
+    messages.scrollTop = messages.scrollHeight;
+}
+
+function clearSearch() {
+    isSearching = false;
+    document.getElementById("searchInput").value = "";
+    document.getElementById("clearSearchBtn").style.display = "none";
+    loadMessages();
+}
+
+checkSession();
+
 </script>
+
 </body>
 </html>
