@@ -261,22 +261,21 @@
             padding-left: 20px;
         }
 
-        /* Výchozí stav: Všechno kromě hesla je skryté */
+        /* Výchozí stav: po načtení se zobrazí přihlášení */
         #dashboardBox,
         #pollsBox,
         #infoBox,
         #profileBox,
-        #loginBox,
         #registerBox,
         #nicknameBox,
         #chat,
+        #pendingAccessBox,
         #resetPasswordBox,
         #updatePasswordBox {
             display: none;
         }
 
-        /* Heslo je viditelné jako první */
-        #chatPasswordBox {
+        #loginBox {
             display: block;
         }
 
@@ -667,6 +666,16 @@
             transform: scale(1.2);
         }
 
+        .message-link {
+            color: #0066cc;
+            text-decoration: underline;
+            overflow-wrap: anywhere;
+        }
+
+        body.dark-mode .message-link {
+            color: #93c5fd;
+        }
+
         .error { color: #b00020; }
         .success { color: green; }
         .info { color: #555; }
@@ -708,43 +717,7 @@
 
 <body>
 
-<!-- MÍSTNOST HESLO (ZOBRAZENO JAKO PRVNÍ) -->
-<div class="box" id="chatPasswordBox">
-    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
-    <h1>🔒 Krsmol 2027</h1>
-
-    <p>Pro vstup do systému musíš zadat přístupové heslo.</p>
-
-    <div class="password-wrapper">
-        <input
-            id="roomPasswordInput"
-            type="password"
-            placeholder="Heslo místnosti"
-            onkeydown="if(event.key === 'Enter') verifyRoomPassword()"
-        >
-
-        <button
-            type="button"
-            class="toggle-password-btn"
-            onclick="togglePasswordVisibility('roomPasswordInput', this)"
-        >
-            <svg class="eye-open" viewBox="0 0 24 24">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                <circle cx="12" cy="12" r="3"/>
-            </svg>
-
-            <svg class="eye-closed" viewBox="0 0 24 24" style="display:none;">
-                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                <line x1="1" y1="1" x2="23" y2="23"/>
-            </svg>
-        </button>
-    </div>
-
-    <button onclick="verifyRoomPassword()">Odemknout</button>
-    <p id="roomPasswordMessage"></p>
-</div>
-
-<!-- ROZCESTNÍK (Nové menu po zadání hesla) -->
+<!-- ROZCESTNÍK -->
 <div class="box" id="dashboardBox">
     <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
     <h1>🏠 Rozcestník</h1>
@@ -755,8 +728,18 @@
         <button class="secondary" onclick="openInfo()">ℹ️ Informace o chatě(Připravuje se)</button>
         <button class="poll-btn" onclick="openPolls()">📊 Ankety (Připravuje se)</button>
         <button class="secondary" onclick="showProfileSettings()">⚙️ Nastavení profilu</button>
-        <button class="secondary" onclick="backToRoomPassword()">🚪 Zamknout a odejít</button>
+        <button class="logout" onclick="logout()">🚪 Odhlásit</button>
     </div>
+</div>
+
+<!-- ČEKÁNÍ NA SCHVÁLENÍ -->
+<div class="box" id="pendingAccessBox">
+    <button class="theme-btn" onclick="toggleDarkMode()">🌙</button>
+    <h1>⏳ Čeká na schválení</h1>
+    <p>Účet je vytvořený, ale zatím nemá přístup do soukromého chatu.</p>
+    <p>Požádej správce chaty o schválení účtu a potom stránku znovu načti.</p>
+    <button class="secondary" onclick="checkSession()">Zkontrolovat znovu</button>
+    <button class="logout" onclick="logout()">Odhlásit</button>
 </div>
 
     
@@ -884,7 +867,6 @@
     <button class="secondary" onclick="showRegister()">Vytvořit nový účet</button>
     <!-- NOVÉ TLAČÍTKO: Zapomenuté heslo -->
     <button class="secondary" style="margin-top:10px;" onclick="showResetPassword()">Zapomenuté heslo?</button>
-    <button class="logout logout-small" style="width:100%; margin-top:10px;" onclick="showDashboard()">⬅️ Zpět do menu</button>
     <p id="loginMessage"></p>
 </div>
 
@@ -1129,12 +1111,34 @@ function getAvatarColor(name) {
     return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
-function linkify(text) {
-    const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+function appendMessageText(container, value) {
+    const text = String(value || "");
+    const urlRegex = /\bhttps?:\/\/[^\s<>"']+/gi;
+    let cursor = 0;
 
-    return text.replace(urlRegex, (url) =>
-        `<a href="${url}" target="_blank" style="color: #0066cc; text-decoration: underline;">${url}</a>`
-    );
+    for (const match of text.matchAll(urlRegex)) {
+        const url = match[0];
+        const index = match.index || 0;
+
+        container.appendChild(document.createTextNode(text.slice(cursor, index)));
+
+        try {
+            const parsedUrl = new URL(url);
+            const link = document.createElement("a");
+            link.href = parsedUrl.href;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.className = "message-link";
+            link.textContent = url;
+            container.appendChild(link);
+        } catch {
+            container.appendChild(document.createTextNode(url));
+        }
+
+        cursor = index + url.length;
+    }
+
+    container.appendChild(document.createTextNode(text.slice(cursor)));
 }
 
 function updateThemeButtons() {
@@ -1191,6 +1195,12 @@ function insertEmoji(emoji) {
 
     document.getElementById("emojiPicker").style.display = "none";
 }
+
+document.addEventListener("click", () => {
+    document.querySelectorAll(".reaction-popup").forEach(popup => {
+        popup.style.display = "none";
+    });
+});
 
 if ("Notification" in window && Notification.permission === "default") {
     Notification.requestPermission();
@@ -1356,14 +1366,13 @@ async function triggerNotification(nickname, text) {
 const SUPABASE_URL = "https://jdvyfigrazambxtnqpkq.supabase.co";
 const SUPABASE_KEY = "sb_publishable_YKO_HGnM6so7hNtg_naIeQ_cYX40nxJ";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const CHAT_PASSWORD = "Krsmol2027";
 
 let presenceChannel = null;
 let messagesChannel = null;
 let currentUser = null;
 let currentNickname = null;
-let chatInterval = null;
-let roomAuthenticated = false;
+let hasChatAccess = false;
+let refreshTimeout = null;
 
 // Proměnné pro sledování nových zpráv a spouštění notifikací
 let knownMessageIds = new Set();
@@ -1383,23 +1392,8 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 
 
 /* ================================= */
-/* HESLO MÍSTNOSTI A MENU LOGIKA */
+/* MENU LOGIKA */
 /* ================================= */
-
-function verifyRoomPassword() {
-    const input = document.getElementById("roomPasswordInput").value;
-    const msg = document.getElementById("roomPasswordMessage");
-
-    if (input === CHAT_PASSWORD) {
-        roomAuthenticated = true;
-        document.getElementById("roomPasswordMessage").innerText = "";
-        document.getElementById("roomPasswordInput").value = "";
-        showDashboard();
-    } else {
-        msg.innerText = "❌ Nesprávné heslo.";
-        msg.className = "error";
-    }
-}
 
 function showDashboard() {
     document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
@@ -1508,29 +1502,17 @@ async function saveProfileSettings() {
     }, 1500);
 }
 
-function backToRoomPassword() {
-    roomAuthenticated = false;
-    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
-    document.getElementById("chatPasswordBox").style.display = "block";
-}
-
 function enterChatFlow() {
-    document.getElementById("dashboardBox").style.display = "none";
-    checkSession();
+    if (!currentUser || !currentNickname || !hasChatAccess) {
+        checkSession();
+        return;
+    }
+
+    openChat(currentNickname);
 }
 
-function backToDashboardFromChat() {
-    if (chatInterval) {
-        clearInterval(chatInterval);
-        chatInterval = null;
-    }
-    
-    if (presenceChannel) {
-        try {
-            presenceChannel.untrack();
-        } catch(e) {}
-    }
-
+async function backToDashboardFromChat() {
+    await stopChatSubscriptions();
     document.getElementById("chat").style.display = "none";
     showDashboard();
 }
@@ -1669,7 +1651,7 @@ async function register() {
     if (data.session) {
         message.innerText = "✅ Účet vytvořen.";
         message.className = "success";
-        await checkProfile();
+        await completeLoginFlow();
         return;
     }
 
@@ -1704,7 +1686,7 @@ async function login() {
         return;
     }
 
-    await checkProfile();
+    await completeLoginFlow();
 }
 
 
@@ -1712,9 +1694,46 @@ async function login() {
 /* PROFIL */
 /* ================================= */
 
+async function completeLoginFlow() {
+    const profileReady = await checkProfile();
+    if (!profileReady) return;
+
+    hasChatAccess = await checkMembership();
+    if (hasChatAccess) {
+        showDashboard();
+    } else {
+        showPendingAccess();
+    }
+}
+
+async function checkMembership() {
+    if (!currentUser) return false;
+
+    const { data, error } = await supabaseClient
+        .from("chat_members")
+        .select("user_id")
+        .eq("user_id", currentUser.id)
+        .maybeSingle();
+
+    if (error) {
+        console.error("Chyba při kontrole přístupu:", error);
+        return false;
+    }
+
+    return Boolean(data);
+}
+
+function showPendingAccess() {
+    document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
+    document.getElementById("pendingAccessBox").style.display = "block";
+}
+
 async function checkProfile() {
     const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) return;
+    if (!user) {
+        showLogin();
+        return false;
+    }
 
     currentUser = user;
 
@@ -1728,7 +1747,8 @@ async function checkProfile() {
     document.getElementById("registerBox").style.display = "none";
 
     if (profile) {
-        return openChat(profile.nickname);
+        currentNickname = profile.nickname;
+        return true;
     }
 
     const savedNickname = user.user_metadata?.nickname;
@@ -1744,11 +1764,13 @@ async function checkProfile() {
             .single();
 
         if (newProfile) {
-            return openChat(newProfile.nickname);
+            currentNickname = newProfile.nickname;
+            return true;
         }
     }
 
     document.getElementById("nicknameBox").style.display = "block";
+    return false;
 }
 
 
@@ -1784,7 +1806,8 @@ async function saveNickname() {
         return;
     }
 
-    openChat(data.nickname);
+    currentNickname = data.nickname;
+    await completeLoginFlow();
 }
 
 
@@ -1793,6 +1816,11 @@ async function saveNickname() {
 /* ================================= */
 
 async function openChat(nickname) {
+    if (!currentUser || !hasChatAccess) {
+        showPendingAccess();
+        return;
+    }
+
     document.querySelectorAll('.box').forEach(el => el.style.display = 'none');
     document.getElementById("chat").style.display = "block";
 
@@ -1805,14 +1833,7 @@ async function openChat(nickname) {
     await loadMessages();
     await loadUsers();
     await startPresence();
-
-    if (chatInterval) clearInterval(chatInterval);
-
-    chatInterval = setInterval(() => {
-        if (!isSearching) {
-            loadMessages();
-        }
-    }, 3000);
+    await startMessagesRealtime();
 }
 
 
@@ -1954,6 +1975,63 @@ function handleTyping() {
     }
 }
 
+function scheduleMessagesRefresh() {
+    if (isSearching) return;
+
+    clearTimeout(refreshTimeout);
+    refreshTimeout = setTimeout(() => {
+        loadMessages();
+    }, 150);
+}
+
+async function startMessagesRealtime() {
+    if (messagesChannel) {
+        await supabaseClient.removeChannel(messagesChannel);
+    }
+
+    messagesChannel = supabaseClient
+        .channel(`chat-db-${currentUser.id}`)
+        .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "messages" },
+            scheduleMessagesRefresh
+        )
+        .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "reactions" },
+            scheduleMessagesRefresh
+        )
+        .subscribe(status => {
+            if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+                console.error("Realtime spojení se nepodařilo navázat.");
+            }
+        });
+}
+
+async function stopChatSubscriptions() {
+    clearTimeout(refreshTimeout);
+    refreshTimeout = null;
+
+    if (presenceChannel) {
+        try {
+            await presenceChannel.untrack();
+            await supabaseClient.removeChannel(presenceChannel);
+        } catch (error) {
+            console.error("Nepodařilo se ukončit presence kanál:", error);
+        }
+        presenceChannel = null;
+    }
+
+    if (messagesChannel) {
+        try {
+            await supabaseClient.removeChannel(messagesChannel);
+        } catch (error) {
+            console.error("Nepodařilo se ukončit realtime kanál:", error);
+        }
+        messagesChannel = null;
+    }
+}
+
 
 /* ================================= */
 /* NAČTENÍ ZPRÁV + REAKCÍ + NOTIFIKACE */
@@ -2064,7 +2142,7 @@ function addMessage(message, currentUserId) {
     /* TEXT */
     const text = document.createElement("span");
     text.className = "text";
-    text.innerHTML = linkify(message.message);
+    appendMessageText(text, message.message);
 
     /* ČAS */
     const time = document.createElement("span");
@@ -2077,7 +2155,10 @@ function addMessage(message, currentUserId) {
         }) : "čas neznámý";
 
     if (message.is_edited) {
-        time.innerHTML += ' <span class="edited-label">(upraveno)</span>';
+        const editedLabel = document.createElement("span");
+        editedLabel.className = "edited-label";
+        editedLabel.textContent = " (upraveno)";
+        time.appendChild(editedLabel);
     }
 
     div.appendChild(nickWrapper);
@@ -2108,15 +2189,17 @@ function addMessage(message, currentUserId) {
 
     const popup = document.createElement("div");
     popup.className = "reaction-popup";
-    popup.innerHTML = `
-        <button onclick="addReaction(${message.id}, '👍')">👍</button>
-        <button onclick="addReaction(${message.id}, '👎')">👎</button>
-        <button onclick="addReaction(${message.id}, '😂')">😂</button>
-        <button onclick="addReaction(${message.id}, '❤️')">❤️</button>
-        <button onclick="addReaction(${message.id}, '🔥')">🔥</button>
-        <button onclick="addReaction(${message.id}, '💩')">💩</button>
-        <button onclick="addReaction(${message.id}, '🎉')">🎉</button>
-    `;
+    ["👍", "👎", "😂", "❤️", "🔥", "💩", "🎉"].forEach(emoji => {
+        const reactionButton = document.createElement("button");
+        reactionButton.type = "button";
+        reactionButton.textContent = emoji;
+        reactionButton.onclick = async event => {
+            event.stopPropagation();
+            popup.style.display = "none";
+            await addReaction(message.id, emoji);
+        };
+        popup.appendChild(reactionButton);
+    });
 
     triggerBtn.onclick = (e) => {
         e.stopPropagation();
@@ -2130,10 +2213,6 @@ function addMessage(message, currentUserId) {
     reactionContainer.appendChild(popup);
     div.appendChild(reactionContainer);
 
-    document.addEventListener('click', () => {
-        popup.style.display = 'none';
-    });
-
     /* ČAS */
     div.appendChild(time);
 
@@ -2144,13 +2223,13 @@ function addMessage(message, currentUserId) {
 
         const editBtn = document.createElement("button");
         editBtn.className = "action-btn edit-btn";
-        editBtn.innerHTML = "✏️";
+        editBtn.textContent = "✏️";
         editBtn.title = "Upravit zprávu";
         editBtn.onclick = () => editMessage(message.id, message.message);
 
         const delBtn = document.createElement("button");
         delBtn.className = "action-btn delete-btn";
-        delBtn.innerHTML = "🗑️";
+        delBtn.textContent = "🗑️";
         delBtn.title = "Smazat zprávu";
         delBtn.onclick = () => deleteMessage(message.id);
 
@@ -2238,13 +2317,9 @@ async function sendMessage() {
     if (!text) return;
     if (!currentUser) return alert("Nejsi přihlášen.");
 
-    const nickname = document.getElementById("currentNickname").innerText;
-
     const { error } = await supabaseClient
         .from("messages")
         .insert({
-            user_id: currentUser.id,
-            nickname,
             message: text
         });
 
@@ -2253,7 +2328,7 @@ async function sendMessage() {
     }
 
     input.value = "";
-    scrollToBottom();
+    scheduleMessagesRefresh();
 }
 
 
@@ -2262,21 +2337,7 @@ async function sendMessage() {
 /* ================================= */
 
 async function logout() {
-    if (chatInterval) {
-        clearInterval(chatInterval);
-        chatInterval = null;
-    }
-    if (presenceChannel) {
-        try {
-            await presenceChannel.untrack();
-            await supabaseClient.removeChannel(presenceChannel);
-        } catch(e) {}
-    }
-    if (messagesChannel) {
-        try {
-            await supabaseClient.removeChannel(messagesChannel);
-        } catch(e) {}
-    }
+    await stopChatSubscriptions();
     await supabaseClient.auth.signOut();
     location.reload();
 }
@@ -2288,17 +2349,32 @@ async function logout() {
 
 async function addReaction(messageId, emoji) {
     if (!currentUser) return;
-    const { error } = await supabaseClient
+
+    const { data: existingReaction, error: lookupError } = await supabaseClient
         .from("reactions")
-        .insert({
-            message_id: messageId,
-            user_id: currentUser.id,
-            emoji: emoji
-        });
+        .select("id")
+        .eq("message_id", messageId)
+        .eq("user_id", currentUser.id)
+        .eq("emoji", emoji)
+        .maybeSingle();
+
+    if (lookupError) {
+        console.error("Chyba při kontrole reakce:", lookupError);
+        return;
+    }
+
+    const operation = existingReaction
+        ? supabaseClient.from("reactions").delete().eq("id", existingReaction.id)
+        : supabaseClient.from("reactions").insert({ message_id: messageId, emoji });
+
+    const { error } = await operation;
 
     if (error) {
         console.error("Chyba při reakci:", error);
-    } 
+        return;
+    }
+
+    scheduleMessagesRefresh();
 }
 
 
@@ -2316,11 +2392,12 @@ async function checkSession() {
 
     if (session) {
         currentUser = session.user;
-        await checkProfile();
+        await completeLoginFlow();
     } else {
-        if (roomAuthenticated) {
-            document.getElementById("loginBox").style.display = "block";
-        }
+        currentUser = null;
+        currentNickname = null;
+        hasChatAccess = false;
+        showLogin();
     }
 }
 
